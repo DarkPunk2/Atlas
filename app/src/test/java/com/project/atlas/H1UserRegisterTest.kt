@@ -18,6 +18,8 @@ class H1UserRegisterTest {
     fun setUp(){
         user = AuthService()
     }
+    @AfterEach
+    fun
 
     @Test
     fun acceptationTest_1() {
@@ -27,7 +29,6 @@ class H1UserRegisterTest {
         val email = "usuario@gmail.com"
         val pass = "Contraseñavalida@13"    //Debe contener una mayuscula,
                                             // una minuscula un special char y un número
-
         //UserInterface
 
         user.createUser(email, pass)
@@ -36,7 +37,7 @@ class H1UserRegisterTest {
 
     }
 
-    @Test
+    @Test(expected=UserAlreadyExistException::class)
     fun acceptationTest_2() {
         //Given
         UserModel.eMail = "usuario@gmail.com"
@@ -44,14 +45,11 @@ class H1UserRegisterTest {
         val email = "usuario@gmail.com"
         val pass = "Contraseñavalida@13"    //Debe contener una mayuscula,
                                             // una minuscula un special char y un número
-
+        user.createUser(email, pass)
         //Then
-        assertThrows(UserAlreadyExistException::class.java) {
-            user.createUser(email, pass)
-        }
-
 
     }
+
 
 
 
