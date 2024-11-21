@@ -16,7 +16,7 @@ class H11VehicleAddTest {
     @BeforeEach
     fun setUp(){
         dbService = VehicleDatabaseService();
-        service = VehicleService();
+        service = VehicleService(dbService);
     }
 
     @Test
@@ -32,7 +32,6 @@ class H11VehicleAddTest {
         assertTrue(service.checkEntry("test@gmail.com",vehicle))
     }
 
-    //{"Nombre: Mi coche, Tipo: null, Energía: Gasolina 95, Consumo: 7.9 l/100Km"}
     @Test(expected = vehicleWrongBusinessRulesException::class)
     fun acceptanceTest3(){
         val vehicle = VehicleModel("Mi coche",null, Petrol95(), 7.9)
