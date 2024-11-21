@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.project.atlas"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.project.atlas"
