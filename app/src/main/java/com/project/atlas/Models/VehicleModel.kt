@@ -1,9 +1,9 @@
 package com.project.atlas.Models
-import com.project.atlas.interfaces.EnergyType
+import com.project.atlas.Interfaces.EnergyType
 
-DataClass VehicleModel (
-    alias:String,
-    type:Double,
-    energyType: EnergyType,
-    consumption:Double
+data class VehicleModel(
+    val alias:String?,
+    val type: String?,
+    val energyType: EnergyType?,
+    val consumption:Double?
 )

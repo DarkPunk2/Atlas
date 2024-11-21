@@ -18,8 +18,6 @@ class H1UserRegisterTest {
     fun setUp(){
         user = AuthService()
     }
-    @AfterEach
-    fun
 
     @Test
     fun acceptationTest_1() {
