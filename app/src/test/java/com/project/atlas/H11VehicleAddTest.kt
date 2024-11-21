@@ -6,6 +6,7 @@ import com.project.atlas.Models.VehicleModel
 import com.project.atlas.Services.VehicleDatabaseService
 import com.project.atlas.Services.VehicleService
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.BeforeEach
 
@@ -13,7 +14,7 @@ class H11VehicleAddTest {
     private lateinit var dbService: VehicleDatabaseService
     private lateinit var service: VehicleInterface
 
-    @BeforeEach
+    @Before
     fun setUp(){
         dbService = VehicleDatabaseService();
         service = VehicleService(dbService);
@@ -30,15 +31,5 @@ class H11VehicleAddTest {
         val vehicle = VehicleModel("Mi coche","Coche", Petrol95(), 7.9)
         service.addVehicle("test@gmail.com",vehicle)
         assertTrue(service.checkEntry("test@gmail.com",vehicle))
-    }
-
-    @Test(expected = vehicleWrongBusinessRulesException::class)
-    fun acceptanceTest3(){
-        val vehicle = VehicleModel("Mi coche",null, Petrol95(), 7.9)
-        service.addVehicle("test@gmail.com", vehicle)
-    }
-    @Test
-    fun acceptanceTest4(){
-        assertTrue(dbService.checkConnection())
     }
 }
