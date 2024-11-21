@@ -1,19 +1,18 @@
-package com.project.atlas.Services;
+package com.project.atlas.Services
 
-import androidx.annotation.NonNull;
-import com.project.atlas.Interfaces.VehicleInterface;
-import com.project.atlas.Models.VehicleModel;
+import com.google.firebase.firestore.FirebaseFirestore
+import com.project.atlas.Interfaces.VehicleInterface
+import com.project.atlas.Models.VehicleModel
 
-public class VehicleDatabaseService implements VehicleInterface {
-    @Override
-    public boolean addVehicle(@NonNull String user, @NonNull VehicleModel vehicle){
-        return false;
+class VehicleDatabaseService : VehicleInterface {
+
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    override fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
+        return false
     }
-    public boolean checkConnection(){
-        return false;
-    }
-    @Override
-    public boolean checkEntry(@NonNull String user, @NonNull VehicleModel vehicle) {
-        return false;
+
+    override fun listVehicle(user: String): List<VehicleModel>? {
+        return null;
     }
 }
