@@ -2,23 +2,20 @@ package com.project.atlas
 
 import com.project.atlas.Models.Coordinates
 import com.project.atlas.Models.Location
-import com.project.atlas.Services.LocationRepository
 import com.project.atlas.ViewModels.LocationViewModel
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.Before
+import org.junit.Test
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 
 class H7AddLocationTest {
 
-    private lateinit var locManager: LocationViewModel
-    private lateinit var locRepository: LocationRepository
+    private lateinit var locationViewModel: LocationViewModel
 
-    @BeforeEach
+    @Before
     fun startup(){
-        locManager = LocationViewModel()
-        locRepository = LocationRepository()
+        locationViewModel = LocationViewModel()
     }
 
     @Test
@@ -27,13 +24,13 @@ class H7AddLocationTest {
 
 
         //When
-        val coord: Coordinates = Coordinates(45.0, 25.0)
-        val location: Location = Location(coord, "Parque")
-        locManager.addLocation(location);
+        val coord = Coordinates(45.0, 25.0)
+        val location = Location(coord, "Parque")
+        locationViewModel.addLocation(location)
 
         //Then
-        assertEquals(locRepository.getNumLocations(), 1)
-        assertEquals(locRepository.getLocation(0), location)
+        assertEquals(locationViewModel.getNumLocations(), 1)
+        assertEquals(locationViewModel.getLocation(0), location)
     }
 
     @Test
@@ -41,10 +38,12 @@ class H7AddLocationTest {
         //Given
 
         //When
-        val coord: Coordinates = Coordinates(45.0, 25.0)
-        val location: Location = Location(coord, "")
+        val coord = Coordinates(45.0, 25.0)
+        val location = Location(coord, "")
 
         //Then
-        assertThrows<IllegalArgumentException> { locManager.addLocation(location) }
+        assertThrows(IllegalArgumentException::class.java) {
+            locationViewModel.addLocation(location)
+        }
     }
 }
