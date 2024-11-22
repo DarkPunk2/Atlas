@@ -17,13 +17,13 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class H2UserLoginTest {
     private lateinit var user: UserInterface
-    private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseUser: FirebaseUser
-
 
     @Before
     fun userSetup(){
         user = AuthService()
+        firebaseAuth  = FirebaseAuth.getInstance()
         firebaseAuth.createUserWithEmailAndPassword("usuario@gmail.com","contraseñaValida@13")
             .addOnCompleteListener {
                 if (it.isSuccessful) {
@@ -66,5 +66,4 @@ class H2UserLoginTest {
     fun deleteUser(){
         firebaseUser.delete()
     }
-
 }
