@@ -2,12 +2,13 @@ package com.project.atlas
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.project.atlas.Exceptions.IncorrectEmailException
 import com.project.atlas.Exceptions.IncorrectPasswordException
 import com.project.atlas.Interfaces.UserInterface
 import com.project.atlas.Models.UserModel
 import com.project.atlas.Services.AuthService
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -18,19 +19,21 @@ import org.junit.runner.RunWith
 class H2UserLoginTest {
     private lateinit var user: UserInterface
     private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var firebaseUser: FirebaseUser
+
 
     @Before
-    fun userSetup(){
+    fun userSetup() = runBlocking {
         user = AuthService()
-        firebaseAuth  = FirebaseAuth.getInstance()
-        firebaseAuth.createUserWithEmailAndPassword("usuario@gmail.com","contraseñaValida@13")
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    firebaseUser = firebaseAuth.currentUser!!
-                }
-            }
+        firebaseAuth = FirebaseAuth.getInstance()
+
+        try {
+            val authResult = firebaseAuth.createUserWithEmailAndPassword("usuario@gmail.com", "contraseñaValida@13").await()
+        } catch (e: Exception) {
+            // Handle the exception if necessary
+            println("Error creating user: ${e.message}")
+        }
     }
+
     @Test
     fun h2P1Test(){
         //Given
@@ -64,6 +67,6 @@ class H2UserLoginTest {
     }
     @After
     fun deleteUser(){
-        firebaseUser.delete()
+        firebaseAuth.currentUser?.delete()
     }
 }

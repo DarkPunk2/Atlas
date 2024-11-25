@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.gms.google-services") version "4.4.2" apply false
-
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.project.atlas"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.project.atlas"
@@ -83,6 +82,5 @@ dependencies {
     implementation(libs.osm.android.compose)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
-
-
+    implementation(platform(libs.firebase.bom.v3360))
 }
