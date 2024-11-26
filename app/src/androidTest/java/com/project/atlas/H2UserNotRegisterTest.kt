@@ -16,7 +16,7 @@ class H2UserNotRegisterTest {
         val email = "usuario@gmail.com"
         val pass = "Contraseñavalida@13"
 
-        user.createUser(email, pass)
+        user.loginUser(email, pass)
         //Then
 
     }
