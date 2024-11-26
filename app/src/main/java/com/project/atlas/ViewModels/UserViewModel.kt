@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.project.atlas.Exceptions.IncorrectEmailException
 import com.project.atlas.Exceptions.IncorrectPasswordException
+import com.project.atlas.Exceptions.UserAlreadyExistException
 import com.project.atlas.Exceptions.UserNotFoundException
 import com.project.atlas.Interfaces.UserInterface
 import com.project.atlas.Models.AuthState
@@ -37,7 +38,26 @@ class UserViewModel: ViewModel() {
         } catch (noUser: UserNotFoundException){
             _authState.value = AuthState.Error(noUser.message.toString())
         }
-
     }
+
+    fun createUser(email: String, password: String) {
+        //authentication is loading
+        _authState.value = AuthState.Loading
+
+        //Attempt to log in the user
+        try {
+            authService.createUser(email, password)
+            _authState.value = UserModel.getAuthState()
+        } catch (inPass: IncorrectPasswordException){
+            _authState.value = AuthState.Error(inPass.message.toString())
+        } catch (inMail: IncorrectEmailException){
+            _authState.value = AuthState.Error(inMail.message.toString())
+        } catch (noUser: UserNotFoundException){
+            _authState.value = AuthState.Error(noUser.message.toString())
+        } catch (alreadyUser: UserAlreadyExistException){
+            _authState.value = AuthState.Error(alreadyUser.message.toString())
+        }
+    }
+
 
 }

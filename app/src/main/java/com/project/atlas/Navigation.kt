@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.project.atlas.ViewModels.UserViewModel
 import com.project.atlas.views.LoginPage
+import com.project.atlas.views.SignUpPage
 
 @Composable
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
@@ -16,6 +17,11 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
         composable("login"){
             LoginPage(modifier, navController, userViewModel)
         }
+        composable("signup"){
+            SignUpPage(modifier, navController, userViewModel)
+        }
 
     })
+
+
 }
