@@ -11,6 +11,7 @@ import com.project.atlas.Exceptions.UserNotFoundException
 import com.project.atlas.Interfaces.UserInterface
 import com.project.atlas.Models.AuthState
 import com.project.atlas.Models.UserModel
+import java.util.concurrent.CountDownLatch
 
 class AuthService : UserInterface {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -67,16 +68,23 @@ class AuthService : UserInterface {
         if (!password.matches(regex)){
             throw IncorrectPasswordException("Password is not valid")
         }
+        UserModel.setAuthState(AuthState.Loading)
 
+        val latch = CountDownLatch(1)
+        var exception: Exception? = null
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener{ task ->
                 if (task.isSuccessful){
                     UserModel.setMail(email)
                     UserModel.setAuthState(AuthState.Authenticated)
                 }else{
-                    throw UserNotFoundException(task.exception?.message.toString())
+                    UserModel.setAuthState(AuthState.Unauthenticated)
+                    exception = UserNotFoundException(task.exception?.message ?: "User not found")
                 }
+                latch.countDown()
             }
+        latch.await()
+        exception?.let { throw it }
     }
 }
 

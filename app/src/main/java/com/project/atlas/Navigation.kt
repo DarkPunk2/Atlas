@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.project.atlas.ViewModels.UserViewModel
+import com.project.atlas.views.HomePage
 import com.project.atlas.views.LoginPage
 import com.project.atlas.views.SignUpPage
 
@@ -20,8 +21,9 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
         composable("signup"){
             SignUpPage(modifier, navController, userViewModel)
         }
+        composable("home"){
+            HomePage(modifier, navController)
+        }
 
     })
-
-
 }

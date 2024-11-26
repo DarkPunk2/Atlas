@@ -43,6 +43,7 @@ class H2UserLoginTest {
         val password = "contraseñaValida@13"
         user.loginUser(email,password)
         //Then
+
         assertEquals(email, UserModel.eMail)
     }
     @Test(expected= IncorrectPasswordException::class)
