@@ -36,11 +36,15 @@ class H11VehicleAddTest {
         //Given - lista no vacía
         val vehicle = VehicleModel("Mi buga","Coche", Petrol95(), 7.9)
         service.addVehicle("testVehicleAdd",vehicle)
+        var initial_size = service.listVehicle("testVehicleAdd")!!.size
+        assertTrue(initial_size > 0)
         //When - se quiere añadir este vehículo
         val vehicleReapeted = VehicleModel("Mi buga","Coche", Petrol95(), 7.9)
         service.addVehicle("testVehicleAdd",vehicleReapeted)
         //Then - el vehículo no se añade
         val list: List<VehicleModel>? = service.listVehicle("testVehicleAdd")
-        assertEquals(list!!.get(-1), vehicleReapeted)
+        var final_size = list!!.size
+        assertEquals(initial_size, final_size)
+        assertEquals(list.first().alias, vehicleReapeted.alias)
     }
 }
