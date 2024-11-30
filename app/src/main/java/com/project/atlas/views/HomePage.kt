@@ -53,9 +53,10 @@ fun HomePage(modifier: Modifier = Modifier,navController: NavController ) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.atlaslogo),
+            //painter = painterResource(id = R.drawable.atlaslogo),
+            painter = painterResource(id = R.drawable.atlas_t),
             contentDescription = "Logo",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(200.dp)
         )
         Spacer(modifier = Modifier.height(15.dp))
         Text(
