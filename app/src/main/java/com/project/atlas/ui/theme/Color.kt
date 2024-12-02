@@ -10,5 +10,5 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-val AtlasGreen = Color(0xFF1cd51e)
-val AtlasDarker = Color(0xFF2b790e)
+val AtlasGreen = Color(0xFF00FF66)
+val AtlasDarker = Color(0xFF02B44A)
