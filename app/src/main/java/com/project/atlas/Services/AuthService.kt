@@ -1,8 +1,12 @@
 package com.project.atlas.Services
 
+import android.util.Log
+import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.project.atlas.Exceptions.IncorrectEmailException
 import com.project.atlas.Exceptions.IncorrectPasswordException
+import com.project.atlas.Exceptions.UserAlreadyExistException
 import com.project.atlas.Exceptions.UserNotFoundException
 import com.project.atlas.Interfaces.UserInterface
 import com.project.atlas.Models.AuthState
@@ -14,9 +18,36 @@ import kotlin.coroutines.suspendCoroutine
 
 class AuthService : UserInterface {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private var exception: Exception? = null
 
-    override fun createUser(eMail: String, pass: String) {
-        // Implementación aquí
+    override suspend fun createUser(email: String, password: String) {
+        if (email.isEmpty() || password.isEmpty()) {
+            throw IncorrectEmailException("Email can't be empty")
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            throw IncorrectEmailException("Email is not valid")
+        }
+        val regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$".toRegex()
+        if (!password.matches(regex)) {
+            throw IncorrectPasswordException("Password is not valid")
+        }
+
+        return suspendCoroutine { continuation ->
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        UserModel.setMail(email)
+                        UserModel.setAuthState(AuthState.Authenticated)
+                        continuation.resume(Unit)
+                    } else {
+                        val exception = when (task.exception) {
+                            is FirebaseAuthUserCollisionException -> UserAlreadyExistException("User already exists")
+                            else -> Exception(task.exception?.message ?: "Unknown error")
+                        }
+                        continuation.resumeWithException(exception)
+                    }
+                }
+        }
     }
 
     override suspend fun loginUser(email: String, password: String) {

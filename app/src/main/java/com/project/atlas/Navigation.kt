@@ -9,6 +9,7 @@ import com.project.atlas.ViewModels.UserViewModel
 import com.project.atlas.views.HomePage
 import com.project.atlas.views.LoginPage
 import com.project.atlas.views.MapPage
+import com.project.atlas.views.SignUpPage
 
 @Composable
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
@@ -23,6 +24,9 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
         }
         composable("map"){
             MapPage(modifier, navController)
+        }
+        composable("signup"){
+            SignUpPage(modifier, navController, userViewModel)
         }
 
     })
