@@ -25,7 +25,7 @@ class H1UserRegisterTest {
     }
 
     @Test
-    fun acceptationTest_1() {
+    suspend fun acceptationTest_1() {
         //Given
 
         //When
@@ -41,7 +41,7 @@ class H1UserRegisterTest {
     }
 
     @Test(expected=UserAlreadyExistException::class)
-    fun acceptationTest_2() {
+    suspend fun acceptationTest_2() {
         //Given
         //Añade al usuario a Firebase
         user = AuthService()
