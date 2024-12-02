@@ -5,7 +5,6 @@ import Petrol98
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 
 import com.project.atlas.Interfaces.EnergyType
 import com.project.atlas.Interfaces.Petrol95
@@ -13,15 +12,17 @@ import com.project.atlas.Interfaces.VehicleInterface
 
 import com.project.atlas.Models.VehicleModel
 import java.util.concurrent.CountDownLatch
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class VehicleDatabaseService : VehicleInterface {
 
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-
-    override fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
-        var success = false
-        val latch = CountDownLatch(1)
-
+    private var usersCollection:String = "users"
+    fun setTestMode(){
+        usersCollection = "usersTest"
+    }
+    override suspend fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
         if (checkForDuplicates(user, vehicle)) {
             return false
         }
@@ -33,58 +34,39 @@ class VehicleDatabaseService : VehicleInterface {
             "consumption" to vehicle.consumption
         )
 
-        db.collection("users")
-            .document(user)
-            .collection("vehicles")
-            .document(vehicle.alias!!)
-            .set(dbVehicle)
-            .addOnSuccessListener {
-                success = true
-                latch.countDown()
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firebase", "Error adding vehicle: ${exception.message}")
-                latch.countDown()
-            }
-        latch.await()
-        return success
-    }
-
-
-    override fun listVehicle(user: String): List<VehicleModel>? {
-        val vehicleList = mutableListOf<VehicleModel>()
-        val latch = CountDownLatch(1) // Para bloquear hasta que Firebase complete la operación
-        var success = false
-
-        db.collection("users")
-            .document(user)
-            .collection("vehicles")
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    val vehicle = document.toVehicle()
-                    if (vehicle != null) {
-                        vehicleList.add(vehicle)
-                    }
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(user)
+                .collection("vehicles")
+                .document(vehicle.alias!!)
+                .set(dbVehicle)
+                .addOnSuccessListener {
+                    continuation.resume(true)
                 }
-                success = true
-                latch.countDown()
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firebase", "Error fetching vehicles: ${exception.message}")
-                latch.countDown() // Libera el bloqueo incluso si ocurre un error
-            }
-
-        latch.await()
-
-        return if (success) {
-            vehicleList
-        } else {
-            println("Error en la consulta")
-            emptyList()
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error adding vehicle: ${exception.message}")
+                    continuation.resume(false)
+                }
         }
     }
-
+    override suspend fun listVehicle(user: String): List<VehicleModel>? {
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(user)
+                .collection("vehicles")
+                .get()
+                .addOnSuccessListener { result ->
+                    val vehicleList = result.mapNotNull { document ->
+                        document.toVehicle()
+                    }
+                    continuation.resume(vehicleList)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error fetching vehicles: ${exception.message}")
+                    continuation.resume(emptyList())
+                }
+        }
+    }
 
     fun DocumentSnapshot.toVehicle(): VehicleModel {
         return VehicleModel(
@@ -93,6 +75,23 @@ class VehicleDatabaseService : VehicleInterface {
             energyType = stringToEnergyType(getString("energyType")),
             consumption = getDouble("consumption")
         )
+    }
+
+    private suspend fun checkForDuplicates(user: String, vehicle: VehicleModel): Boolean {
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(user)
+                .collection("vehicles")
+                .document(vehicle.alias!!)
+                .get()
+                .addOnSuccessListener { document ->
+                    continuation.resume(document.exists())
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error checking duplicates: ${exception.message}")
+                    continuation.resume(false)
+                }
+        }
     }
 
     private fun stringToEnergyType(value: String?): EnergyType? {
@@ -106,27 +105,6 @@ class VehicleDatabaseService : VehicleInterface {
 
     private fun energyTypeToString(energyType: EnergyType?): String? {
         return energyType?.typeName
-    }
-
-    private fun checkForDuplicates(user: String, vehicle: VehicleModel): Boolean {
-        var exists = false
-        val latch = CountDownLatch(1)
-
-        db.collection("users")
-            .document(user)
-            .collection("vehicles")
-            .document(vehicle.alias!!)
-            .get()
-            .addOnSuccessListener { document ->
-                exists = document.exists()
-                latch.countDown()
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firebase", "Error checking duplicates: ${exception.message}")
-                latch.countDown()
-            }
-        latch.await()
-        return exists
     }
 
 

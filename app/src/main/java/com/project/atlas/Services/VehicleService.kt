@@ -3,6 +3,7 @@ package com.project.atlas.Services;
 import Calories
 import Electricity
 import Petrol98
+import android.annotation.SuppressLint
 import com.project.atlas.Exceptions.VehicleWrongBusinessRulesException;
 import com.project.atlas.Interfaces.EnergyType
 import com.project.atlas.Interfaces.Petrol95
@@ -13,14 +14,15 @@ import com.project.atlas.Models.VehicleType
 
 class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInterface {
 
-    override fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
+    override suspend fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
         return dbService.addVehicle(user, vehicle)
     }
 
-    override fun listVehicle(user: String): List<VehicleModel>? {
+    override suspend fun listVehicle(user: String): List<VehicleModel>? {
         return dbService.listVehicle(user)
     }
 
+    @SuppressLint("SuspiciousIndentation")
     @Throws(VehicleWrongBusinessRulesException::class)
     fun checkBusinessRules(vehicle: VehicleModel): Boolean {
         if (checkAlias(vehicle.alias) && checkConsumption(vehicle.consumption) && checkTypeWithEnergyType(vehicle)){

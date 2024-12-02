@@ -4,6 +4,7 @@ import com.project.atlas.Interfaces.*
 import com.project.atlas.Models.VehicleModel
 import com.project.atlas.Services.VehicleService
 import com.project.atlas.Services.VehicleDatabaseService
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -16,23 +17,28 @@ class H11VehicleAddTest {
 
     @Before
     fun setUp(){
-        dbService = VehicleDatabaseService();
-        service = VehicleService(dbService);
+        dbService = VehicleDatabaseService()
+        dbService.setTestMode()
+        service = VehicleService(dbService)
     }
 
     @Test
-    fun acceptanceTest1(){
+    fun acceptanceTest1() {
         //Given - lista vacía
-        assertTrue(service.listVehicle("testVehicleAdd")!!.isEmpty())
+        runBlocking{
+            assertTrue(service.listVehicle("testVehicleAdd")!!.isEmpty())
+        }
         //When - se quiere añadir este vehículo
         val vehicle = VehicleModel("Mi coche","Coche", Petrol95(), 7.9)
         //Then - se intenta añadir el vehículo
+        runBlocking{
         assertTrue(service.addVehicle("testVehicleAdd",vehicle))
         assertFalse(service.listVehicle("testVehicleAdd")!!.isEmpty())
+        }
     }
 
     @Test
-    fun acceptanceTest2(){
+    fun acceptanceTest2() = runBlocking{
         //Given - lista no vacía
         val vehicle = VehicleModel("Mi buga","Coche", Petrol95(), 7.9)
         service.addVehicle("testVehicleAdd",vehicle)
