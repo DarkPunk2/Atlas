@@ -11,7 +11,10 @@ import com.project.atlas.Exceptions.UserNotFoundException
 import com.project.atlas.Interfaces.UserInterface
 import com.project.atlas.Models.AuthState
 import com.project.atlas.Models.UserModel
-import java.util.concurrent.CountDownLatch
+
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class AuthService : UserInterface {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -52,39 +55,36 @@ class AuthService : UserInterface {
 
     }
 
-    override fun loginUser(email: String, password: String) {
-        if (email.isEmpty()){
+    override suspend fun loginUser(email: String, password: String) {
+        if (email.isEmpty()) {
             throw IncorrectEmailException("Email can't be empty")
         }
-        if (password.isEmpty()){
-            throw IncorrectPasswordException("Email can't be empty")
+        if (password.isEmpty()) {
+            throw IncorrectPasswordException("Password can't be empty")
         }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             throw IncorrectEmailException("Email is not valid")
         }
-
         val regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$".toRegex()
-        if (!password.matches(regex)){
+        if (!password.matches(regex)) {
             throw IncorrectPasswordException("Password is not valid")
         }
-        UserModel.setAuthState(AuthState.Loading)
 
-        val latch = CountDownLatch(1)
-        var exception: Exception? = null
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener{ task ->
-                if (task.isSuccessful){
-                    UserModel.setMail(email)
-                    UserModel.setAuthState(AuthState.Authenticated)
-                }else{
-                    UserModel.setAuthState(AuthState.Unauthenticated)
-                    exception = UserNotFoundException(task.exception?.message ?: "User not found")
+        UserModel.setAuthState(AuthState.Loading)
+        return suspendCoroutine { continuation ->
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        UserModel.setMail(email)
+                        UserModel.setAuthState(AuthState.Authenticated)
+                        continuation.resume(Unit)
+                    } else {
+                        UserModel.setAuthState(AuthState.Unauthenticated)
+                        continuation.resumeWithException(UserNotFoundException(task.exception?.message ?: "User not found"))
+                    }
                 }
-                latch.countDown()
-            }
-        latch.await()
-        exception?.let { throw it }
+        }
     }
 }
+
 

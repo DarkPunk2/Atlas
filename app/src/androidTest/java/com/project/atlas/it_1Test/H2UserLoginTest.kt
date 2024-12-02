@@ -1,4 +1,4 @@
-package com.project.atlas
+package com.project.atlas.it_1Test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.auth.FirebaseAuth
@@ -14,6 +14,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @RunWith(AndroidJUnit4::class)
 class H2UserLoginTest {
@@ -35,12 +36,13 @@ class H2UserLoginTest {
     }
 
     @Test
-    fun h2P1Test(){
+    fun h2P1Test() = runBlocking{
         //Given
 
         //When
         val email = "usuario@gmail.com"
         val password = "contraseñaValida@13"
+
         user.loginUser(email,password)
         //Then
 
@@ -53,7 +55,9 @@ class H2UserLoginTest {
         //When
         val email = "usuario@gmail.com"
         val password = "12345"
-        user.loginUser(email,password)
+        runBlocking {
+            user.loginUser(email, password)
+        }
         //Then
     }
     @Test(expected= IncorrectEmailException::class)
@@ -63,7 +67,9 @@ class H2UserLoginTest {
         //When
         val email = "usuario@gma"
         val password = "contraseñaValida@13"
-        user.loginUser(email,password)
+        runBlocking {
+            user.loginUser(email, password)
+        }
         //Then
     }
     @After
