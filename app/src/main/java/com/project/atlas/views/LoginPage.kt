@@ -42,6 +42,7 @@ import com.project.atlas.Models.AuthState
 import com.project.atlas.R
 import com.project.atlas.ViewModels.UserViewModel
 import com.project.atlas.ui.theme.AtlasDarker
+import com.project.atlas.ui.theme.AtlasGreen
 
 @Composable
 fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userViewModel: UserViewModel) {
@@ -72,11 +73,11 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.atlaslogo),
+            painter = painterResource(id = R.drawable.atlas_t),
             contentDescription = "Logo",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(200.dp)
         )
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = "Log-in",
             style = MaterialTheme.typography.displayMedium,
@@ -116,7 +117,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
             },
             enabled = authState.value != AuthState.Loading,
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors( containerColor = AtlasDarker )
+            colors = ButtonDefaults.buttonColors( containerColor = AtlasGreen )
         ) {
             Text(
                 text = "Log-in",
