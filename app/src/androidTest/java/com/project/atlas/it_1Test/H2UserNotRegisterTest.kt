@@ -1,4 +1,4 @@
-package com.project.atlas
+package com.project.atlas.it_1Test
 
 import com.project.atlas.Exceptions.UserNotFoundException
 import com.project.atlas.Interfaces.UserInterface

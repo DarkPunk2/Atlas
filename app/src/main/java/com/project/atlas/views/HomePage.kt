@@ -64,6 +64,11 @@ fun HomePage(modifier: Modifier = Modifier,navController: NavController ) {
             style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold
         )
+        TextButton(onClick = {
+            navController.navigate("map")
+        }) {
+            Text(text = "Go to mapView Test")
+        }
 
     }
 }

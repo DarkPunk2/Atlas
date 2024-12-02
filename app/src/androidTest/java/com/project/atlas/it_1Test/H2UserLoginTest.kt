@@ -1,4 +1,4 @@
-package com.project.atlas
+package com.project.atlas.it_1Test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.auth.FirebaseAuth
