@@ -1,8 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.gms.google-services") version "4.4.2" apply false
-
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -29,6 +28,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("customDebugType") {
+            isDebuggable = true
         }
     }
     compileOptions {
@@ -67,8 +69,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
-    testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -83,6 +86,5 @@ dependencies {
     implementation(libs.osm.android.compose)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
-
-
+    implementation(platform(libs.firebase.bom.v3360))
 }
