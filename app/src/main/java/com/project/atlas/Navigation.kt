@@ -6,8 +6,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.project.atlas.ViewModels.UserViewModel
-import com.project.atlas.ViewModels.VehicleViewModel
+import com.project.atlas.viewModels.UserViewModel
+import com.project.atlas.viewModels.VehicleViewModel
 import com.project.atlas.views.HomePage
 import com.project.atlas.views.LoginPage
 import com.project.atlas.views.MapPage

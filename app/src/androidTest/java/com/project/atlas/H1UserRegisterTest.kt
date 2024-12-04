@@ -3,10 +3,10 @@ package com.project.atlas
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.project.atlas.Exceptions.UserAlreadyExistException
-import com.project.atlas.Interfaces.UserInterface
-import com.project.atlas.Models.UserModel
-import com.project.atlas.Services.AuthService
+import com.project.atlas.exceptions.UserAlreadyExistException
+import com.project.atlas.interfaces.UserInterface
+import com.project.atlas.models.UserModel
+import com.project.atlas.services.AuthService
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

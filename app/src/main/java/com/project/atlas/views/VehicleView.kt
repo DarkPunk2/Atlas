@@ -23,12 +23,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -38,12 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.project.atlas.Interfaces.Petrol95
-import com.project.atlas.ViewModels.VehicleViewModel
-import com.project.atlas.Models.VehicleModel
+import com.project.atlas.viewModels.VehicleViewModel
+import com.project.atlas.models.VehicleModel
 import com.project.atlas.R
-import org.osmdroid.views.overlay.gridlines.LatLonGridlineOverlay.backgroundColor
-import org.w3c.dom.Text
 
 
 @OptIn(ExperimentalMaterial3Api::class)

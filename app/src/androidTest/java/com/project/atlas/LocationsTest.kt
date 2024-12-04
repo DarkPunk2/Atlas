@@ -1,11 +1,12 @@
 package com.project.atlas
 
-import com.project.atlas.Models.Location
-import com.project.atlas.ViewModels.LocationsViewModel
+import com.project.atlas.models.Location
+import com.project.atlas.viewModels.LocationsViewModel
 
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 
 class LocationsTest {

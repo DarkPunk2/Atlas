@@ -1,8 +1,8 @@
 package com.project.atlas.it_1Test
 
-import com.project.atlas.Exceptions.UserNotFoundException
-import com.project.atlas.Interfaces.UserInterface
-import com.project.atlas.Services.AuthService
+import com.project.atlas.exceptions.UserNotFoundException
+import com.project.atlas.interfaces.UserInterface
+import com.project.atlas.services.AuthService
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 

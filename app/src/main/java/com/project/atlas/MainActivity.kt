@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.google.firebase.FirebaseApp
-import com.project.atlas.ViewModels.UserViewModel
+import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.ui.theme.AtlasTheme
 
 class MainActivity : ComponentActivity() {
