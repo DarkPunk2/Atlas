@@ -1,4 +1,3 @@
 package com.project.atlas.models
 
-class Rute {
-}
+class Rute

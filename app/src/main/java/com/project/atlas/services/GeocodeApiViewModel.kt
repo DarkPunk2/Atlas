@@ -26,7 +26,7 @@ object ApiClient {
 
 
     fun fetchGeocode(apiKey: String, location: String, onResult: (String) -> Unit) {
-        val call = ApiClient.geocodeService.getGeocode(apiKey, location)
+        val call = geocodeService.getGeocode(apiKey, location)
 
         call.enqueue(object : Callback<GeocodeResponse> {
             override fun onResponse(
@@ -51,7 +51,7 @@ object ApiClient {
 
     suspend fun fetchToponymByLatLong(apiKey: String, latitude: String, longitude: String): String {
         return suspendCoroutine { continuation ->
-            val call = ApiClient.geocodeService.getGeocodeByLatLong(apiKey, latitude, longitude)
+            val call = geocodeService.getGeocodeByLatLong(apiKey, latitude, longitude)
 
             call.enqueue(object : Callback<GeocodeResponse> {
                 override fun onResponse(call: Call<GeocodeResponse>, response: Response<GeocodeResponse>) {
