@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.project.atlas.models.Location
 import com.project.atlas.viewModels.LocationsViewModel
 
@@ -112,9 +113,8 @@ fun LocationCard(
     }
 }
 
-@Preview
 @Composable
-fun LocationsListView() {
+fun LocationsListView(navController: NavController) {
     val viewModel: LocationsViewModel = viewModel()
     val locations = remember { mutableStateOf(viewModel.getAllLocations()) }
     val showCard = remember { mutableStateOf(false) }
@@ -139,7 +139,7 @@ fun LocationsListView() {
                 ) {
                     IconButton(
                         onClick = {
-                            /* TODO */
+                            navController.popBackStack()
                         }
                     ) {
                         Icon(
@@ -192,7 +192,7 @@ fun LocationsListView() {
             enter = slideInVertically { it },
             exit = slideOutVertically { it }
         ) {
-            AddLocationView(onBack = { showCard.value = false }, viewModel)
+            AddLocationView(onBack = { showCard.value = false }, viewModel, 0.0, 0.0)
         }
         AnimatedVisibility(
             visible = showActionCard.value,

@@ -41,10 +41,12 @@ import com.project.atlas.viewModels.LocationsViewModel
 @Composable
 fun AddLocationView(
     onBack: () -> Unit,
-    lvm: LocationsViewModel
+    lvm: LocationsViewModel,
+    lat: Double,
+    lon: Double
 ) {
-    var lat = remember { mutableStateOf("") }
-    var lon = remember { mutableStateOf("") }
+    var lats = remember { mutableStateOf(lat.toString()) }
+    var lons = remember { mutableStateOf(lon.toString()) }
     var alias = remember { mutableStateOf("") }
     val focusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
@@ -90,8 +92,8 @@ fun AddLocationView(
                         Column(modifier = Modifier.padding(8.dp)) {
                             Row {
                                 OutlinedTextField(
-                                    value = lat.value,
-                                    onValueChange = { lat.value = it },
+                                    value = lats.value,
+                                    onValueChange = { lats.value = it },
                                     label = { Text("Lat") },
                                     placeholder = { Text("0.0") },
                                     singleLine = true,
@@ -103,8 +105,8 @@ fun AddLocationView(
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
                                 OutlinedTextField(
-                                    value = lon.value,
-                                    onValueChange = { lon.value = it },
+                                    value = lons.value,
+                                    onValueChange = { lons.value = it },
                                     label = { Text("Lon") },
                                     placeholder = { Text("0.0") },
                                     singleLine = true,
@@ -132,12 +134,12 @@ fun AddLocationView(
                                 Button(
                                     onClick = {
                                         lvm.addLocation(
-                                            lat.value.toDouble(),
-                                            lon.value.toDouble(),
+                                            lats.value.toDouble(),
+                                            lons.value.toDouble(),
                                             alias.value
                                         )
-                                        lat = mutableStateOf("")
-                                        lon = mutableStateOf("")
+                                        lats = mutableStateOf("")
+                                        lons = mutableStateOf("")
                                         alias = mutableStateOf("")
                                         focusManager.clearFocus()
                                         Log.d("locations", "Añadido")

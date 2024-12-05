@@ -6,6 +6,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.project.atlas.models.Location
+import com.project.atlas.models.UserModel
 import kotlinx.coroutines.tasks.await
 
 class LocationRepository {
@@ -18,7 +19,10 @@ class LocationRepository {
             "alias" to location.alias
         )
 
-        db.collection("locations").document(location.alias)
+        db.collection("users")
+            .document(UserModel.eMail)
+            .collection("locations")
+            .document(location.alias)
             .set(dbLocation)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${location.alias}")
@@ -31,7 +35,9 @@ class LocationRepository {
     suspend fun getAllLocations(): List<Location> {
         val locationsList = mutableListOf<Location>()
         try {
-            val result: QuerySnapshot = db.collection("locations")
+            val result: QuerySnapshot = db.collection("users")
+                .document(UserModel.eMail)
+                .collection("locations")
                 .get()
                 .await()
 
@@ -52,7 +58,10 @@ class LocationRepository {
     }
 
     fun deleteLocation(location: Location){
-        db.collection("locations").document(location.alias)
+        db.collection("users")
+            .document(UserModel.eMail)
+            .collection("locations")
+            .document(location.alias)
             .delete()
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
             .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
