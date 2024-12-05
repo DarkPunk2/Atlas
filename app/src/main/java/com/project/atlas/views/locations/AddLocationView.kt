@@ -1,4 +1,4 @@
-package com.project.atlas.Views
+package com.project.atlas.views.locations
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +42,7 @@ import com.project.atlas.viewModels.LocationsViewModel
 fun AddLocationView(
     onBack: () -> Unit,
     lvm: LocationsViewModel
-){
+) {
     var lat = remember { mutableStateOf("") }
     var lon = remember { mutableStateOf("") }
     var alias = remember { mutableStateOf("") }
@@ -61,7 +61,7 @@ fun AddLocationView(
             colors = CardDefaults
                 .cardColors(containerColor = MaterialTheme.colorScheme.inverseSurface),
             modifier = Modifier.shadow(4.dp)
-            )
+        )
         {
             MaterialTheme(darkColorScheme()) {
                 Surface(
@@ -140,7 +140,7 @@ fun AddLocationView(
                                         lon = mutableStateOf("")
                                         alias = mutableStateOf("")
                                         focusManager.clearFocus()
-                                        Log.d("locations","Añadido")
+                                        Log.d("locations", "Añadido")
                                         onBack()
                                     }) {
                                     Text("Save location")

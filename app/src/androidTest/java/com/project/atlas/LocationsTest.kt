@@ -69,4 +69,27 @@ class LocationsTest {
         //Then
         assertEquals(locationsViewModel.getNumLocations(), 0)
     }
+
+    @Test
+    fun H10P1Test(){
+        //Given
+        val location1 = Location(40.0, 0.0, "Parque")
+        locationsViewModel.addLocation(location1)
+        //When
+        locationsViewModel.removeLocation(location1)
+
+        //Then
+        assertEquals(locationsViewModel.getNumLocations(), 0)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun H10P2Test(){
+        //Given
+        val location1 = Location(40.0, 0.0, "Parque")
+
+        //When
+        locationsViewModel.removeLocation(location1)
+
+        //Then
+    }
 }

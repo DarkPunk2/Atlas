@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -160,7 +159,7 @@ fun vehicleDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = { /* Navegar hacia atrás */ }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver"
                         )
                     }
@@ -185,11 +184,7 @@ fun vehicleDetailScreen(
                 Text(text = "Modelo: ${vehicle.energyType?.typeName ?: "N/A"}")
                 Text(text = "Descripción: ${vehicle.consumption}")
             }
-        } ?: Text(
-            text = "Vehículo no encontrado",
-            modifier = Modifier.fillMaxSize(),
-            textAlign = TextAlign.Center
-        )
+        }
     }
 }
 

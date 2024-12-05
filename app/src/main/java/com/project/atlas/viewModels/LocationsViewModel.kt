@@ -23,7 +23,7 @@ class LocationsViewModel: ViewModel() {
     fun addLocation(lat: Double, lon: Double, alias: String) {
         if(abs(lat)<=90.0 && abs(lon)<=180.0) {
             viewModelScope.launch {
-                val gAlias = if (alias.isEmpty()) {
+                val newAlias = if (alias.isEmpty()) {
                     ApiClient.fetchToponymByLatLong(
                         "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                         lat.toString(),
@@ -33,8 +33,9 @@ class LocationsViewModel: ViewModel() {
                     alias
                 }
 
-                Log.d(TAG, "El alias es $gAlias")
-                val newLocation = Location(lat, lon, gAlias)
+                //Sanitize alias to remove any / characters and everything until a comma
+                val sanitizedAlias = newAlias.replace(Regex("/[^,]*,"), ",")
+                val newLocation = Location(lat, lon, sanitizedAlias)
                 locationRepository.addLocation(newLocation)
                 addLocation(newLocation)
             }
@@ -63,6 +64,15 @@ class LocationsViewModel: ViewModel() {
     }
 
     fun removeLocation(location: Location) {
+        if (locationsList.size > 0) {
+            locationRepository.deleteLocation(location)
+            locationsList.remove(location)
+        } else {
+            throw IllegalStateException()
+        }
+    }
+
+    fun updateAlias(location: Location, newAlias: String) {
 
     }
 }
