@@ -1,8 +1,7 @@
 package com.project.atlas.interfaces
 
 interface UserInterface {
-
-    suspend fun createUser(eMail: String, pass: String)
+    fun initUser()
+    suspend fun createUser(email: String, password: String)
     suspend fun loginUser(email: String, password: String)
-
 }

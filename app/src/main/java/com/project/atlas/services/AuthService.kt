@@ -16,7 +16,13 @@ import kotlin.coroutines.suspendCoroutine
 
 class AuthService : UserInterface {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private var exception: Exception? = null
+
+    override fun initUser(){
+        if (auth.currentUser != null){
+            UserModel.setMail(auth.currentUser!!.email!!)
+            UserModel.setAuthState(AuthState.Authenticated)
+        }
+    }
 
     override suspend fun createUser(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {
@@ -29,7 +35,6 @@ class AuthService : UserInterface {
         if (!password.matches(regex)) {
             throw IncorrectPasswordException("Password is not valid")
         }
-
         return suspendCoroutine { continuation ->
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->

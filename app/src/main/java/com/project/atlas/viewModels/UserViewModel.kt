@@ -20,6 +20,7 @@ class UserViewModel : ViewModel() {
     private val authService: UserInterface = AuthService()
 
     init {
+        authService.initUser()
         _authState.value = UserModel.getAuthState()
     }
 
