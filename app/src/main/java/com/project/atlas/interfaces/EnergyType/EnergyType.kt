@@ -1,6 +1,9 @@
 package com.project.atlas.interfaces
 
-interface EnergyType {
-    val typeName: String
-
+abstract class EnergyType {
+    abstract val typeName: String
+    abstract val magnitude: String
+    override fun toString(): String {
+        return typeName
+    }
 }

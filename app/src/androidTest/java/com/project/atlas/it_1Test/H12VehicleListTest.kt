@@ -1,10 +1,11 @@
-package com.project.atlas
+package com.project.atlas.it_1Test
 
 
-import com.project.atlas.interfaces.*
-import com.project.atlas.models.VehicleModel
-import com.project.atlas.services.VehicleService
-import com.project.atlas.services.VehicleDatabaseService
+import com.project.atlas.Interfaces.*
+import com.project.atlas.Models.VehicleModel
+import com.project.atlas.Models.VehicleType
+import com.project.atlas.Services.VehicleService
+import com.project.atlas.Services.VehicleDatabaseService
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -27,7 +28,7 @@ class H12VehicleListTest {
     @Test
     fun acceptanceTest1(){
         //Given - lista no vacía
-        val vehicle = VehicleModel("Mi coche","Coche", Petrol95(), 7.9)
+        val vehicle = VehicleModel("Mi coche", VehicleType.Coche, Petrol95(), 7.9)
         runBlocking {
             service.addVehicle("testVehicleList",vehicle)
         }

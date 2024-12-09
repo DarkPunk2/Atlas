@@ -1,9 +1,10 @@
-package com.project.atlas
+package com.project.atlas.it_1Test
 
-import com.project.atlas.interfaces.*
-import com.project.atlas.models.VehicleModel
-import com.project.atlas.services.VehicleService
-import com.project.atlas.services.VehicleDatabaseService
+import com.project.atlas.Interfaces.*
+import com.project.atlas.Models.VehicleModel
+import com.project.atlas.Models.VehicleType
+import com.project.atlas.Services.VehicleService
+import com.project.atlas.Services.VehicleDatabaseService
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -29,7 +30,7 @@ class H11VehicleAddTest {
             assertTrue(service.listVehicle("testVehicleAdd")!!.isEmpty())
         }
         //When - se quiere añadir este vehículo
-        val vehicle = VehicleModel("Mi coche","Coche", Petrol95(), 7.9)
+        val vehicle = VehicleModel("Mi coche",VehicleType.Coche, Petrol95(), 7.9)
         //Then - se intenta añadir el vehículo
         runBlocking{
         assertTrue(service.addVehicle("testVehicleAdd",vehicle))
@@ -40,12 +41,12 @@ class H11VehicleAddTest {
     @Test
     fun acceptanceTest2() = runBlocking{
         //Given - lista no vacía
-        val vehicle = VehicleModel("Mi buga","Coche", Petrol95(), 7.9)
+        val vehicle = VehicleModel("Mi buga",VehicleType.Coche, Petrol95(), 7.9)
         service.addVehicle("testVehicleAdd",vehicle)
         var initial_size = service.listVehicle("testVehicleAdd")!!.size
         assertTrue(initial_size > 0)
         //When - se quiere añadir este vehículo
-        val vehicleReapeted = VehicleModel("Mi buga","Coche", Petrol95(), 7.9)
+        val vehicleReapeted = VehicleModel("Mi buga",VehicleType.Coche, Petrol95(), 7.9)
         service.addVehicle("testVehicleAdd",vehicleReapeted)
         //Then - el vehículo no se añade
         val list: List<VehicleModel>? = service.listVehicle("testVehicleAdd")

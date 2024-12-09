@@ -3,14 +3,14 @@ import com.project.atlas.interfaces.EnergyType
 
 
 enum class VehicleType {
-    coche, moto, patinete, andar, bicicleta
+    Coche, Moto, Patinete, Andar, Bicicleta
 }
 
 data class VehicleModel(
-    val alias:String?,
-    val type: String?,
-    val energyType: EnergyType?,
-    val consumption:Double?
+    var alias:String?,
+    var type: VehicleType,
+    var energyType: EnergyType?,
+    var consumption:Double?
 ){
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
