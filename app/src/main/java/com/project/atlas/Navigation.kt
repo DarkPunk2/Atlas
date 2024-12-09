@@ -17,7 +17,7 @@ import com.project.atlas.views.listVehicle
 @Composable
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
     val navController = rememberNavController()
-
+    val vehicleViewModel: VehicleViewModel = viewModel()
     NavHost(navController = navController, startDestination =  "login", builder = {
         composable("login"){
             LoginPage(modifier, navController, userViewModel)
@@ -32,8 +32,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
             SignUpPage(modifier, navController, userViewModel)
         }
         composable("vehicles"){
-            val vehicleViewModel: VehicleViewModel = viewModel()
-            listVehicle(modifier, navController, VehicleViewModel())
+            listVehicle(modifier, navController, vehicleViewModel)
         }
     })
 }
