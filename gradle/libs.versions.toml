@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.1"
+androidMapsUtils = "0.6.2"
 converterGson = "2.9.0"
 firebaseBom = "33.6.0"
 firebaseBomVersion = "33.6.0"
@@ -24,8 +25,10 @@ retrofit = "2.9.0"
 runtimeLivedata = "1.7.5"
 firebaseFirestoreKtx = "25.1.1"
 firebaseFirestore = "25.1.1"
+playServicesMaps = "19.0.0"
 
 [libraries]
+android-maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "androidMapsUtils" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
@@ -58,6 +61,7 @@ osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "os
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

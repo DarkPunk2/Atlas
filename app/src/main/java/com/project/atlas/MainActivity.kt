@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import com.google.firebase.FirebaseApp
 import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.ui.theme.AtlasTheme
+import com.project.atlas.viewModels.RuteViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,10 +20,11 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         val userViewModel: UserViewModel by viewModels()
+        val ruteViewModel: RuteViewModel by viewModels()
         setContent {
             AtlasTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MyAppNavigation(modifier = Modifier.padding(innerPadding), userViewModel = userViewModel)
+                    MyAppNavigation(modifier = Modifier.padding(innerPadding), userViewModel = userViewModel, ruteViewModel)
                 }
             }
         }

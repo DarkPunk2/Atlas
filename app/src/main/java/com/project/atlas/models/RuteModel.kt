@@ -1,18 +1,12 @@
 package com.project.atlas.models
 
-import com.google.gson.JsonObject
+import com.project.atlas.apisRequest.RuteType
 
-data class RuteModel(var start: Location,var end: Location,var vehicle: VehicleModel){
-    fun getDistance(): Double{
-        return -1.0
-    }
-    fun getDuration(): Int{
-        return -1
-    }
-}
-
-enum class RuteType{
-    FASTER,
-    CHEAPER,
-    SHORTER
-}
+data class RuteModel(val start: Location,
+                     val end: Location,
+                     val vehicle: VehicleModel,
+                     val ruteType: RuteType,
+                     val distance: Double,
+                     val duration: Double,
+                     val rute: String
+)

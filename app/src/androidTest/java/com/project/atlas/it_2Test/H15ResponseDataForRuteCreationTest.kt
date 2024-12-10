@@ -2,10 +2,11 @@ package com.project.atlas.it_2Test
 
 import Diesel
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.firestore.FirebaseFirestore
 import com.project.atlas.exceptions.UnreachableLocationException
 import com.project.atlas.models.Location
-import com.project.atlas.models.RuteType
+import com.project.atlas.apisRequest.ResponseDataForRute
+import com.project.atlas.apisRequest.RuteType
+import com.project.atlas.models.RuteModel
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.services.DatabaseService
@@ -16,8 +17,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+
 @RunWith(AndroidJUnit4::class)
-class H15RuteModelCreationTest {
+class H15ResponseDataForRuteCreationTest {
     private val ruteService = RuteService(DatabaseService())
 
     @Before
@@ -25,26 +27,31 @@ class H15RuteModelCreationTest {
         UserModel.setMail("testRute@test.test")
     }
     @Test
-    fun h15P1Test() = runBlocking{
+    fun h15P1Test(){
         //Given
         val start = Location(39.992573, -0.064749,"Castellon")
         val end = Location(39.479126, -0.342623,"Valencia")
-        val vehicle = VehicleModel("Coche","Coche", Diesel(), 4.0)
+        val vehicle = VehicleModel("Coche","driving-car", Diesel(), 4.0)
+        val rute: RuteModel
         //When
-        val rute = ruteService.createRute(start,end,vehicle,RuteType.FASTER)
+        runBlocking {
+            rute = ruteService.createRute(start, end, vehicle, RuteType.FASTER)
+        }
         //Then
-        assertTrue("Unexpected distance",rute.getDistance() in 68.0..82.0)
-        assertTrue("Unexpected duration",rute.getDuration() in 38..72)
+        assertTrue("Unexpected distance",rute.distance in 68000.0..82000.0)
+        assertTrue("Unexpected duration",rute.duration in 2280.0..3720.0)
     }
 
     @Test(expected = UnreachableLocationException::class)
-    fun h15P4Test() = runBlocking {
+    fun h15P4Test(){
         //Given
         val start = Location(39.992573, -0.064749, "Castellon")
         val end = Location(40.724762, -73.994691, "New York")
-        val vehicle = VehicleModel("Coche", "Coche", Diesel(), 4.0)
+        val vehicle = VehicleModel("Coche", "driving-car", Diesel(), 4.0)
         //When
-        ruteService.createRute(start, end, vehicle, RuteType.FASTER)
+        runBlocking {
+            ruteService.createRute(start, end, vehicle, RuteType.FASTER)
+        }
         //Then
     }
 }

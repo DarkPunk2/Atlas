@@ -2,10 +2,9 @@ package com.project.atlas.it_2Test
 
 import Diesel
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.firestore.FirebaseFirestore
 import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.models.Location
-import com.project.atlas.models.RuteType
+import com.project.atlas.apisRequest.RuteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.services.DatabaseService
@@ -31,7 +30,7 @@ class H19AddRuteTest {
         val start = Location(39.992573, -0.064749,"Castellon")
         val end = Location(39.479126, -0.342623,"Valencia")
         val vehicle = VehicleModel("Coche","Coche", Diesel(), 4.0)
-        val rute = ruteService.createRute(start,end,vehicle,RuteType.FASTER)
+        val rute = ruteService.createRute(start,end,vehicle, RuteType.FASTER)
         //When
         val result = ruteService.addRute(rute)
         //Then
@@ -45,7 +44,7 @@ class H19AddRuteTest {
         val start = Location(39.992573, -0.064749,"Castellon")
         val end = Location(39.479126, -0.342623,"Valencia")
         val vehicle = VehicleModel("Coche","Coche", Diesel(), 4.0)
-        val rute = ruteService.createRute(start,end,vehicle,RuteType.FASTER)
+        val rute = ruteService.createRute(start,end,vehicle, RuteType.FASTER)
         //When
         ruteService.addRute(rute)
         //Then

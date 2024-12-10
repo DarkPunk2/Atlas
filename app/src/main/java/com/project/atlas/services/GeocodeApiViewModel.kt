@@ -2,12 +2,16 @@ package com.project.atlas.services
 
 import GeocodeResponse
 import GeocodeService
+import com.project.atlas.apisRequest.RequestDataForRute
+import com.project.atlas.apisRequest.ResponseDataForRute
+import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 object ApiClient {
@@ -71,8 +75,28 @@ object ApiClient {
         }
     }
 
+    suspend fun fetchRute(coordinates: List<List<Double>>, ruteType: String, vehicleType: String): ResponseDataForRute {
+        val body = RequestDataForRute(coordinates, ruteType)
+        return suspendCancellableCoroutine { continuation ->
+            val call = geocodeService.getRute(vehicleType, body)
 
+            call.enqueue(object : Callback<ResponseDataForRute> {
+                override fun onResponse(call: Call<ResponseDataForRute>, response: Response<ResponseDataForRute>) {
+                    if (response.isSuccessful && response.body() != null) {
+                        continuation.resume(response.body()!!)
+                    } else {
+                        continuation.resumeWithException(RuntimeException("Error: ${response.code()} ${response.message()}"))
+                    }
+                }
 
+                override fun onFailure(call: Call<ResponseDataForRute>, t: Throwable) {
+                    continuation.resumeWithException(t)
+                }
+            })
 
-
+            continuation.invokeOnCancellation {
+                call.cancel()
+            }
+        }
+    }
 }
