@@ -61,11 +61,11 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
     private fun checkTypeWithEnergyType(vehicle: VehicleModel):Boolean{
         //comprueba que el tipo coincida con la energía introducida
         when (vehicle.type) {
-            VehicleType.Coche -> return checkBusinessMotor(vehicle.energyType)
-            VehicleType.Moto -> return checkBusinessMotor(vehicle.energyType)
-            VehicleType.Patinete -> return vehicle.energyType is Electricity
-            VehicleType.Bicicleta -> return vehicle.energyType is Calories
-            VehicleType.Andar -> return vehicle.energyType is Calories
+            VehicleType.Car -> return checkBusinessMotor(vehicle.energyType)
+            VehicleType.Bike -> return checkBusinessMotor(vehicle.energyType)
+            VehicleType.Scooter -> return vehicle.energyType is Electricity
+            VehicleType.Cycle -> return vehicle.energyType is Calories
+            VehicleType.Walk -> return vehicle.energyType is Calories
             else -> {
                 return false
             }

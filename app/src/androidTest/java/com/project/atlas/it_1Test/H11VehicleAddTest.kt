@@ -30,7 +30,7 @@ class H11VehicleAddTest {
             assertTrue(service.listVehicle("testVehicleAdd")!!.isEmpty())
         }
         //When - se quiere añadir este vehículo
-        val vehicle = VehicleModel("Mi coche",VehicleType.Coche, Petrol95(), 7.9)
+        val vehicle = VehicleModel("Mi coche",VehicleType.Car, Petrol95(), 7.9)
         //Then - se intenta añadir el vehículo
         runBlocking{
         assertTrue(service.addVehicle("testVehicleAdd",vehicle))
@@ -41,12 +41,12 @@ class H11VehicleAddTest {
     @Test
     fun acceptanceTest2() = runBlocking{
         //Given - lista no vacía
-        val vehicle = VehicleModel("Mi buga",VehicleType.Coche, Petrol95(), 7.9)
+        val vehicle = VehicleModel("Mi buga",VehicleType.Car, Petrol95(), 7.9)
         service.addVehicle("testVehicleAdd",vehicle)
         var initial_size = service.listVehicle("testVehicleAdd")!!.size
         assertTrue(initial_size > 0)
         //When - se quiere añadir este vehículo
-        val vehicleReapeted = VehicleModel("Mi buga",VehicleType.Coche, Petrol95(), 7.9)
+        val vehicleReapeted = VehicleModel("Mi buga",VehicleType.Car, Petrol95(), 7.9)
         service.addVehicle("testVehicleAdd",vehicleReapeted)
         //Then - el vehículo no se añade
         val list: List<VehicleModel>? = service.listVehicle("testVehicleAdd")

@@ -33,7 +33,7 @@ class H14VehicleUpdateTest {
         //Given - hay un vehículo en lista
         val initial_consumption = 7.9
         val initial_energy = Petrol95()
-        var vehicle = VehicleModel("Mi coche", VehicleType.Coche, initial_energy, initial_consumption)
+        var vehicle = VehicleModel("Mi coche", VehicleType.Car, initial_energy, initial_consumption)
         runBlocking {
             service.addVehicle("testVehicleUpdate", vehicle)
         }
@@ -48,7 +48,7 @@ class H14VehicleUpdateTest {
         vehicle.consumption = initial_consumption // retornamos el valor de inicio al objeto para realizar las comparaciones
 
         //Then - se recupera el vehículo modificado de la bbdd...
-        var vehicle_updated:VehicleModel = VehicleModel("", VehicleType.Andar,Petrol98(),0.1) //uno por defecto
+        var vehicle_updated:VehicleModel = VehicleModel("", VehicleType.Walk,Petrol98(),0.1) //uno por defecto
         runBlocking {
             vehicle_updated = service.getVehicle("testVehicleUpdate", vehicle.alias!!)
         }
@@ -72,7 +72,7 @@ class H14VehicleUpdateTest {
     fun acceptanceTest2(){
         //Given - hay un vehículo en lista
         val initial_consumption = 7.9
-        var vehicle = VehicleModel("Mi coche", VehicleType.Coche, Petrol95(), initial_consumption)
+        var vehicle = VehicleModel("Mi coche", VehicleType.Car, Petrol95(), initial_consumption)
         runBlocking {
             service.addVehicle("testVehicleUpdate", vehicle)
         }
@@ -89,7 +89,7 @@ class H14VehicleUpdateTest {
         //Given - hay un vehículo en lista
         val initial_consumption = 7.9
         val initial_alias = "Mi coche"
-        var vehicle = VehicleModel(initial_alias, VehicleType.Coche, Petrol95(), initial_consumption)
+        var vehicle = VehicleModel(initial_alias, VehicleType.Car, Petrol95(), initial_consumption)
         runBlocking {
             service.addVehicle("testVehicleUpdate", vehicle)
         }
@@ -102,7 +102,7 @@ class H14VehicleUpdateTest {
         }
 
         vehicle.consumption = initial_consumption // retornamos el valor de inicio al objeto para realizar las comparaciones
-        var vehicle_updated:VehicleModel = VehicleModel("", VehicleType.Andar,Petrol98(),0.1) //uno por defecto
+        var vehicle_updated:VehicleModel = VehicleModel("", VehicleType.Walk,Petrol98(),0.1) //uno por defecto
         runBlocking {
             vehicle_updated = service.getVehicle("testVehicleUpdate", vehicle.alias!!)
         }

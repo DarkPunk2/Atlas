@@ -1,8 +1,6 @@
 package com.project.atlas.it_2Test
 
-import com.project.atlas.Exceptions.IncorrectPasswordException
 import com.project.atlas.Exceptions.VehicleNotExistsException
-import com.project.atlas.Exceptions.VehicleWrongBusinessRulesException
 import com.project.atlas.Interfaces.Petrol95
 import com.project.atlas.Interfaces.VehicleInterface
 import com.project.atlas.Models.VehicleModel
@@ -29,7 +27,7 @@ class H13VehicleDeleteTest {
     @Test
     fun acceptanceTest1(){
         //Given - hay un vehículo en lista
-        val vehicle = VehicleModel("Mi coche", VehicleType.Coche, Petrol95(), 7.9)
+        val vehicle = VehicleModel("Mi coche", VehicleType.Car, Petrol95(), 7.9)
         runBlocking {
             service.addVehicle("testVehicleDelete", vehicle)
         }
@@ -47,13 +45,13 @@ class H13VehicleDeleteTest {
     @Test(expected = VehicleNotExistsException::class)
     fun acceptanceTest2(){
         //Given - hay un vehículo en lista
-        val vehicle = VehicleModel("Mi buga", VehicleType.Coche, Petrol95(), 7.9)
+        val vehicle = VehicleModel("Mi buga", VehicleType.Car, Petrol95(), 7.9)
 
         runBlocking {
             service.addVehicle("testVehicleDelete", vehicle)
         }
         //When - se intenta eliminar un vehículo que no ha sido añadido
-        val vehicleIncorrect = VehicleModel("Mi coche99", VehicleType.Coche, Petrol95(), 7.9)
+        val vehicleIncorrect = VehicleModel("Mi coche99", VehicleType.Car, Petrol95(), 7.9)
         runBlocking {
             service.deleteVehicle("testVehicleDelete", vehicleIncorrect.alias!!)
         }
