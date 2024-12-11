@@ -3,20 +3,6 @@
   <component name="AndroidTestResultsUserPreferences">
     <option name="androidTestResultsTableState">
       <map>
-        <entry key="-2070240148">
-          <value>
-            <AndroidTestResultsTableState>
-              <option name="preferredColumnWidths">
-                <map>
-                  <entry key="Duration" value="90" />
-                  <entry key="Pixel_8_API_34" value="120" />
-                  <entry key="Pixel_8a_API_35" value="120" />
-                  <entry key="Tests" value="360" />
-                </map>
-              </option>
-            </AndroidTestResultsTableState>
-          </value>
-        </entry>
         <entry key="-1960453265">
           <value>
             <AndroidTestResultsTableState>
@@ -60,6 +46,46 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-723968721">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="HUAWEI BND-L21" value="120" />
+                  <entry key="Small_Phone_API_35" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="-723968690">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Small_Phone_API_35" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="-723968659">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Small_Phone_API_35" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-485401611">
           <value>
             <AndroidTestResultsTableState>
@@ -73,27 +99,14 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
-        <entry key="-399267279">
+        <entry key="-349953618">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="HUAWEI BND-L21" value="120" />
                   <entry key="Tests" value="360" />
-                  <entry key="samsung SM-A536B" value="120" />
-                </map>
-              </option>
-            </AndroidTestResultsTableState>
-          </value>
-        </entry>
-        <entry key="-314581299">
-          <value>
-            <AndroidTestResultsTableState>
-              <option name="preferredColumnWidths">
-                <map>
-                  <entry key="Duration" value="90" />
-                  <entry key="Tests" value="360" />
-                  <entry key="samsung SM-A536B" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -113,26 +126,28 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
-        <entry key="-184447501">
+        <entry key="-134946254">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
-                  <entry key="Pixel_8_API_34" value="120" />
+                  <entry key="HUAWEI BND-L21" value="120" />
+                  <entry key="Small_Phone_API_35" value="120" />
                   <entry key="Tests" value="360" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
           </value>
         </entry>
-        <entry key="-155818350">
+        <entry key="-134946223">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
-                  <entry key="Pixel_8_API_34" value="120" />
+                  <entry key="HUAWEI BND-L21" value="120" />
+                  <entry key="Small_Phone_API_35" value="120" />
                   <entry key="Tests" value="360" />
                 </map>
               </option>
@@ -154,14 +169,14 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
-        <entry key="361922976">
+        <entry key="330877526">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="HUAWEI BND-L21" value="120" />
                   <entry key="Tests" value="360" />
-                  <entry key="samsung SM-A536B" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -182,6 +197,20 @@
           </value>
         </entry>
         <entry key="646028195">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="HUAWEI BND-L21" value="120" />
+                  <entry key="Small_Phone_API_35" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="1348659303">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
@@ -221,19 +250,6 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
-        <entry key="1704159376">
-          <value>
-            <AndroidTestResultsTableState>
-              <option name="preferredColumnWidths">
-                <map>
-                  <entry key="Duration" value="90" />
-                  <entry key="Pixel_8_API_34" value="120" />
-                  <entry key="Tests" value="360" />
-                </map>
-              </option>
-            </AndroidTestResultsTableState>
-          </value>
-        </entry>
         <entry key="1903775302">
           <value>
             <AndroidTestResultsTableState>
@@ -241,47 +257,6 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Medium_Phone_API_35" value="120" />
-                  <entry key="Tests" value="360" />
-                  <entry key="samsung SM-A536B" value="120" />
-                </map>
-              </option>
-            </AndroidTestResultsTableState>
-          </value>
-        </entry>
-        <entry key="1961003412">
-          <value>
-            <AndroidTestResultsTableState>
-              <option name="preferredColumnWidths">
-                <map>
-                  <entry key="Duration" value="90" />
-                  <entry key="Pixel_8a_API_35" value="120" />
-                  <entry key="Tests" value="360" />
-                  <entry key="samsung SM-A536B" value="120" />
-                </map>
-              </option>
-            </AndroidTestResultsTableState>
-          </value>
-        </entry>
-        <entry key="1962380625">
-          <value>
-            <AndroidTestResultsTableState>
-              <option name="preferredColumnWidths">
-                <map>
-                  <entry key="Duration" value="90" />
-                  <entry key="Pixel_8a_API_35" value="120" />
-                  <entry key="Tests" value="360" />
-                </map>
-              </option>
-            </AndroidTestResultsTableState>
-          </value>
-        </entry>
-        <entry key="1977448278">
-          <value>
-            <AndroidTestResultsTableState>
-              <option name="preferredColumnWidths">
-                <map>
-                  <entry key="Duration" value="90" />
-                  <entry key="Pixel_8a_API_35" value="120" />
                   <entry key="Tests" value="360" />
                   <entry key="samsung SM-A536B" value="120" />
                 </map>

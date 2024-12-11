@@ -3,14 +3,24 @@ import com.project.atlas.interfaces.EnergyType
 
 
 enum class VehicleType {
-    coche, moto, patinete, andar, bicicleta
+    Car, Bike, Scooter, Walk, Cycle;
+
+    fun toRoute():String{
+        return when(this){
+            Car -> "driving-car"
+            Bike -> "driving-car"
+            Scooter -> "cycling-electric"
+            Walk -> "foot-walking"
+            Cycle -> "cycling-regular"
+        }
+    }
 }
 
 data class VehicleModel(
-    val alias:String?,
-    val type: String?,
-    val energyType: EnergyType?,
-    val consumption:Double?
+    var alias:String?,
+    var type: VehicleType,
+    var energyType: EnergyType?,
+    var consumption:Double?
 ){
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

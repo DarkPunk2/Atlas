@@ -1,8 +1,9 @@
-package com.project.atlas
+package com.project.atlas.it_1Test
 
 
 import com.project.atlas.interfaces.*
 import com.project.atlas.models.VehicleModel
+import com.project.atlas.models.VehicleType
 import com.project.atlas.services.VehicleService
 import com.project.atlas.services.VehicleDatabaseService
 import kotlinx.coroutines.runBlocking
@@ -27,7 +28,7 @@ class H12VehicleListTest {
     @Test
     fun acceptanceTest1(){
         //Given - lista no vacía
-        val vehicle = VehicleModel("Mi coche","Coche", Petrol95(), 7.9)
+        val vehicle = VehicleModel("Mi coche", VehicleType.Car, Petrol95(), 7.9)
         runBlocking {
             service.addVehicle("testVehicleList",vehicle)
         }
