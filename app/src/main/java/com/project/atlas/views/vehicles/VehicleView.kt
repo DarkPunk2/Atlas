@@ -1,4 +1,4 @@
-package com.project.atlas.views
+package com.project.atlas.views.vehicles
 
 import Diesel
 import Electricity
@@ -35,6 +35,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -47,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,6 +64,7 @@ import com.project.atlas.viewModels.VehicleViewModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.models.VehicleType
 import com.project.atlas.R
+import com.project.atlas.ui.theme.AtlasGold
 import com.project.atlas.ui.theme.AtlasGreen
 import kotlinx.coroutines.delay
 
@@ -74,14 +80,37 @@ fun listVehicle(
     var isLoading by remember { mutableStateOf(true) }
     var showDetails by remember { mutableStateOf<VehicleModel?>(null) }
     var showAddForm by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
+    //variables SnackBar
+    var showSnackbar by remember { mutableStateOf(false) }
+    var snackbarMessage by remember { mutableStateOf("") }
+    var snackbarColor by remember { mutableStateOf(AtlasGreen) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
 
     LaunchedEffect(Unit) {
         vehicleViewModel.refreshVehicles()
     }
     isLoading = false
 
+    if (showSnackbar) {
+        LaunchedEffect(snackbarHostState) {
+            snackbarHostState.showSnackbar(snackbarMessage)
+            showSnackbar = false
+        }
+    }
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = snackbarColor,
+                    contentColor = Color.Black,
+                    shape = RoundedCornerShape(16.dp)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -93,7 +122,7 @@ fun listVehicle(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                             contentDescription = "Go Back",
-                            tint = MaterialTheme.colorScheme.onSurface // Mismo color que el texto por defecto
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -165,11 +194,18 @@ fun listVehicle(
             onDismiss = { showDetails = null },
             onDelete = {
                 vehicleViewModel.delete(vehicle)
+                snackbarMessage = "Vehicle ${vehicle.alias} deleted sucessfully"
+                snackbarColor = Color.Red
                 showDetails = null
+                showSnackbar = true
             },
             onUpdate = { oldAlias,updatedVehicle ->
+                var diff = !oldAlias.equals(updatedVehicle.alias)
                 vehicleViewModel.update(oldAlias,updatedVehicle)
+                snackbarMessage = if(diff) "Vehicle ${updatedVehicle.alias} (previously ${oldAlias}) updated sucessfully" else "Vehicle ${updatedVehicle.alias} updated sucessfully"
+                snackbarColor = AtlasGold
                 showDetails = null
+                showSnackbar = true
             }
         )
     }
@@ -179,9 +215,13 @@ fun listVehicle(
             vehicleList= vehicleList,
             onDismiss = { showAddForm = false },
             onConfirm = { alias, type, energyType, consumption ->
-                val newVehicle = VehicleModel(alias, type, energyType, consumption.toDouble())
+                val legalAlias = alias.trim()
+                val newVehicle = VehicleModel(legalAlias, type, energyType, consumption.toDouble())
                 vehicleViewModel.add(newVehicle)
+                snackbarMessage = "Vehicle ${legalAlias} added successfully"
+                snackbarColor = AtlasGreen
                 showAddForm = false
+                showSnackbar = true
             }
         )
     }
@@ -199,8 +239,8 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
     var consumption by remember { mutableStateOf("") }
 
     val energyOptions = when (selectedType?.name) {
-        "Coche", "Moto" -> listOf(Petrol95(), Petrol98(), Diesel(), Electricity())
-        "Patinete" -> listOf(Electricity())
+        "Car", "Bike" -> listOf(Petrol95(), Petrol98(), Diesel(), Electricity())
+        "Scooter" -> listOf(Electricity())
         else -> emptyList()
     }
 
@@ -222,22 +262,24 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text(text = "Añadir Vehículo") },
+        title = { Text(text = "Add Vehicle") },
         text = {
             Column {
                 // Alias
                 TextField(
                     value = alias,
                     onValueChange = {
-                        alias = it
+                        alias = it.replace("\n", "")
                         aliasError = it.isBlank() || vehicleList.any { it.alias == alias }
                     },
                     label = { Text("Alias") },
-                    isError = aliasError
-                )
+                    isError = aliasError,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done))
                 if (aliasError) {
                     Text(
-                        text = if (alias!!.isBlank()) "El alias no puede estar vacío" else "El alias ya existe",
+                        text = if (alias!!.isBlank()) "Alias cannot be blank" else "Alias already exists",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -245,7 +287,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
 
                 // Tipo de Vehículo
                 DropdownSelector(
-                    label = "Tipo",
+                    label = "Type",
                     items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter) /*VehicleType.entries*/,
                     selectedItem = selectedType,
                     onItemSelected = { selectedType = it }
@@ -253,7 +295,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
 
                 // Tipo de Energía
                 DropdownSelector(
-                    label = "Tipo de Energía",
+                    label = "Energy type",
                     items = energyOptions,
                     selectedItem = selectedEnergyType,
                     onItemSelected = {
@@ -262,22 +304,24 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     }
                 )
                 if (energyError) {
-                    Text("Seleccione un tipo de energía válido", color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                    Text("Select a valid energy type", color = Color.Red, style = MaterialTheme.typography.bodySmall)
                 }
 
                 // Consumo
                 TextField(
                     value = consumption,
                     onValueChange = {
-                        consumption = it
+                        consumption = it.replace(",", ".")
                         consumptionError = it.toDoubleOrNull()?.let { it <= 0 } ?: true
                     },
-                    label = { Text("Consumo ${selectedEnergyType?.magnitude ?: "no seleccionado"}") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    label = { Text("Consumption ${selectedEnergyType?.magnitude ?: "not selected"}") },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done),
                     isError = consumptionError
                 )
                 if (consumptionError) {
-                    Text("El consumo debe ser mayor que 0", color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                    Text("Consumption must be greater than 0", color = Color.Red, style = MaterialTheme.typography.bodySmall)
                 }
             }
         },
@@ -293,7 +337,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
                 )
             ) {
-                Text("Añadir")
+                Text("Add", color = Color.Black)
             }
         },
         dismissButton = {
@@ -301,7 +345,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                 onClick = { onDismiss() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
-                Text("Cancelar")
+                Text("Cancel")
             }
         }
     )
@@ -320,8 +364,8 @@ fun EditVehicleDialog(
     var consumption by remember { mutableStateOf(vehicle.consumption.toString()) }
 
     val energyOptions = when (selectedType?.name) {
-        "Coche", "Moto" -> listOf(Petrol95(), Petrol98(), Diesel(), Electricity())
-        "Patinete" -> listOf(Electricity())
+        "Car", "Bike" -> listOf(Petrol95(), Petrol98(), Diesel(), Electricity())
+        "Scooter" -> listOf(Electricity())
         else -> emptyList()
     }
 
@@ -346,7 +390,7 @@ fun EditVehicleDialog(
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text("Editar Vehículo") },
+        title = { Text("Edit Vehicle") },
         text = {
             Column {
                 // Alias
@@ -361,7 +405,7 @@ fun EditVehicleDialog(
                 )
                 if (aliasError) {
                     Text(
-                        text = if (alias!!.isBlank()) "El alias no puede estar vacío" else "El alias ya existe",
+                        text = if (alias!!.isBlank()) "Alias cannot be blank" else "Alias already exists",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -369,7 +413,7 @@ fun EditVehicleDialog(
 
                 // Tipo de Vehículo
                 DropdownSelector(
-                    label = "Tipo",
+                    label = "Type",
                     items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter),
                     selectedItem = selectedType,
                     onItemSelected = { selectedType = it }
@@ -377,7 +421,7 @@ fun EditVehicleDialog(
 
                 // Tipo de Energía
                 DropdownSelector(
-                    label = "Tipo de Energía",
+                    label =  "Energy type",
                     items = energyOptions,
                     selectedItem = selectedEnergyType,
                     onItemSelected = {
@@ -387,7 +431,7 @@ fun EditVehicleDialog(
                 )
                 if (energyError) {
                     Text(
-                        text = "Seleccione un tipo de energía válido",
+                        text ="Seleccione un tipo de energía válido",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -400,13 +444,13 @@ fun EditVehicleDialog(
                         consumption = it
                         consumptionError = it.toDoubleOrNull()?.let { it <= 0 } ?: true
                     },
-                    label = { Text("Consumo ${selectedEnergyType?.magnitude ?: "no seleccionado"}") },
+                    label = { Text("Consumption ${selectedEnergyType?.magnitude ?: "not selected"}") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = consumptionError
                 )
                 if (consumptionError) {
                     Text(
-                        text = "El consumo debe ser mayor que 0",
+                        text = "Consumption must be greater than 0",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -425,7 +469,7 @@ fun EditVehicleDialog(
                     containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
                 )
             ) {
-                Text("Guardar Cambios")
+                Text("Save changes")
             }
         },
         dismissButton = {
@@ -433,7 +477,7 @@ fun EditVehicleDialog(
                 onClick = { onDismiss() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
-                Text("Cancelar")
+                Text("Cancel")
             }
         }
     )
@@ -442,8 +486,8 @@ fun EditVehicleDialog(
     if (showConfirmationDialog) {
         AlertDialog(
             onDismissRequest = { showConfirmationDialog = false },
-            title = { Text("Confirmar Actualización") },
-            text = { Text("¿Está seguro de que desea actualizar los datos del vehículo?") },
+            title = { Text("Confirm Update") },
+            text = { Text("Are you sure you want to update the vehicle details?") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -452,7 +496,7 @@ fun EditVehicleDialog(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Sí")
+                    Text("Yes", color = Color.Black)
                 }
             },
             dismissButton = {
@@ -487,7 +531,7 @@ fun <T> DropdownSelector(
             OutlinedButton(
                 onClick = { expanded = true }
                 ) {
-                Text(text = selectedItem?.toString() ?: "Seleccionar $label", color = Color.Black)
+                Text(text = selectedItem?.toString() ?: "Select $label", color = Color.Black)
             }
             DropdownMenu(
                 expanded = expanded,
@@ -538,11 +582,11 @@ fun VehicleItem(vehicle: VehicleModel, onClick: () -> Unit) {
                 Image(
                     painter = painterResource(
                         id = when (vehicle.type.name) {
-                            "Coche" -> R.drawable.car
-                            "Moto" -> R.drawable.bike
-                            "Bicicleta" -> R.drawable.cycle
-                            "Patinete" -> R.drawable.scooter
-                            "Andar" -> R.drawable.walk
+                            "Car" -> R.drawable.car
+                            "Bike" -> R.drawable.bike
+                            "Cycle" -> R.drawable.cycle
+                            "Scooter" -> R.drawable.scooter
+                            "Walk" -> R.drawable.walk
                             else -> android.R.drawable.stat_notify_sdcard_usb
                         }
                     ),
@@ -618,7 +662,7 @@ fun VehicleDetailsDialog(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Alias", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.alias?:"S/N", style = MaterialTheme.typography.bodyMedium)
+                    Text(vehicle.alias ?: "S/N", style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Type", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
@@ -648,20 +692,26 @@ fun VehicleDetailsDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // Botón de actualizar
-                Button(
-                    onClick = { showEditDialog = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = AtlasGreen)
-                ) {
-                    Text("Actualizar", color = Color.Black)
-                }
+                // Mostrar botones solo si el tipo de vehículo no es Walk ni Cycle
+                if (vehicle.type != VehicleType.Walk && vehicle.type != VehicleType.Cycle) {
+                    // Botón de actualizar
+                    Button(
+                        onClick = { showEditDialog = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = AtlasGreen)
+                    ) {
+                        Text("Update", color = Color.Black)
+                    }
 
-                // Botón de eliminar
-                Button(
-                    onClick = { showDeleteConfirmation = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text("Eliminar", color = Color.White)
+                    // Botón de eliminar
+                    Button(
+                        onClick = { showDeleteConfirmation = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    ) {
+                        Text("Delete", color = Color.White)
+                    }
+                } else {
+
+                    Spacer(modifier = Modifier.width(120.dp))
                 }
             }
         }
@@ -671,23 +721,25 @@ fun VehicleDetailsDialog(
     if (showDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = false },
-            title = { Text("Confirmar Eliminación") },
-            text = { Text("¿Estás seguro de que deseas eliminar este vehículo?") },
+            title = { Text("Confirm Deletion") },
+            text = { Text("Are you sure you want to delete this vehicle?") },
             confirmButton = {
                 Button(
                     onClick = {
-                    onDelete()
-                    showDeleteConfirmation = false },
+                        onDelete()
+                        showDeleteConfirmation = false
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                    ) {
-                    Text(text="Eliminar")
+                ) {
+                    Text(text = "Delete")
                 }
             },
             dismissButton = {
-                Button(onClick = { showDeleteConfirmation = false },
+                Button(
+                    onClick = { showDeleteConfirmation = false },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
                 ) {
-                    Text(text="Cancelar", color = Color.Black)
+                    Text(text = "Cancel", color = Color.Black)
                 }
             }
         )
@@ -707,27 +759,4 @@ fun VehicleDetailsDialog(
         )
     }
 }
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewListVehicle() {
-    val vehicleViewModel = VehicleViewModel() // Aquí puedes crear un ViewModel ficticio o usar uno de prueba
-    val navController = rememberNavController()
-    val vehicleList = listOf(
-        VehicleModel("Car1", VehicleType.Car, Petrol95(), 8.5),
-        VehicleModel("Bike1", VehicleType.Bike, Petrol98(), 5.0)
-    )
-    vehicleViewModel.vehicleList.observeAsState(vehicleList)
-
-    // Datos de ejemplo para vehicleList
-    vehicleViewModel.vehicleList.observeAsState(emptyList())
-
-    listVehicle(
-        modifier = Modifier.fillMaxSize(),
-        navController = navController,
-        vehicleViewModel = vehicleViewModel
-    )
-}
-
 

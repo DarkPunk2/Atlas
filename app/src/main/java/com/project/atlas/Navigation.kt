@@ -12,8 +12,9 @@ import com.project.atlas.views.HomePage
 import com.project.atlas.views.LoginPage
 import com.project.atlas.views.MapPage
 import com.project.atlas.views.SignUpPage
-import com.project.atlas.views.listVehicle
+import com.project.atlas.views.vehicles.listVehicle
 import com.project.atlas.views.locations.LocationsListView
+import com.project.atlas.views.vehicles.SelectVehicle
 
 @Composable
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
@@ -37,6 +38,9 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
         }
         composable("vehicles"){
             listVehicle(modifier, navController, vehicleViewModel)
+        }
+        composable("selectVehicles"){
+            SelectVehicle(modifier, navController, vehicleViewModel)
         }
     })
 }

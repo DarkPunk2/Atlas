@@ -21,6 +21,7 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
     }
 
     override suspend fun listVehicle(user: String): List<VehicleModel>? {
+        if(!dbService.checkForVehicles(user)) dbService.createDefaults(user)
         return dbService.listVehicle(user)
     }
     override suspend fun deleteVehicle(user: String, vehicleAlias:String): Boolean {
