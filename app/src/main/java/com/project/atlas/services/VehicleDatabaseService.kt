@@ -17,7 +17,6 @@ import com.project.atlas.Models.VehicleModel
 import com.project.atlas.Models.VehicleType
 import java.io.Serializable
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class VehicleDatabaseService : VehicleInterface {
@@ -170,11 +169,11 @@ class VehicleDatabaseService : VehicleInterface {
     }
     private fun stringToVehicleType(value: String?): VehicleType? {
         return when (value) {
-            "Coche" -> VehicleType.Coche
-            "Moto" -> VehicleType.Moto
-            "Patinete" -> VehicleType.Patinete
-            "Andar" -> VehicleType.Andar
-            "Bicicleta" -> VehicleType.Bicicleta
+            "Car" -> VehicleType.Car
+            "Bike" -> VehicleType.Bike
+            "Scooter" -> VehicleType.Scooter
+            "Walk" -> VehicleType.Walk
+            "Cycle" -> VehicleType.Cycle
             else -> null
         }
     }

@@ -3,7 +3,17 @@ import com.project.atlas.interfaces.EnergyType
 
 
 enum class VehicleType {
-    Coche, Moto, Patinete, Andar, Bicicleta
+    Car, Bike, Scooter, Walk, Cycle;
+
+    fun toRoute():String{
+        return when(this){
+            Car -> "driving-car"
+            Bike -> "driving-car"
+            Scooter -> "cycling-electric"
+            Walk -> "foot-walking"
+            Cycle -> "cycling-regular"
+        }
+    }
 }
 
 data class VehicleModel(
