@@ -53,11 +53,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.project.atlas.Interfaces.EnergyType
-import com.project.atlas.Interfaces.Petrol95
-import com.project.atlas.ViewModels.VehicleViewModel
-import com.project.atlas.Models.VehicleModel
-import com.project.atlas.Models.VehicleType
+import com.project.atlas.interfaces.EnergyType
+import com.project.atlas.interfaces.Petrol95
+import com.project.atlas.viewModels.VehicleViewModel
+import com.project.atlas.models.VehicleModel
+import com.project.atlas.models.VehicleType
 import com.project.atlas.R
 import com.project.atlas.ui.theme.AtlasGreen
 import kotlinx.coroutines.delay
@@ -199,8 +199,8 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
     var consumption by remember { mutableStateOf("") }
 
     val energyOptions = when (selectedType?.name) {
-        "Coche", "Moto" -> listOf(Petrol95(), Petrol98(), Diesel(), Electricity())
-        "Patinete" -> listOf(Electricity())
+        "Car", "Bike" -> listOf(Petrol95(), Petrol98(), Diesel(), Electricity())
+        "Scooter" -> listOf(Electricity())
         else -> emptyList()
     }
 
@@ -222,7 +222,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text(text = "Añadir Vehículo") },
+        title = { Text(text = "Add Vehicle") },
         text = {
             Column {
                 // Alias
@@ -237,7 +237,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                 )
                 if (aliasError) {
                     Text(
-                        text = if (alias!!.isBlank()) "El alias no puede estar vacío" else "El alias ya existe",
+                        text = if (alias!!.isBlank()) "Alias cannot be blank" else "Alias already exists",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -245,7 +245,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
 
                 // Tipo de Vehículo
                 DropdownSelector(
-                    label = "Tipo",
+                    label = "Type",
                     items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter) /*VehicleType.entries*/,
                     selectedItem = selectedType,
                     onItemSelected = { selectedType = it }
@@ -253,7 +253,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
 
                 // Tipo de Energía
                 DropdownSelector(
-                    label = "Tipo de Energía",
+                    label = "Energy type",
                     items = energyOptions,
                     selectedItem = selectedEnergyType,
                     onItemSelected = {
@@ -262,7 +262,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     }
                 )
                 if (energyError) {
-                    Text("Seleccione un tipo de energía válido", color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                    Text("Select a valid energy type", color = Color.Red, style = MaterialTheme.typography.bodySmall)
                 }
 
                 // Consumo
@@ -272,12 +272,12 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                         consumption = it
                         consumptionError = it.toDoubleOrNull()?.let { it <= 0 } ?: true
                     },
-                    label = { Text("Consumo ${selectedEnergyType?.magnitude ?: "no seleccionado"}") },
+                    label = { Text("Consumo ${selectedEnergyType?.magnitude ?: "not selected"}") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = consumptionError
                 )
                 if (consumptionError) {
-                    Text("El consumo debe ser mayor que 0", color = Color.Red, style = MaterialTheme.typography.bodySmall)
+                    Text("Consuption must be greater than 0", color = Color.Red, style = MaterialTheme.typography.bodySmall)
                 }
             }
         },
@@ -293,7 +293,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
                 )
             ) {
-                Text("Añadir")
+                Text("Add")
             }
         },
         dismissButton = {
@@ -301,7 +301,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                 onClick = { onDismiss() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
-                Text("Cancelar")
+                Text("Cancel")
             }
         }
     )
@@ -320,8 +320,8 @@ fun EditVehicleDialog(
     var consumption by remember { mutableStateOf(vehicle.consumption.toString()) }
 
     val energyOptions = when (selectedType?.name) {
-        "Coche", "Moto" -> listOf(Petrol95(), Petrol98(), Diesel(), Electricity())
-        "Patinete" -> listOf(Electricity())
+        "Car", "Bike" -> listOf(Petrol95(), Petrol98(), Diesel(), Electricity())
+        "Scooter" -> listOf(Electricity())
         else -> emptyList()
     }
 
@@ -346,7 +346,7 @@ fun EditVehicleDialog(
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text("Editar Vehículo") },
+        title = { Text("Edit Vehicle") },
         text = {
             Column {
                 // Alias
@@ -361,7 +361,7 @@ fun EditVehicleDialog(
                 )
                 if (aliasError) {
                     Text(
-                        text = if (alias!!.isBlank()) "El alias no puede estar vacío" else "El alias ya existe",
+                        text = if (alias!!.isBlank()) "Alias cannot be blank" else "Alias alrady exists",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -369,7 +369,7 @@ fun EditVehicleDialog(
 
                 // Tipo de Vehículo
                 DropdownSelector(
-                    label = "Tipo",
+                    label = "Type",
                     items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter),
                     selectedItem = selectedType,
                     onItemSelected = { selectedType = it }
@@ -377,7 +377,7 @@ fun EditVehicleDialog(
 
                 // Tipo de Energía
                 DropdownSelector(
-                    label = "Tipo de Energía",
+                    label = "Energy Type",
                     items = energyOptions,
                     selectedItem = selectedEnergyType,
                     onItemSelected = {
@@ -387,7 +387,7 @@ fun EditVehicleDialog(
                 )
                 if (energyError) {
                     Text(
-                        text = "Seleccione un tipo de energía válido",
+                        text = "Select a valid energy type",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -400,13 +400,13 @@ fun EditVehicleDialog(
                         consumption = it
                         consumptionError = it.toDoubleOrNull()?.let { it <= 0 } ?: true
                     },
-                    label = { Text("Consumo ${selectedEnergyType?.magnitude ?: "no seleccionado"}") },
+                    label = { Text("Consumo ${selectedEnergyType?.magnitude ?: "not selected"}") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = consumptionError
                 )
                 if (consumptionError) {
                     Text(
-                        text = "El consumo debe ser mayor que 0",
+                        text = "Consption must be greater than 0",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -425,7 +425,7 @@ fun EditVehicleDialog(
                     containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
                 )
             ) {
-                Text("Guardar Cambios")
+                Text("Save Changes")
             }
         },
         dismissButton = {
@@ -433,7 +433,7 @@ fun EditVehicleDialog(
                 onClick = { onDismiss() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
-                Text("Cancelar")
+                Text("Cancel")
             }
         }
     )
@@ -442,8 +442,8 @@ fun EditVehicleDialog(
     if (showConfirmationDialog) {
         AlertDialog(
             onDismissRequest = { showConfirmationDialog = false },
-            title = { Text("Confirmar Actualización") },
-            text = { Text("¿Está seguro de que desea actualizar los datos del vehículo?") },
+            title = { Text("Confirm Update") },
+            text = { Text("Are you sure you want to update the vehicle data") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -452,7 +452,7 @@ fun EditVehicleDialog(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Sí")
+                    Text("Yes")
                 }
             },
             dismissButton = {
@@ -487,7 +487,7 @@ fun <T> DropdownSelector(
             OutlinedButton(
                 onClick = { expanded = true }
                 ) {
-                Text(text = selectedItem?.toString() ?: "Seleccionar $label", color = Color.Black)
+                Text(text = selectedItem?.toString() ?: "Select $label", color = Color.Black)
             }
             DropdownMenu(
                 expanded = expanded,
@@ -538,11 +538,11 @@ fun VehicleItem(vehicle: VehicleModel, onClick: () -> Unit) {
                 Image(
                     painter = painterResource(
                         id = when (vehicle.type.name) {
-                            "Coche" -> R.drawable.car
-                            "Moto" -> R.drawable.bike
-                            "Bicicleta" -> R.drawable.cycle
-                            "Patinete" -> R.drawable.scooter
-                            "Andar" -> R.drawable.walk
+                            "Car" -> R.drawable.car
+                            "Bike" -> R.drawable.bike
+                            "Cycle" -> R.drawable.cycle
+                            "Scooter" -> R.drawable.scooter
+                            "Walk" -> R.drawable.walk
                             else -> android.R.drawable.stat_notify_sdcard_usb
                         }
                     ),
@@ -671,8 +671,9 @@ fun VehicleDetailsDialog(
     if (showDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = false },
-            title = { Text("Confirmar Eliminación") },
-            text = { Text("¿Estás seguro de que deseas eliminar este vehículo?") },
+            title = { Text("Confirm Deletion") },
+            text = { Text("¿Estás seguro de que deseas eliminar este vehículo?" +
+                    "Are you sure you wish to delete this vehicle") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -680,14 +681,14 @@ fun VehicleDetailsDialog(
                     showDeleteConfirmation = false },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                     ) {
-                    Text(text="Eliminar")
+                    Text(text="Delete")
                 }
             },
             dismissButton = {
                 Button(onClick = { showDeleteConfirmation = false },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
                 ) {
-                    Text(text="Cancelar", color = Color.Black)
+                    Text(text="Cancel", color = Color.Black)
                 }
             }
         )

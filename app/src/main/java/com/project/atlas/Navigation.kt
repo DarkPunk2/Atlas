@@ -6,13 +6,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.project.atlas.ViewModels.UserViewModel
-import com.project.atlas.ViewModels.VehicleViewModel
+import com.project.atlas.viewModels.UserViewModel
+import com.project.atlas.viewModels.VehicleViewModel
 import com.project.atlas.views.HomePage
 import com.project.atlas.views.LoginPage
 import com.project.atlas.views.MapPage
 import com.project.atlas.views.SignUpPage
 import com.project.atlas.views.listVehicle
+import com.project.atlas.views.locations.LocationsListView
 
 @Composable
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
@@ -30,6 +31,9 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
         }
         composable("signup"){
             SignUpPage(modifier, navController, userViewModel)
+        }
+        composable("locations"){
+            LocationsListView(navController)
         }
         composable("vehicles"){
             listVehicle(modifier, navController, vehicleViewModel)

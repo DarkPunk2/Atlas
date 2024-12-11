@@ -38,9 +38,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.project.atlas.Models.AuthState
+import com.project.atlas.models.AuthState
 import com.project.atlas.R
-import com.project.atlas.ViewModels.UserViewModel
+import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.ui.theme.AtlasDarker
 import com.project.atlas.ui.theme.AtlasGreen
 
