@@ -1,18 +1,18 @@
-package com.project.atlas.ViewModels
+package com.project.atlas.viewModels
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.atlas.Interfaces.UserInterface
-import com.project.atlas.Interfaces.VehicleInterface
-import com.project.atlas.Models.Location
-import com.project.atlas.Models.UserModel
-import com.project.atlas.Models.VehicleModel
-import com.project.atlas.Services.AuthService
-import com.project.atlas.Services.VehicleDatabaseService
-import com.project.atlas.Services.VehicleService
+import com.project.atlas.interfaces.UserInterface
+import com.project.atlas.interfaces.VehicleInterface
+import com.project.atlas.models.Location
+import com.project.atlas.models.UserModel
+import com.project.atlas.models.VehicleModel
+import com.project.atlas.services.AuthService
+import com.project.atlas.services.VehicleDatabaseService
+import com.project.atlas.services.VehicleService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

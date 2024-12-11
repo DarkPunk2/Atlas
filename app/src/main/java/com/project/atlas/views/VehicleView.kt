@@ -53,11 +53,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.project.atlas.Interfaces.EnergyType
-import com.project.atlas.Interfaces.Petrol95
-import com.project.atlas.ViewModels.VehicleViewModel
-import com.project.atlas.Models.VehicleModel
-import com.project.atlas.Models.VehicleType
+import com.project.atlas.interfaces.EnergyType
+import com.project.atlas.interfaces.Petrol95
+import com.project.atlas.viewModels.VehicleViewModel
+import com.project.atlas.models.VehicleModel
+import com.project.atlas.models.VehicleType
 import com.project.atlas.R
 import com.project.atlas.ui.theme.AtlasGreen
 import kotlinx.coroutines.delay

@@ -1,11 +1,11 @@
 package com.project.atlas.it_1Test
 
 
-import com.project.atlas.Interfaces.*
-import com.project.atlas.Models.VehicleModel
-import com.project.atlas.Models.VehicleType
-import com.project.atlas.Services.VehicleService
-import com.project.atlas.Services.VehicleDatabaseService
+import com.project.atlas.interfaces.*
+import com.project.atlas.models.VehicleModel
+import com.project.atlas.models.VehicleType
+import com.project.atlas.services.VehicleService
+import com.project.atlas.services.VehicleDatabaseService
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Before

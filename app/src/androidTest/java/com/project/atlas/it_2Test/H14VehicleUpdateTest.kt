@@ -2,14 +2,14 @@ package com.project.atlas.it_2Test
 
 import Diesel
 import Petrol98
-import com.project.atlas.Exceptions.VehicleNotExistsException
-import com.project.atlas.Exceptions.VehicleWrongBusinessRulesException
-import com.project.atlas.Interfaces.Petrol95
-import com.project.atlas.Interfaces.VehicleInterface
-import com.project.atlas.Models.VehicleModel
-import com.project.atlas.Models.VehicleType
-import com.project.atlas.Services.VehicleDatabaseService
-import com.project.atlas.Services.VehicleService
+import com.project.atlas.exceptions.VehicleNotExistsException
+import com.project.atlas.exceptions.VehicleWrongBusinessRulesException
+import com.project.atlas.interfaces.Petrol95
+import com.project.atlas.interfaces.VehicleInterface
+import com.project.atlas.models.VehicleModel
+import com.project.atlas.models.VehicleType
+import com.project.atlas.services.VehicleDatabaseService
+import com.project.atlas.services.VehicleService
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertFalse

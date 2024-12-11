@@ -1,5 +1,4 @@
-package com.project.atlas.Exceptions
-
+package com.project.atlas.exceptions
 
 class VehicleNotExistsException(message:String) : Exception(message) {
 }

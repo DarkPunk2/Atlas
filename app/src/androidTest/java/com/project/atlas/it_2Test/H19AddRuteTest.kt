@@ -8,6 +8,7 @@ import com.project.atlas.models.Location
 import com.project.atlas.models.RuteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
+import com.project.atlas.models.VehicleType
 import com.project.atlas.services.DatabaseService
 import com.project.atlas.services.FailDataBaseService
 import com.project.atlas.services.RuteService
@@ -30,7 +31,7 @@ class H19AddRuteTest {
         //Given
         val start = Location(39.992573, -0.064749,"Castellon")
         val end = Location(39.479126, -0.342623,"Valencia")
-        val vehicle = VehicleModel("Coche","Coche", Diesel(), 4.0)
+        val vehicle = VehicleModel("Coche",VehicleType.Car, Diesel(), 4.0)
         val rute = ruteService.createRute(start,end,vehicle,RuteType.FASTER)
         //When
         val result = ruteService.addRute(rute)
@@ -44,7 +45,7 @@ class H19AddRuteTest {
         ruteService = RuteService(FailDataBaseService())
         val start = Location(39.992573, -0.064749,"Castellon")
         val end = Location(39.479126, -0.342623,"Valencia")
-        val vehicle = VehicleModel("Coche","Coche", Diesel(), 4.0)
+        val vehicle = VehicleModel("Coche",VehicleType.Car, Diesel(), 4.0)
         val rute = ruteService.createRute(start,end,vehicle,RuteType.FASTER)
         //When
         ruteService.addRute(rute)

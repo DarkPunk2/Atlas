@@ -1,4 +1,4 @@
-package com.project.atlas.Services
+package com.project.atlas.services
 
 import Calories
 import Diesel
@@ -7,14 +7,14 @@ import Petrol98
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.project.atlas.Exceptions.VehicleNotExistsException
+import com.project.atlas.exceptions.VehicleNotExistsException
 
-import com.project.atlas.Interfaces.EnergyType
-import com.project.atlas.Interfaces.Petrol95
-import com.project.atlas.Interfaces.VehicleInterface
+import com.project.atlas.interfaces.EnergyType
+import com.project.atlas.interfaces.Petrol95
+import com.project.atlas.interfaces.VehicleInterface
 
-import com.project.atlas.Models.VehicleModel
-import com.project.atlas.Models.VehicleType
+import com.project.atlas.models.VehicleModel
+import com.project.atlas.models.VehicleType
 import java.io.Serializable
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
