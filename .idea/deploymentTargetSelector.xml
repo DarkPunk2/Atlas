@@ -16,16 +16,13 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="acceptanceTest1()">
+      <SelectionState runConfigName="H15RuteCreationTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="acceptanceTest1() (1)">
+      <SelectionState runConfigName="H19AddRuteTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewListVehicle">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="H11VehicleAddTest">
+      <SelectionState runConfigName="H20GetRuteTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -4,6 +4,7 @@ import GeocodeResponse
 import GeocodeService
 import com.project.atlas.apisRequest.RequestDataForRute
 import com.project.atlas.apisRequest.ResponseDataForRute
+import com.project.atlas.exceptions.InvalidRuteException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -85,12 +86,12 @@ object ApiClient {
                     if (response.isSuccessful && response.body() != null) {
                         continuation.resume(response.body()!!)
                     } else {
-                        continuation.resumeWithException(RuntimeException("Error: ${response.code()} ${response.message()}"))
+                        continuation.resumeWithException(InvalidRuteException("Error: ${response.code()} ${response.message()}"))
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseDataForRute>, t: Throwable) {
-                    continuation.resumeWithException(t)
+                    continuation.resumeWithException(InvalidRuteException("Error: ${t.message ?: "Unknown error"}"))
                 }
             })
 

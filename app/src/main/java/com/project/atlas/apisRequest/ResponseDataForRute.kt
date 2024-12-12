@@ -16,20 +16,6 @@ data class ResponseDataForRute(
     }
 }
 
-enum class RuteType {
-    FASTER,
-    RECOMMENDED,
-    SHORTER;
-    fun getPreference(): String {
-        return when (this) {
-            FASTER -> "fastest"
-            RECOMMENDED -> "recommended"
-            SHORTER -> "shortest"
-        }
-    }
-}
-
-
 data class Engine(
     val build_date: String,
     val graph_date: String,

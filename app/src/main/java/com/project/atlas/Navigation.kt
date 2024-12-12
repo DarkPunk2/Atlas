@@ -12,6 +12,7 @@ import com.project.atlas.viewModels.VehicleViewModel
 import com.project.atlas.views.HomePage
 import com.project.atlas.views.LoginPage
 import com.project.atlas.views.MapPage
+import com.project.atlas.views.RuteCreatorView
 import com.project.atlas.views.RuteViewerPage
 import com.project.atlas.views.SignUpPage
 import com.project.atlas.views.listVehicle
@@ -42,6 +43,9 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel,
         }
         composable("rute"){
             RuteViewerPage(navController,ruteViewModel)
+        }
+        composable("ruteCreator"){
+            RuteCreatorView()
         }
     })
 }
