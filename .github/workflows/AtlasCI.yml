@@ -45,14 +45,14 @@ jobs:
 
     - name: Download and setup emulator
       run: |
-        sdkmanager --install "system-images;android-30;google_apis;x86_64"
+        sdkmanager --install "system-images;android-30;google_apis_playstore;armeabi-v7a"
         sdkmanager --install "platform-tools"
         sdkmanager --install "platforms;android-30"
-        echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+        echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis_playstore;armeabi-v7a" --force
 
     - name: Start emulator
       run: |
-        $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio -no-snapshot -wipe-data -accel on -gpu swiftshader_indirect -no-boot-anim &
+        $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio -no-snapshot -wipe-data -gpu swiftshader_indirect -no-boot-anim &
         adb wait-for-device
         adb shell input keyevent 82 &
     
