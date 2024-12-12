@@ -72,7 +72,11 @@ class LocationsViewModel: ViewModel() {
         }
     }
 
-    fun updateAlias(location: Location, newAlias: String) {
+    fun updateLocation(location1: Location, d: Double, d1: Double) {
+
+    }
+
+    fun updateLocation(location1: Location, d: String) {
 
     }
 }

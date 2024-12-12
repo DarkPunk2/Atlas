@@ -71,6 +71,29 @@ class LocationsTest {
     }
 
     @Test
+    fun H9P1Test(){
+        //Given
+        val location1 = Location(40.0, 0.0, "Parque")
+        locationsViewModel.addLocation(location1)
+        //When
+        locationsViewModel.updateLocation(location1, "Parque Actualizado")
+
+        //Then
+        assertEquals(locationsViewModel.getLocation(0).alias, "Parque Actualizado")
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun H9P2Test(){
+        //Given
+        val location1 = Location(40.0, 0.0, "Parque")
+        locationsViewModel.addLocation(location1)
+        //When
+        locationsViewModel.updateLocation(location1, 100.0, 100.0)
+
+        //Then
+    }
+
+    @Test
     fun H10P1Test(){
         //Given
         val location1 = Location(40.0, 0.0, "Parque")
