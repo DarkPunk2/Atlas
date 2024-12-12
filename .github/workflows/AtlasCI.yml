@@ -58,8 +58,6 @@ jobs:
     
     - name: Verify emulator is up
       run: adb shell getprop init.svc.bootanim | grep -E 'stopped|invalid'
-      retries: 5
-      retry_delay: 30
     
     - name: Run instrumented tests with Gradle
       run: ./gradlew connectedAndroidTest
