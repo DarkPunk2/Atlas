@@ -20,47 +20,18 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
-
-    - name: Cache Gradle packages
-      uses: actions/cache@v2
+        
+    - name: Build app
+      run: ./gradlew assembleDebug assembleAndroidTest
+    - name: Run tests
+      uses: emulator-wtf/run-tests@v0
       with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    
-    - name: Build with Gradle
-      run: ./gradlew build
-    
-    - name: Run unit tests with Gradle
-      run: ./gradlew test
-
-    - name: Download and setup emulator
-      run: |
-        sdkmanager --install "system-images;android-30;google_apis_playstore;armeabi-v7a"
-        sdkmanager --install "platform-tools"
-        sdkmanager --install "platforms;android-30"
-        echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis_playstore;armeabi-v7a" --force
-
-    - name: Start emulator
-      run: |
-        $ANDROID_HOME/emulator/emulator -avd test -no-window -no-audio -no-snapshot -wipe-data -gpu swiftshader_indirect -no-boot-anim &
-        adb wait-for-device
-        adb shell input keyevent 82 &
-    
-    - name: Verify emulator is up
-      run: adb shell getprop init.svc.bootanim | grep -E 'stopped|invalid'
-    
-    - name: Run instrumented tests with Gradle
-      run: ./gradlew connectedAndroidTest
-    
-    - name: Stop emulator
-      run: adb -s emulator-5554 emu kill
+        api-token: ${{ secrets.EW_API_TOKEN }}
+        app: app/build/outputs/apk/debug/app-debug.apk
+        test: app/build/outputs/apk/androidTest/app-debug-androidTest.apk
+        outputs-dir: build/test-results
+    - name: Publish test report
+      uses: mikepenz/action-junit-report@v2
+      if: always() # always run even if the tests fail
+      with:
+        report_paths: 'build/test-results/**/*.xml'
