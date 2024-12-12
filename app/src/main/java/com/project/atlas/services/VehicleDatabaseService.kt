@@ -23,7 +23,9 @@ class VehicleDatabaseService : VehicleInterface {
 
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var usersCollection:String = "users"
+    public var isTesting = false
     fun setTestMode(){
+        isTesting = true
         usersCollection = "usersTest"
     }
     fun vehicleToHashMap (vehicle: VehicleModel): HashMap<String, Serializable> {
@@ -35,6 +37,7 @@ class VehicleDatabaseService : VehicleInterface {
         )
         return dbVehicle
     }
+
 
     public suspend fun createDefaults(user: String) : Boolean {
         val vWalk = VehicleModel(VehicleType.Walk.toString(), VehicleType.Walk, Calories(), 60.0)
