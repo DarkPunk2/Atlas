@@ -6,20 +6,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.project.atlas.viewModels.RuteViewModel
 import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.viewModels.VehicleViewModel
 import com.project.atlas.views.HomePage
 import com.project.atlas.views.LoginPage
 import com.project.atlas.views.MapPage
-import com.project.atlas.views.RuteCreatorView
-import com.project.atlas.views.RuteViewerPage
 import com.project.atlas.views.SignUpPage
-import com.project.atlas.views.listVehicle
+import com.project.atlas.views.vehicles.listVehicle
 import com.project.atlas.views.locations.LocationsListView
+import com.project.atlas.views.vehicles.SelectVehicle
 
 @Composable
-fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel, ruteViewModel: RuteViewModel){
+fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
     val navController = rememberNavController()
     val vehicleViewModel: VehicleViewModel = viewModel()
     NavHost(navController = navController, startDestination =  "login", builder = {
@@ -41,11 +39,8 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel,
         composable("vehicles"){
             listVehicle(modifier, navController, vehicleViewModel)
         }
-        composable("rute"){
-            RuteViewerPage(navController,ruteViewModel)
-        }
-        composable("ruteCreator"){
-            RuteCreatorView()
+        composable("selectVehicles"){
+            SelectVehicle(modifier, navController, vehicleViewModel)
         }
     })
 }

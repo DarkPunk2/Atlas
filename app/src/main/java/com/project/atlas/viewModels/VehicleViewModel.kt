@@ -10,6 +10,7 @@ import com.project.atlas.interfaces.VehicleInterface
 import com.project.atlas.models.Location
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
+import com.project.atlas.models.VehicleType
 import com.project.atlas.services.AuthService
 import com.project.atlas.services.VehicleDatabaseService
 import com.project.atlas.services.VehicleService
@@ -23,13 +24,24 @@ open class VehicleViewModel : ViewModel() {
     private val _vehicleList = MutableLiveData<List<VehicleModel>>()
     val vehicleList: LiveData<List<VehicleModel>> = _vehicleList
 
-    // Obtiene los vehículos desde la base de datos y actualiza la lista
+
     fun refreshVehicles() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = service.listVehicle(UserModel.eMail) ?: emptyList()
-            _vehicleList.postValue(result) // Actualiza LiveData en el hilo principal
+
+            // Ordenar la lista
+            val sortedList = result.sortedWith(compareBy {
+                when (it.type) { // Aquí se establece el orden personalizado
+                    VehicleType.Walk -> 0  // Walk va primero
+                    VehicleType.Cycle -> 1 // Cycle va segundo
+                    else -> 2              // El resto de vehículos va después
+                }
+            })
+
+            _vehicleList.postValue(sortedList) // Actualiza LiveData con la lista ordenada
         }
     }
+
 
     // Añade un nuevo vehículo y refresca la lista
     fun add(vehicle: VehicleModel) {

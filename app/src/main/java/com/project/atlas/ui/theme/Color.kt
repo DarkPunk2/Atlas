@@ -12,3 +12,4 @@ val Pink40 = Color(0xFF7D5260)
 
 val AtlasGreen = Color(0xFF00FF66)
 val AtlasDarker = Color(0xFF02B44A)
+val AtlasGold = Color(0xFFFFC107)

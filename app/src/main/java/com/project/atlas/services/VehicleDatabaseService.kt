@@ -35,6 +35,41 @@ class VehicleDatabaseService : VehicleInterface {
         )
         return dbVehicle
     }
+
+    public suspend fun createDefaults(user: String) : Boolean {
+        val vWalk = VehicleModel(VehicleType.Walk.toString(), VehicleType.Walk, Calories(), 60.0)
+        val vCycle = VehicleModel(VehicleType.Cycle.toString(), VehicleType.Cycle, Calories(), 30.0)
+        val dbWalk = vehicleToHashMap(vWalk)
+        val dbCycle = vehicleToHashMap(vCycle)
+
+        return suspendCoroutine<Boolean> { continuation ->
+            val walkTask = db.collection(usersCollection)
+                .document(user)
+                .collection("vehicles")
+                .document(vWalk.alias!!)
+                .set(dbWalk)
+
+            val cycleTask = db.collection(usersCollection)
+                .document(user)
+                .collection("vehicles")
+                .document(vCycle.alias!!)
+                .set(dbCycle)
+
+            val tasks = listOf(walkTask, cycleTask)
+            val allTasks = tasks.map { task ->
+                task.addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error adding vehicle: ${exception.message}")
+                    continuation.resume(false)
+                }
+            }
+            walkTask.addOnSuccessListener {
+                cycleTask.addOnSuccessListener {
+                    continuation.resume(true)
+                }
+            }
+        }
+    }
+
     override suspend fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
         if (!vehicle.alias.isNullOrBlank() and checkForDuplicates(user, vehicle.alias!!)) {
             return false
@@ -153,6 +188,22 @@ class VehicleDatabaseService : VehicleInterface {
                 .get()
                 .addOnSuccessListener { document ->
                     continuation.resume(document.exists())
+                }
+        }
+    }
+    public suspend fun checkForVehicles(user: String): Boolean {
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(user)
+                .collection("vehicles")
+                .get() // Recuperamos todos los documentos de la colección "vehicles"
+                .addOnSuccessListener { querySnapshot ->
+                    // Si la colección tiene documentos, devolvemos true
+                    continuation.resume(querySnapshot.isEmpty.not())
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error checking vehicles: ${exception.message}")
+                    continuation.resume(false)
                 }
         }
     }
