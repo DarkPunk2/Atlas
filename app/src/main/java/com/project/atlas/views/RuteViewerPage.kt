@@ -6,6 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import com.google.maps.android.PolyUtil
+import com.project.atlas.ui.theme.AtlasDarker
+import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.viewModels.RuteViewModel
 import com.utsman.osmandcompose.OpenStreetMap
 import com.utsman.osmandcompose.Polyline
@@ -18,8 +20,8 @@ import org.osmdroid.util.GeoPoint
 fun RuteViewerPage(navController: NavController, ruteViewModel: RuteViewModel) {
 
     val cameraState = rememberCameraState {
-        geoPoint = GeoPoint(ruteViewModel.ruteState.value!!.start.lon,
-            ruteViewModel.ruteState.value!!.start.lat)
+        geoPoint = GeoPoint(ruteViewModel.ruteState.value!!.start.lat,
+            ruteViewModel.ruteState.value!!.start.lon)
         zoom = 12.0
     }
 
@@ -35,7 +37,9 @@ fun RuteViewerPage(navController: NavController, ruteViewModel: RuteViewModel) {
         cameraState = cameraState
     ) {
         // add polyline
-        Polyline(geoPoints = geoPoint)
+        Polyline(geoPoints = geoPoint,
+            color = AtlasDarker
+        )
     }
 }
 

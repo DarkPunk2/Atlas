@@ -14,7 +14,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,8 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.project.atlas.models.Location
 import com.project.atlas.models.RuteType
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.ui.theme.AtlasGreen
@@ -34,8 +38,16 @@ import com.project.atlas.views.vehicles.DropdownSelector
 
 @Composable
 fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) {
-    var expanded by remember { mutableStateOf(false) }
     var selectedType by remember { mutableStateOf<RuteType?>(null) }
+    val ruteState by ruteViewModel.ruteState.observeAsState()
+    ruteViewModel.addStart(Location(39.992573, -0.064749,"Castellon"))
+    ruteViewModel.addEnd(Location(39.479126, -0.342623,"Valencia"))
+
+    LaunchedEffect(ruteState) {
+        ruteState?.let {
+            navController.navigate("viewRute")
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -55,7 +67,7 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
 
             }, modifier = Modifier.fillMaxWidth()
         ) { Text(
-            text = "Start location",
+            text = ruteViewModel.start.value?.alias ?:"Select start location",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 5.dp)
@@ -67,7 +79,7 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
 
             }, modifier = Modifier.fillMaxWidth()
         ) { Text(
-            text = "End location",
+            text = ruteViewModel.end.value?.alias ?:"Select end location",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 5.dp)
@@ -97,7 +109,11 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
         Spacer(modifier = Modifier.height(15.dp))
         Button(
             onClick = {
-
+                ruteViewModel.createRute(start = ruteViewModel.start.value,
+                    end = ruteViewModel.end.value,
+                    vehicle = ruteViewModel.vehicleState.value,
+                    ruteType = selectedType
+                )
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors( containerColor = AtlasGreen )
