@@ -27,7 +27,7 @@ class H19AddRuteTest {
 
     @Before
     fun setup(){
-        UserModel.setMail("testRute@test.test")
+        UserModel.setMail("testAddRute@test.test")
     }
     @Test
     fun h19P1Test(){

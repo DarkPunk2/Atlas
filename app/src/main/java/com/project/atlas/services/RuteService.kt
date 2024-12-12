@@ -1,9 +1,12 @@
 package com.project.atlas.services
 
+import com.project.atlas.exceptions.UserNotLoginException
 import com.project.atlas.interfaces.RuteDatabase
+import com.project.atlas.models.AuthState
 import com.project.atlas.models.Location
 import com.project.atlas.models.RuteModel
 import com.project.atlas.models.RuteType
+import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 
 
@@ -27,6 +30,9 @@ class RuteService(private val db: RuteDatabase) {
     }
 
     suspend fun getRutes(): List<RuteModel>{
+        if (UserModel.getAuthState() == AuthState.Unauthenticated){
+            throw UserNotLoginException("User is not login")
+        }
         return db.getAll()
     }
 
