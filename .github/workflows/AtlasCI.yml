@@ -12,22 +12,60 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - uses: actions/checkout@v4
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Build with Gradle
-      run: ./gradlew build
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
 
-    - name: Run tests with Gradle
-      run: ./gradlew test
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle
 
-    - name: Run instrumented tests with Gradle
-      run: ./gradlew connectedAndroidTest
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Run unit tests with Gradle
+        run: ./gradlew test
+
+      - name: Download and setup emulator
+        run: |
+          sdkmanager --install "system-images;android-30;google_apis;x86_64"
+          sdkmanager --install "platform-tools"
+          sdkmanager --install "platforms;android-30"
+          echo "y" | sdkmanager --install "emulator"
+          echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+          EMULATOR_API=30
+          EMULATOR_NAME=test
+
+      - name: Start emulator
+        run: |
+          $ANDROID_HOME/emulator/emulator-headless -avd $EMULATOR_NAME -no-window -no-audio -no-snapshot -wipe-data -accel on -gpu swiftshader_indirect -no-boot-anim &
+          adb wait-for-device
+          adb shell input keyevent 82 &
+
+      - name: Verify emulator is up
+        run: adb shell getprop init.svc.bootanim | grep -E 'stopped|invalid'
+
+      - name: Run instrumented tests with Gradle
+        run: ./gradlew connectedAndroidTest
+        env:
+          ANDROID_EMULATOR: $EMULATOR_NAME
+
+      - name: Stop emulator
+        run: adb -s emulator-5554 emu kill
