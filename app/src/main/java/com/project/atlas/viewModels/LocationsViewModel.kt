@@ -72,11 +72,20 @@ class LocationsViewModel: ViewModel() {
         }
     }
 
-    fun updateLocation(location1: Location, d: Double, d1: Double) {
-
+    fun updateLocation(location: Location, lat: Double, lon: Double) {
+        if (abs(lat) <= 90.0 && abs(lon) <= 180.0) {
+            location.lat = lat
+            location.lon = lon
+            locationRepository.updateLocation(location, lat, lon, location.alias)
+        } else {
+            throw IllegalArgumentException()
+        }
     }
 
-    fun updateLocation(location1: Location, d: String) {
-
+    fun updateLocation(location: Location, alias: String) {
+        if (alias!=location.alias){
+            location.alias = alias
+            locationRepository.updateLocation(location, location.lat, location.lon, alias)
+        }
     }
 }
