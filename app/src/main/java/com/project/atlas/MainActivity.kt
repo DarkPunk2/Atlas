@@ -20,11 +20,10 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         val userViewModel: UserViewModel by viewModels()
-        val ruteViewModel: RuteViewModel by viewModels()
         setContent {
             AtlasTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MyAppNavigation(modifier = Modifier.padding(innerPadding), userViewModel = userViewModel, ruteViewModel)
+                    MyAppNavigation(modifier = Modifier.padding(innerPadding), userViewModel = userViewModel)
                 }
             }
         }

@@ -15,11 +15,19 @@ import kotlinx.coroutines.launch
 class RuteViewModel: ViewModel() {
     private val _ruteState = MutableLiveData<RuteModel>()
     val ruteState: LiveData<RuteModel> = _ruteState
+    private val _vehicle = MutableLiveData<VehicleModel>()
+    val vehicleState: LiveData<VehicleModel> = _vehicle
+
+
     private val ruteService = RuteService(RuteDatabaseService())
 
     fun createRute(start: Location, end: Location, vehicle: VehicleModel, ruteType: RuteType){
         viewModelScope.launch {
             _ruteState.value = ruteService.createRute(start,end,vehicle,ruteType)
         }
+    }
+
+    fun addVehicle(vehicle: VehicleModel){
+        _vehicle.value = vehicle
     }
 }

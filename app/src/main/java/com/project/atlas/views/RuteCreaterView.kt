@@ -23,12 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.project.atlas.models.RuteType
+import com.project.atlas.models.VehicleModel
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.viewModels.RuteViewModel
+import com.project.atlas.views.vehicles.DropdownSelector
 
 
 @Composable
-fun RuteCreatorView() {
+fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) {
     var expanded by remember { mutableStateOf(false) }
     var selectedType by remember { mutableStateOf<RuteType?>(null) }
 
@@ -71,10 +76,10 @@ fun RuteCreatorView() {
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedButton(
             onClick = {
-
+                navController.navigate("selectVehicles")
             }, modifier = Modifier.fillMaxWidth()
         ) { Text(
-            text = "Vehicle",
+            text = ruteViewModel.vehicleState.value?.alias ?: "Select vehicle",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 5.dp)
@@ -107,8 +112,3 @@ fun RuteCreatorView() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RutePreview() {
-    RuteCreatorView()
-}

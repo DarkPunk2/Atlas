@@ -59,6 +59,7 @@ import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.viewModels.RuteViewModel
 import com.project.atlas.viewModels.VehicleViewModel
 import kotlinx.coroutines.delay
 
@@ -67,7 +68,8 @@ import kotlinx.coroutines.delay
 fun SelectVehicle(
     modifier: Modifier,
     navController: NavController,
-    vehicleViewModel: VehicleViewModel
+    vehicleViewModel: VehicleViewModel,
+    ruteViewModel: RuteViewModel
 ) {
     val vehicleList by vehicleViewModel.vehicleList.observeAsState(emptyList())
     var isLoading by remember { mutableStateOf(true) }
@@ -159,7 +161,10 @@ fun SelectVehicle(
         VehicleSelectDetailsDialog(
             vehicle = vehicle,
             onDismiss = { showDetails = null },
-            onSelect = {/**/}
+            onSelect = {
+                ruteViewModel.addVehicle(vehicle)
+                navController.popBackStack()
+            }
         )
     }
 
