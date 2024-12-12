@@ -20,9 +20,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-        
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
+    
     - name: Build app
       run: ./gradlew assembleDebug assembleAndroidTest
+    
     - name: Run tests
       uses: emulator-wtf/run-tests@v0
       with:
@@ -30,6 +34,7 @@ jobs:
         app: app/build/outputs/apk/debug/app-debug.apk
         test: app/build/outputs/apk/androidTest/app-debug-androidTest.apk
         outputs-dir: build/test-results
+    
     - name: Publish test report
       uses: mikepenz/action-junit-report@v2
       if: always() # always run even if the tests fail
