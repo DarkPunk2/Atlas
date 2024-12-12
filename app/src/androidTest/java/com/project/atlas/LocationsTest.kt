@@ -1,6 +1,7 @@
 package com.project.atlas
 
 import com.project.atlas.models.Location
+import com.project.atlas.models.UserModel
 import com.project.atlas.viewModels.LocationsViewModel
 
 import org.junit.Before
@@ -15,6 +16,7 @@ class LocationsTest {
 
     @Before
     fun startup(){
+        UserModel.setMail("locations@test.test")
         locationsViewModel = LocationsViewModel()
     }
 
