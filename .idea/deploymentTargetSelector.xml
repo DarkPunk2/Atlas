@@ -19,7 +19,11 @@
       </SelectionState>
       <SelectionState runConfigName="Tests in 'com.project.atlas.it_2Test'">
         <option name="selectionMode" value="DROPDOWN" />
+          </SelectionState>
+      <SelectionState runConfigName="MainActivity">
+        <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="H2UserLoginTest">
     </selectionStates>
   </component>
 </project>
