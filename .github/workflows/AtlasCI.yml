@@ -1,4 +1,4 @@
-name: Android CI
+name: AtlasCI
 
 on:
   push:
