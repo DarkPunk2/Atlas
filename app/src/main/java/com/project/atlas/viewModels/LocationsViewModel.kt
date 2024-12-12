@@ -12,16 +12,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-class LocationsViewModel: ViewModel() {
+class LocationsViewModel : ViewModel() {
     private val locationsList = SnapshotStateList<Location>()
     private val locationRepository = LocationRepository()
 
-    fun addLocation(location: Location ) {
+    fun addLocation(location: Location) {
         locationsList.add(location)
     }
 
     fun addLocation(lat: Double, lon: Double, alias: String) {
-        if(abs(lat)<=90.0 && abs(lon)<=180.0) {
+        if (abs(lat) <= 90.0 && abs(lon) <= 180.0) {
             viewModelScope.launch {
                 val newAlias = if (alias.isEmpty()) {
                     ApiClient.fetchToponymByLatLong(
@@ -33,7 +33,7 @@ class LocationsViewModel: ViewModel() {
                     alias
                 }
 
-                //Sanitize alias to remove any / characters and everything until a comma
+                //Sanitizar alias para eliminar cualquier carácter después de una '/' hasta una ',' .
                 val sanitizedAlias = newAlias.replace(Regex("/[^,]*,"), ",")
                 val newLocation = Location(lat, lon, sanitizedAlias)
                 locationRepository.addLocation(newLocation)
@@ -42,12 +42,26 @@ class LocationsViewModel: ViewModel() {
         }
     }
 
+    fun addLocation(toponym: String) {
+        if (toponym.isNotEmpty()) {
+            ApiClient.fetchGeocode(
+                "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
+                toponym
+            ) { lat, lon, topo ->
+                addLocation(lat, lon, topo)
+                Log.d("location", "Nueva ubicación agregada: $topo")
+            }
+        } else {
+            Log.e("location", "No se encontraron resultados en la geocodificación.")
+        }
+    }
+
     fun getNumLocations(): Int {
         return locationsList.size
     }
 
     fun getLocation(index: Int): Location {
-        if (index<getNumLocations()) {
+        if (index < getNumLocations()) {
             return locationsList.get(index)
         }
         throw IndexOutOfBoundsException()
@@ -73,19 +87,27 @@ class LocationsViewModel: ViewModel() {
     }
 
     fun updateLocation(location: Location, lat: Double, lon: Double) {
-        if (abs(lat) <= 90.0 && abs(lon) <= 180.0) {
-            location.lat = lat
-            location.lon = lon
-            locationRepository.updateLocation(location, lat, lon, location.alias)
-        } else {
-            throw IllegalArgumentException()
-        }
+        this.updateLocation(location, lat, lon, location.alias)
     }
 
     fun updateLocation(location: Location, alias: String) {
-        if (alias!=location.alias){
-            location.alias = alias
-            locationRepository.updateLocation(location, location.lat, location.lon, alias)
+        this.updateLocation(location, location.lat, location.lon, alias)
+    }
+
+    fun updateLocation(location: Location, lat: Double, lon: Double, alias: String) {
+        var newLat = location.lat
+        var newLon = location.lon
+        var newAlias = location.alias
+        if (abs(lat) <= 90.0 && abs(lon) <= 180.0) {
+            newLat = lat
+            newLon = lon
         }
+        if (alias != location.alias) {
+            newAlias = alias
+        }
+        locationRepository.updateLocation(location, newLat, newLon, newAlias)
+        location.lat = newLat
+        location.lon = newLon
+        location.alias = newAlias
     }
 }

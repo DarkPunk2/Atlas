@@ -7,25 +7,27 @@
       </SelectionState>
       <SelectionState runConfigName="MainActivity">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-12-05T15:24:26.345075300Z">
+        <DropdownSelection timestamp="2024-12-12T14:35:53.768521300Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=3RP4C17B15012742" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Oboix\.android\avd\Pixel_8_Pro_API_34.avd" />
             </handle>
           </Target>
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="acceptanceTest1()">
+      <SelectionState runConfigName="H9P1Test()">
         <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2024-12-12T14:34:46.492588900Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Oboix\.android\avd\Pixel_8_Pro_API_34.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="acceptanceTest1() (1)">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="PreviewListVehicle">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="H11VehicleAddTest">
+      <SelectionState runConfigName="LocationsListView">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
