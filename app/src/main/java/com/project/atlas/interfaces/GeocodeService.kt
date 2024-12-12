@@ -1,5 +1,11 @@
+import com.project.atlas.apisRequest.RequestDataForRute
+import com.project.atlas.apisRequest.ResponseDataForRute
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface GeocodeService {
@@ -15,5 +21,13 @@ interface GeocodeService {
         @Query("point.lat") latitude: String,
         @Query("point.lon") longitude: String
     ): Call<GeocodeResponse>
+
+    @Headers("Authorization: 5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f", "Content-Type: application/json")
+    @POST("v2/directions/{vehicle}")
+    fun getRute(
+        @Path("vehicle") vehicle: String,
+        @Body coordinates: RequestDataForRute
+    ): Call<ResponseDataForRute>
+
 }
 

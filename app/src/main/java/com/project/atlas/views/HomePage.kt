@@ -63,7 +63,21 @@ fun HomePage(modifier: Modifier = Modifier,navController: NavController ) {
         }) {
             Text(text = "Go to vehicles")
         }
-
+        TextButton(onClick = {
+            navController.navigate("locations")
+        }) {
+            Text(text = "Go to locations")
+        }
+        TextButton(onClick = {
+            navController.navigate("selectVehicles")
+        }) {
+            Text(text = "Go to selection")
+        }
+        TextButton(onClick = {
+            navController.navigate("createRute")
+        }) {
+            Text(text = "Go to rute creation")
+        }
     }
 }
 

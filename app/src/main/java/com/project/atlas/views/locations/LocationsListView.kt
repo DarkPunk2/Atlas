@@ -1,9 +1,11 @@
-package com.project.atlas.Views
+package com.project.atlas.views.locations
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,13 +41,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.project.atlas.models.Location
 import com.project.atlas.viewModels.LocationsViewModel
 
 @Composable
 fun LocationCard(
     alias: String,
     coords: String,
-    favorite: Boolean
+    favorite: Boolean,
+    onClick: () -> Unit
 ) {
     val launched = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -64,6 +69,7 @@ fun LocationCard(
                 .padding(10.dp, 10.dp, 10.dp, 0.dp)
                 .fillMaxWidth()
                 .shadow(4.dp)
+                .clickable { onClick() }
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -107,12 +113,13 @@ fun LocationCard(
     }
 }
 
-@Preview
 @Composable
-fun LocationsListView() {
+fun LocationsListView(navController: NavController) {
     val viewModel: LocationsViewModel = viewModel()
     val locations = remember { mutableStateOf(viewModel.getAllLocations()) }
     val showCard = remember { mutableStateOf(false) }
+    val showActionCard = remember { mutableStateOf(false) }
+    val selectedLocation = remember { mutableStateOf<Location?>(null) }
 
     Box {
         Column(
@@ -132,7 +139,7 @@ fun LocationsListView() {
                 ) {
                     IconButton(
                         onClick = {
-                            /* TODO */
+                            navController.popBackStack()
                         }
                     ) {
                         Icon(
@@ -156,7 +163,12 @@ fun LocationsListView() {
                         LocationCard(
                             alias = location.alias,
                             coords = "(${location.lat}, ${location.lon})",
-                            favorite = false
+                            favorite = false,
+                            onClick = {
+                                selectedLocation.value = location
+                                showActionCard.value = true
+                                Log.d("locations", "correcto")
+                            }
                         )
                     }
                 }
@@ -179,8 +191,24 @@ fun LocationsListView() {
             visible = showCard.value,
             enter = slideInVertically { it },
             exit = slideOutVertically { it }
-            ) {
-            AddLocationView(onBack = { showCard.value = false }, viewModel)
+        ) {
+            AddLocationView(onBack = { showCard.value = false }, viewModel, 0.0, 0.0)
+        }
+        AnimatedVisibility(
+            visible = showActionCard.value,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it }
+        ) {
+            selectedLocation.value?.let { location ->
+                LocationActionView(
+                    onBack = {
+                        showActionCard.value = false
+                        selectedLocation.value = null
+                    },
+                    viewModel,
+                    location
+                )
+            }
         }
     }
 }

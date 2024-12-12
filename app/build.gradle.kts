@@ -54,7 +54,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -87,4 +86,8 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     implementation(platform(libs.firebase.bom.v3360))
+    implementation(libs.material3)
+    implementation(libs.ui)
+    implementation(libs.play.services.maps.v1802)
+    implementation(libs.android.maps.utils)
 }
