@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.auth.FirebaseAuth
 import com.project.atlas.exceptions.IncorrectEmailException
 import com.project.atlas.exceptions.IncorrectPasswordException
+import com.project.atlas.exceptions.UserNotFoundException
 import com.project.atlas.interfaces.UserInterface
 import com.project.atlas.models.UserModel
 import com.project.atlas.services.AuthService
@@ -18,29 +19,14 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class H2UserLoginTest {
-    private lateinit var user: UserInterface
-    private lateinit var firebaseAuth: FirebaseAuth
-
-
-    @Before
-    fun userSetup() = runBlocking {
-        user = AuthService()
-        firebaseAuth = FirebaseAuth.getInstance()
-
-        try {
-            val authResult = firebaseAuth.createUserWithEmailAndPassword("usuario@gmail.com", "contraseñaValida@13").await()
-        } catch (e: Exception) {
-            // Handle the exception if necessary
-            println("Error creating user: ${e.message}")
-        }
-    }
+    private var user: UserInterface = AuthService()
 
     @Test
     fun h2P1Test() = runBlocking{
         //Given
 
         //When
-        val email = "usuario@gmail.com"
+        val email = "login@test.test"
         val password = "contraseñaValida@13"
 
         user.loginUser(email,password)
@@ -48,12 +34,25 @@ class H2UserLoginTest {
 
         assertEquals(email, UserModel.eMail)
     }
+    @Test(expected= UserNotFoundException::class)
+    fun h2P2Test() {
+        //Given
+
+        //When
+        val email = "notlogin@test.test"
+        val pass = "Contraseñavalida@13"
+        runBlocking {
+            user.loginUser(email, pass)
+        }
+        //Then
+
+    }
     @Test(expected= IncorrectPasswordException::class)
     fun h2P3Test(){
         //Given
 
         //When
-        val email = "usuario@gmail.com"
+        val email = "login@test.test"
         val password = "12345"
         runBlocking {
             user.loginUser(email, password)
@@ -65,15 +64,11 @@ class H2UserLoginTest {
         //Given
 
         //When
-        val email = "usuario@gma"
+        val email = "login@gma"
         val password = "contraseñaValida@13"
         runBlocking {
             user.loginUser(email, password)
         }
         //Then
-    }
-    @After
-    fun deleteUser(){
-        firebaseAuth.currentUser?.delete()
     }
 }
