@@ -2,6 +2,7 @@ package com.project.atlas.services
 
 import GeocodeResponse
 import GeocodeService
+import android.util.Log
 import com.project.atlas.apisRequest.RequestDataForRute
 import com.project.atlas.apisRequest.ResponseDataForRute
 import com.project.atlas.exceptions.InvalidRuteException
@@ -30,7 +31,7 @@ object ApiClient {
     }
 
 
-    fun fetchGeocode(apiKey: String, location: String, onResult: (String) -> Unit) {
+    fun fetchGeocode(apiKey: String, location: String, onResult: (Double, Double, String) -> Unit) {
         val call = geocodeService.getGeocode(apiKey, location)
 
         call.enqueue(object : Callback<GeocodeResponse> {
@@ -40,15 +41,17 @@ object ApiClient {
             ) {
                 if (response.isSuccessful && response.body() != null) {
                     val geocodeResponse = response.body()
-                    onResult(geocodeResponse.toString()) // O adapta según lo que necesites mostrar
 
-                } else {
-                    onResult("Error: ${response.code()} ${response.message()}")
+                    val toponym = geocodeResponse?.features?.get(0)?.properties?.label ?: "Topónimo no encontrado"
+                    val lat = geocodeResponse?.features?.get(0)?.geometry?.coordinates?.get(1) ?: 0.0
+                    val lon = geocodeResponse?.features?.get(0)?.geometry?.coordinates?.get(0) ?: 0.0
+
+                    onResult(lat, lon, toponym)
                 }
             }
 
             override fun onFailure(call: Call<GeocodeResponse>, t: Throwable) {
-                onResult("Error: ${t.message}")
+                Log.e("GeocodeApiViewModel", "Error en FetchGeocode")
             }
         })
     }

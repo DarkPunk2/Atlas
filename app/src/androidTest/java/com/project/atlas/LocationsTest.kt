@@ -18,6 +18,7 @@ class LocationsTest {
     fun startup(){
         UserModel.setMail("locations@test.test")
         locationsViewModel = LocationsViewModel()
+        UserModel.setMail("locations@test.com")
     }
 
     @Test
@@ -34,15 +35,15 @@ class LocationsTest {
         assertEquals(locationsViewModel.getAllLocations().get(0), location)
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException::class)
     fun H7P5Test(){
         //Given
 
         //When
         val location = Location(100.0, 100.0, "Parque")
+        locationsViewModel.addLocation(location)
 
         //Then
-        assertEquals(locationsViewModel.getNumLocations(), 0)
     }
 
     @Test
@@ -70,6 +71,29 @@ class LocationsTest {
 
         //Then
         assertEquals(locationsViewModel.getNumLocations(), 0)
+    }
+
+    @Test
+    fun H9P1Test(){
+        //Given
+        val location1 = Location(40.0, 0.0, "Parque")
+        locationsViewModel.addLocation(location1)
+        //When
+        locationsViewModel.updateLocation(location1, "Parque Actualizado")
+
+        //Then
+        assertEquals(locationsViewModel.getLocation(0).alias, "Parque Actualizado")
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun H9P2Test(){
+        //Given
+        val location1 = Location(40.0, 0.0, "Parque")
+        locationsViewModel.addLocation(location1)
+        //When
+        locationsViewModel.updateLocation(location1, 100.0, 100.0)
+
+        //Then
     }
 
     @Test
