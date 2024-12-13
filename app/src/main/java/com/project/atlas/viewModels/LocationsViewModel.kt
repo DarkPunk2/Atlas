@@ -17,28 +17,29 @@ class LocationsViewModel : ViewModel() {
     private val locationRepository = LocationRepository()
 
     fun addLocation(location: Location) {
+        if (abs(location.lat) > 90.0 || abs(location.lon) > 180.0) {
+            throw IllegalArgumentException()
+        }
         locationsList.add(location)
     }
 
     fun addLocation(lat: Double, lon: Double, alias: String) {
-        if (abs(lat) <= 90.0 && abs(lon) <= 180.0) {
-            viewModelScope.launch {
-                val newAlias = if (alias.isEmpty()) {
-                    ApiClient.fetchToponymByLatLong(
-                        "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
-                        lat.toString(),
-                        lon.toString()
-                    )
-                } else {
-                    alias
-                }
-
-                //Sanitizar alias para eliminar cualquier carácter después de una '/' hasta una ',' .
-                val sanitizedAlias = newAlias.replace(Regex("/[^,]*,"), ",")
-                val newLocation = Location(lat, lon, sanitizedAlias)
-                locationRepository.addLocation(newLocation)
-                addLocation(newLocation)
+        viewModelScope.launch {
+            val newAlias = if (alias.isEmpty()) {
+                ApiClient.fetchToponymByLatLong(
+                    "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
+                    lat.toString(),
+                    lon.toString()
+                )
+            } else {
+                alias
             }
+
+            //Sanitizar alias para eliminar cualquier carácter después de una '/' hasta una ',' .
+            val sanitizedAlias = newAlias.replace(Regex("/[^,]*,"), ",")
+            val newLocation = Location(lat, lon, sanitizedAlias)
+            locationRepository.addLocation(newLocation)
+            addLocation(newLocation)
         }
     }
 
@@ -95,19 +96,16 @@ class LocationsViewModel : ViewModel() {
     }
 
     fun updateLocation(location: Location, lat: Double, lon: Double, alias: String) {
-        var newLat = location.lat
-        var newLon = location.lon
         var newAlias = location.alias
-        if (abs(lat) <= 90.0 && abs(lon) <= 180.0) {
-            newLat = lat
-            newLon = lon
+        if (abs(lat) > 90.0 || abs(lon) > 180.0) {
+            throw IllegalArgumentException()
         }
         if (alias != location.alias) {
             newAlias = alias
         }
-        locationRepository.updateLocation(location, newLat, newLon, newAlias)
-        location.lat = newLat
-        location.lon = newLon
+        locationRepository.updateLocation(location, lat, lon, newAlias)
+        location.lat = lat
+        location.lon = lon
         location.alias = newAlias
     }
 }

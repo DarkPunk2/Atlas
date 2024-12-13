@@ -1,6 +1,7 @@
 package com.project.atlas
 
 import com.project.atlas.models.Location
+import com.project.atlas.models.UserModel
 import com.project.atlas.viewModels.LocationsViewModel
 
 import org.junit.Before
@@ -16,6 +17,7 @@ class LocationsTest {
     @Before
     fun startup(){
         locationsViewModel = LocationsViewModel()
+        UserModel.setMail("locations@test.com")
     }
 
     @Test
@@ -32,15 +34,15 @@ class LocationsTest {
         assertEquals(locationsViewModel.getAllLocations().get(0), location)
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException::class)
     fun H7P5Test(){
         //Given
 
         //When
         val location = Location(100.0, 100.0, "Parque")
+        locationsViewModel.addLocation(location)
 
         //Then
-        assertEquals(locationsViewModel.getNumLocations(), 0)
     }
 
     @Test

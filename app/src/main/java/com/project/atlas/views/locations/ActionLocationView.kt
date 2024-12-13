@@ -3,17 +3,13 @@ package com.project.atlas.views.locations
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandIn
-import androidx.compose.animation.fadeIn
 import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -23,24 +19,31 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.project.atlas.components.CustomBottomSheet
 import com.project.atlas.models.Location
 import com.project.atlas.viewModels.LocationsViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActionLocationView(
     onDismiss: () -> Unit,
-    lvm: LocationsViewModel,
+    viewModel: LocationsViewModel,
     location: Location
 ) {
+
     val showEditCard = remember { mutableStateOf(false) }
 
     val onBack: () -> Unit = if (showEditCard.value) {
-        { showEditCard.value = false }
+        {
+            showEditCard.value = false
+        }
     } else {
-        onDismiss
+        {
+            onDismiss()
+        }
     }
 
     CustomBottomSheet(
@@ -58,13 +61,10 @@ fun ActionLocationView(
             )
         ) {
             EditLocationView(
-                onBack = {
-                    showEditCard.value = false
-                },
                 onDismiss = {
                     onDismiss()
                 },
-                lvm,
+                viewModel,
                 location
             )
         }
@@ -107,7 +107,7 @@ fun ActionLocationView(
                     Spacer(modifier = Modifier.size(8.dp))
                     FilledTonalButton(
                         onClick = {
-                            lvm.removeLocation(
+                            viewModel.removeLocation(
                                 location
                             )
                             Log.d("locations", "Removed")
