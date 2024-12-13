@@ -21,7 +21,8 @@ class RuteService(private val db: RuteDatabase) {
             ruteType = ruteType,
             distance = response.getDistance(),
             duration = response.getDuration(),
-            rute = response.getRute()
+            rute = response.getRute(),
+            bbox = response.bbox
         )
     }
 

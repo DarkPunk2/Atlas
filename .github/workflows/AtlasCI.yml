@@ -2,9 +2,13 @@ name: AtlasCI
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - "master"
+      - "it-3"
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - "master"
+      - "it-3"
 
 jobs:
   build:
@@ -40,6 +44,5 @@ jobs:
     
     - name: Publish test report
       uses: mikepenz/action-junit-report@v2
-      if: always() # always run even if the tests fail
       with:
         report_paths: 'build/test-results/**/*.xml'

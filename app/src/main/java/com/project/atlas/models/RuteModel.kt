@@ -9,7 +9,8 @@ data class RuteModel(val id: String = UUID.randomUUID().toString(),
                      val ruteType: RuteType,
                      val distance: Double,
                      val duration: Double,
-                     val rute: String
+                     val rute: String,
+                     val bbox: List<Double>
 )
 
 enum class RuteType {
