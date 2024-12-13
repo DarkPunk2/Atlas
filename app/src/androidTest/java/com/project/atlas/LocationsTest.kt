@@ -16,6 +16,7 @@ class LocationsTest {
 
     @Before
     fun startup(){
+        UserModel.setMail("locations@test.test")
         locationsViewModel = LocationsViewModel()
         UserModel.setMail("locations@test.com")
     }

@@ -60,7 +60,11 @@ class H13VehicleDeleteTest {
     @After
     fun deleteAddedVehicle() {
         runBlocking {
+            try{
             service.deleteVehicle("testVehicleDelete", "Mi buga")
+            }catch (e: Exception){
+
+            }
         }
     }
 }

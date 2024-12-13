@@ -1,18 +1,26 @@
 package com.project.atlas.models
 
-import com.google.gson.JsonObject
+import java.util.UUID
 
-data class RuteModel(var start: Location,var end: Location,var vehicle: VehicleModel){
-    fun getDistance(): Double{
-        return -1.0
-    }
-    fun getDuration(): Int{
-        return -1
-    }
-}
+data class RuteModel(val id: String = UUID.randomUUID().toString(),
+                     val start: Location,
+                     val end: Location,
+                     val vehicle: VehicleModel,
+                     val ruteType: RuteType,
+                     val distance: Double,
+                     val duration: Double,
+                     val rute: String
+)
 
-enum class RuteType{
+enum class RuteType {
     FASTER,
-    CHEAPER,
-    SHORTER
+    RECOMMENDED,
+    SHORTER;
+    fun getPreference(): String {
+        return when (this) {
+            FASTER -> "fastest"
+            RECOMMENDED -> "recommended"
+            SHORTER -> "shortest"
+        }
+    }
 }
