@@ -23,22 +23,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.project.atlas.models.Location
-import com.project.atlas.models.RuteType
-import com.project.atlas.models.VehicleModel
+import com.project.atlas.models.RouteType
 import com.project.atlas.ui.theme.AtlasGreen
-import com.project.atlas.viewModels.RuteViewModel
+import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.vehicles.DropdownSelector
 
 
 @Composable
-fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) {
-    var selectedType by remember { mutableStateOf<RuteType?>(null) }
+fun RuteCreatorView(navController: NavController, ruteViewModel: RouteViewModel) {
+    var selectedType by remember { mutableStateOf<RouteType?>(null) }
     val ruteState by ruteViewModel.ruteState.observeAsState()
     ruteViewModel.addStart(Location(39.992573, -0.064749,"Castellon"))
     ruteViewModel.addEnd(Location(39.479126, -0.342623,"Valencia"))
@@ -101,7 +97,7 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
 
         DropdownSelector(
             label = "Type",
-            items = RuteType.entries.toList(),
+            items = RouteType.entries.toList(),
             selectedItem = selectedType,
             onItemSelected = { selectedType = it }
         )
@@ -112,7 +108,7 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
                 ruteViewModel.createRute(start = ruteViewModel.start.value,
                     end = ruteViewModel.end.value,
                     vehicle = ruteViewModel.vehicleState.value,
-                    ruteType = selectedType
+                    routeType = selectedType
                 )
             },
             modifier = Modifier.fillMaxWidth(),

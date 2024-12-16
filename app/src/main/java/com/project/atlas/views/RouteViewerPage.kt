@@ -7,8 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import com.google.maps.android.PolyUtil
 import com.project.atlas.ui.theme.AtlasDarker
-import com.project.atlas.ui.theme.AtlasGreen
-import com.project.atlas.viewModels.RuteViewModel
+import com.project.atlas.viewModels.RouteViewModel
 import com.utsman.osmandcompose.OpenStreetMap
 import com.utsman.osmandcompose.Polyline
 
@@ -17,7 +16,7 @@ import org.osmdroid.util.GeoPoint
 
 
 @Composable
-fun RuteViewerPage(navController: NavController, ruteViewModel: RuteViewModel) {
+fun RouteViewerPage(navController: NavController, ruteViewModel: RouteViewModel) {
 
     val cameraState = rememberCameraState {
         geoPoint = GeoPoint(ruteViewModel.ruteState.value!!.start.lat,
