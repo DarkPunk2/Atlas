@@ -23,7 +23,8 @@ class RouteService(private val db: RouteDatabase) {
             routeType = routeType,
             distance = response.getDistance(),
             duration = response.getDuration(),
-            rute = response.getRute()
+            rute = response.getRute(),
+            bbox = response.bbox
         )
         addRoute(route)
         return route

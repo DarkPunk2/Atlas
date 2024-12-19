@@ -18,7 +18,6 @@ import com.project.atlas.views.SignUpPage
 import com.project.atlas.views.vehicles.listVehicle
 import com.project.atlas.views.locations.LocationsListView
 import com.project.atlas.views.vehicles.SelectVehicle
-import com.project.atlas.views.vehicles.listRoute
 
 @Composable
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){

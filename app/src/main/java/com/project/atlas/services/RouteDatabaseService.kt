@@ -93,7 +93,8 @@ class RouteDatabaseService: RouteDatabase {
             "ruteType" to rute.routeType.name,
             "distance" to rute.distance,
             "duration" to rute.duration,
-            "rute" to rute.rute
+            "rute" to rute.rute,
+            "bbox" to rute.bbox
         )
     }
 
@@ -135,7 +136,8 @@ class RouteDatabaseService: RouteDatabase {
             routeType = RouteType.valueOf(getString("ruteType")!!),
             distance = getDouble("distance")!!,
             duration = getDouble("duration")!!,
-            rute = getString("rute")!!
+            rute = getString("rute")!!,
+            bbox = get("bbox") as List<Double>
         )
     }
 

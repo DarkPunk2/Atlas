@@ -1,4 +1,4 @@
-package com.project.atlas
+package com.project.atlas.it_3Test
 
 import com.project.atlas.models.Location
 import com.project.atlas.models.UserModel
@@ -7,7 +7,6 @@ import com.project.atlas.viewModels.LocationsViewModel
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 
 class LocationsTest {

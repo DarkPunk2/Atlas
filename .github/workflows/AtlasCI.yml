@@ -2,9 +2,13 @@ name: AtlasCI
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - "master"
+      - "it-3"
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - "master"
+      - "it-3"
 
 jobs:
   build:

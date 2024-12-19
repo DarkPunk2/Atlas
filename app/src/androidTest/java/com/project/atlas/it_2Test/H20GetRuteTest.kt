@@ -30,7 +30,7 @@ class H20GetRuteTest {
         }
         //Then
         assertTrue("Incorrect number of values on the list",result.size == 1)
-        assertTrue("Incorrect rute",result.get(0).id == "0064bb23-e362-4554-8c6f-cc3ed92c4fc5")
+        assertTrue("Incorrect rute",result.get(0).id == "c38b7172-7c08-44dc-a9da-2735820e2e03")
     }
 
     @Test(expected = UserNotLoginException::class)

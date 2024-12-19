@@ -39,6 +39,12 @@ class RouteViewModel: ViewModel() {
         }
     }
 
+    fun addRute(ruteModel: RuteModel){
+        viewModelScope.launch {
+            ruteService.addRute(ruteModel)
+        }
+    }
+
     fun addVehicle(vehicle: VehicleModel){
         _vehicle.value = vehicle
     }

@@ -40,7 +40,12 @@ class H1UserRegisterTest {
         }
         //Then
         assertEquals(email,UserModel.eMail)
-
+        runBlocking {
+            firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener {
+                firebaseUser = firebaseAuth.currentUser!!
+                firebaseUser.delete()
+            }
+        }
     }
 
     @Test(expected=UserAlreadyExistException::class)
