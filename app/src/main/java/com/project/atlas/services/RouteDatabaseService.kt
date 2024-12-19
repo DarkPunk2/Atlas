@@ -8,6 +8,8 @@ import Petrol98
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.atlas.exceptions.RouteNotFoundException
+import com.project.atlas.exceptions.VehicleNotExistsException
 import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.interfaces.RouteDatabase
 import com.project.atlas.models.Location
@@ -29,17 +31,17 @@ class RouteDatabaseService: RouteDatabase {
         usersCollection = "usersTest"
     }
 
-    override suspend fun add(rute: RouteModel): Boolean {
-        if (checkForDuplicates(UserModel.eMail, rute.id)) {
+    override suspend fun add(route: RouteModel): Boolean {
+        if (checkForDuplicates(UserModel.eMail, route.id)) {
             return false
         }
-        val dbRute = ruteToMap(rute)
+        val dbRute = ruteToMap(route)
 
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
                 .document(UserModel.eMail)
                 .collection(collectionId)
-                .document(rute.id)
+                .document(route.id)
                 .set(dbRute)
                 .addOnSuccessListener {
                     continuation.resume(true)
@@ -47,6 +49,19 @@ class RouteDatabaseService: RouteDatabase {
                 .addOnFailureListener { exception ->
                     Log.e("Firebase", "Error adding rute: ${exception.message}")
                     continuation.resume(false)
+                }
+        }
+    }
+
+    override suspend fun remove(routeID: String): Boolean {
+        if(!checkForDuplicates(UserModel.eMail, routeID)) throw RouteNotFoundException("La ruta ${routeID} no existe en la base de datos")
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(UserModel.eMail)
+                .collection(collectionId)
+                .document(routeID).delete()
+                .addOnSuccessListener {
+                    continuation.resume(true)
                 }
         }
     }
@@ -144,10 +159,6 @@ class RouteDatabaseService: RouteDatabase {
                     continuation.resume(emptyList())
                 }
         }
-    }
-
-    override fun remove(): Boolean {
-        TODO("Not yet implemented")
     }
 
     private suspend fun checkForDuplicates(user: String, id: String): Boolean {

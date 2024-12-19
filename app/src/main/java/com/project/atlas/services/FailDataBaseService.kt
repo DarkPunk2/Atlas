@@ -13,7 +13,7 @@ class FailDataBaseService: RouteDatabase {
         throw ServiceNotAvailableException("Service is not available")
     }
 
-    override fun remove(): Boolean {
+    override suspend fun remove(routeID: String): Boolean {
         throw ServiceNotAvailableException("Service is not available")
     }
 }

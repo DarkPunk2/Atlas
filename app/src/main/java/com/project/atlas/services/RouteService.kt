@@ -11,9 +11,11 @@ import com.project.atlas.models.VehicleModel
 
 
 class RouteService(private val db: RouteDatabase) {
+    var routeApi = ApiClient
+
     suspend fun createRute(start: Location, end: Location, vehicle: VehicleModel, routeType: RouteType): RouteModel {
         val coordinates = listOf(listOf(start.lon,start.lat), listOf(end.lon,end.lat))
-        val response = ApiClient.fetchRoute(coordinates,routeType.getPreference(), vehicle.type.toRoute())
+        val response = routeApi.fetchRoute(coordinates,routeType.getPreference(), vehicle.type.toRoute())
         val route =  RouteModel(
             start = start,
             end = end,
@@ -31,11 +33,15 @@ class RouteService(private val db: RouteDatabase) {
         return db.add(rute)
     }
 
-    suspend fun getRutes(): List<RouteModel>{
+    suspend fun getRoutes(): List<RouteModel>{
         if (UserModel.getAuthState() == AuthState.Unauthenticated){
             throw UserNotLoginException("User is not login")
         }
         return db.getAll()
+    }
+
+    suspend fun removeRoute(routeID: String): Boolean{
+        return db.remove(routeID)
     }
 
 }

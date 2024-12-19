@@ -44,6 +44,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-1373770108">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Pixel_8a_API_35" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-1311427921">
           <value>
             <AndroidTestResultsTableState>
@@ -194,19 +207,6 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
-        <entry key="1411001490">
-          <value>
-            <AndroidTestResultsTableState>
-              <option name="preferredColumnWidths">
-                <map>
-                  <entry key="Duration" value="90" />
-                  <entry key="HUAWEI BND-L21" value="120" />
-                  <entry key="Tests" value="360" />
-                </map>
-              </option>
-            </AndroidTestResultsTableState>
-          </value>
-        </entry>
         <entry key="963267113">
           <value>
             <AndroidTestResultsTableState>
@@ -220,7 +220,33 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="1411001490">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="HUAWEI BND-L21" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="1411001521">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="HUAWEI BND-L21" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="1566827447">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
@@ -246,13 +272,13 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
-        <entry key="1566827447">
+        <entry key="1735799298">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
-                  <entry key="HUAWEI BND-L21" value="120" />
+                  <entry key="Pixel_8a_API_35" value="120" />
                   <entry key="Tests" value="360" />
                 </map>
               </option>

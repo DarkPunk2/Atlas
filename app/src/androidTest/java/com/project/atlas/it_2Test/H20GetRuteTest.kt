@@ -26,7 +26,7 @@ class H20GetRuteTest {
         //When
         val result: List<RouteModel>
         runBlocking {
-            result = routeService.getRutes()
+            result = routeService.getRoutes()
         }
         //Then
         assertTrue("Incorrect number of values on the list",result.size == 1)
@@ -40,7 +40,7 @@ class H20GetRuteTest {
         //When
         val result: List<RouteModel>
         runBlocking {
-            result = routeService.getRutes()
+            result = routeService.getRoutes()
         }
         //Then
 

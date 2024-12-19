@@ -52,6 +52,6 @@ class RouteViewModel: ViewModel() {
     }
 
     suspend fun getRutes(){
-        _ruteList.postValue(routeService.getRutes())
+        _ruteList.postValue(routeService.getRoutes())
     }
 }
