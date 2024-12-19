@@ -12,12 +12,13 @@ import com.project.atlas.viewModels.VehicleViewModel
 import com.project.atlas.views.HomePage
 import com.project.atlas.views.LoginPage
 import com.project.atlas.views.MapPage
-import com.project.atlas.views.RuteCreatorView
-import com.project.atlas.views.RouteViewerPage
 import com.project.atlas.views.SignUpPage
 import com.project.atlas.views.vehicles.listVehicle
 import com.project.atlas.views.locations.LocationsListView
 import com.project.atlas.views.vehicles.SelectVehicle
+import com.project.atlas.views.vehicles.listRoute
+import com.project.atlas.views.routes.RouteCreatorView
+import com.project.atlas.views.routes.RouteViewerPage
 
 @Composable
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
@@ -50,7 +51,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
             SelectVehicle(modifier, navController, vehicleViewModel, ruteViewModel)
         }
         composable("createRute"){
-            RuteCreatorView(navController, ruteViewModel)
+            RouteCreatorView(navController, ruteViewModel)
         }
         composable("viewRute"){
             RouteViewerPage(navController, ruteViewModel)

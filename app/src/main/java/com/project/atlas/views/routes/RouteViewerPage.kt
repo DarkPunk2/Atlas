@@ -1,4 +1,4 @@
-package com.project.atlas.views.rute
+package com.project.atlas.views.routes
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import com.google.maps.android.PolyUtil
 import com.project.atlas.ui.theme.AtlasDarker
-import com.project.atlas.viewModels.RuteViewModel
+import com.project.atlas.viewModels.RouteViewModel
 import com.utsman.osmandcompose.CameraProperty
 import com.utsman.osmandcompose.CameraState
 import com.utsman.osmandcompose.DefaultMapProperties
@@ -27,8 +27,8 @@ import kotlin.math.log2
 
 
 @Composable
-fun RuteViewerPage(navController: NavController, ruteViewModel: RuteViewModel) {
-    val bbox = ruteViewModel.ruteState.value!!.bbox
+fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel) {
+    val bbox = routeViewModel.routeState.value!!.bbox
     val centerLat = (bbox[1] + bbox[3]) / 2
     val centerLon = (bbox[0] + bbox[2]) / 2
     val latDiff = bbox[3] - bbox[1]
@@ -58,17 +58,17 @@ fun RuteViewerPage(navController: NavController, ruteViewModel: RuteViewModel) {
     }
 
     val geoPoint = remember {
-        PolyUtil.decode(ruteViewModel.ruteState.value!!.rute).map {
+        PolyUtil.decode(routeViewModel.routeState.value!!.rute).map {
             GeoPoint(it.latitude, it.longitude)
         }
     }
 
-    val start = ruteViewModel.ruteState.value!!.start
+    val start = routeViewModel.routeState.value!!.start
     val starMarker = rememberMarkerState(
         geoPoint = GeoPoint(start.lat,start.lon)
     )
 
-    val end = ruteViewModel.ruteState.value!!.end
+    val end = routeViewModel.routeState.value!!.end
     val endMarker = rememberMarkerState(
         geoPoint = GeoPoint(end.lat,end.lon)
     )
@@ -100,11 +100,11 @@ fun RuteViewerPage(navController: NavController, ruteViewModel: RuteViewModel) {
             color = AtlasDarker
         )
     }
-    RuteDetailsCard(
-        rute = ruteViewModel.ruteState.value!!,
+    RouteDetailsCard(
+        rute = routeViewModel.routeState.value!!,
         activeAdd = true,
         onDismiss = {},
-        onAdd = {rute -> ruteViewModel.addRute(rute)}
+        onAdd = {rute -> routeViewModel.addRoute(rute)}
     )
 }
 

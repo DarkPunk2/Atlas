@@ -1,4 +1,4 @@
-package com.project.atlas.views
+package com.project.atlas.views.routes
 
 
 import androidx.compose.foundation.layout.Arrangement
@@ -33,9 +33,9 @@ import com.project.atlas.views.vehicles.DropdownSelector
 
 
 @Composable
-fun RuteCreatorView(navController: NavController, ruteViewModel: RouteViewModel) {
+fun RouteCreatorView(navController: NavController, ruteViewModel: RouteViewModel) {
     var selectedType by remember { mutableStateOf<RouteType?>(null) }
-    val ruteState by ruteViewModel.ruteState.observeAsState()
+    val ruteState by ruteViewModel.routeState.observeAsState()
     ruteViewModel.addStart(Location(39.992573, -0.064749,"Castellon"))
     ruteViewModel.addEnd(Location(39.479126, -0.342623,"Valencia"))
 

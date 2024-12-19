@@ -31,7 +31,7 @@ class H1UserRegisterTest {
         //Given
 
         //When
-        val email = "usuario@gmail.com"
+        val email = "create@test.test"
         val pass = "Contraseñavalida@13"    //Debe contener una mayuscula,
                                             // una minuscula un special char y un número
         //UserInterface
@@ -51,14 +51,7 @@ class H1UserRegisterTest {
     @Test(expected=UserAlreadyExistException::class)
     fun acceptationTest_2() {
         //Given
-        //Añade al usuario a Firebase
-        user = AuthService(FireBaseAuthService())
-        firebaseAuth.createUserWithEmailAndPassword("usuario@gmail.com","contraseñaValida@13")
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    firebaseUser = firebaseAuth.currentUser!!
-                }
-            }
+
         //When
         val email = "usuario@gmail.com"
         val pass = "Contraseñavalida@13"    //Debe contener una mayuscula,
@@ -67,7 +60,6 @@ class H1UserRegisterTest {
            user.createUser(email, pass)
        }
         //Then
-        //Borra el usuario
-        firebaseUser.delete()
+
     }
 }
