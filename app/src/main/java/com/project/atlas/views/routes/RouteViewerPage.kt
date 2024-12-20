@@ -1,6 +1,16 @@
 package com.project.atlas.views.routes
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -9,6 +19,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.maps.android.PolyUtil
 import com.project.atlas.ui.theme.AtlasDarker
@@ -39,7 +51,7 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
         mutableStateOf(
             CameraState(
                 CameraProperty(
-                    geoPoint = GeoPoint(centerLat,centerLon),
+                    geoPoint = GeoPoint(centerLat, centerLon),
                     zoom = zoom
                 )
             )
@@ -65,17 +77,19 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
 
     val start = routeViewModel.routeState.value!!.start
     val starMarker = rememberMarkerState(
-        geoPoint = GeoPoint(start.lat,start.lon)
+        geoPoint = GeoPoint(start.lat, start.lon)
     )
 
     val end = routeViewModel.routeState.value!!.end
     val endMarker = rememberMarkerState(
-        geoPoint = GeoPoint(end.lat,end.lon)
+        geoPoint = GeoPoint(end.lat, end.lon)
     )
 
     var mapProperties by remember {
         mutableStateOf(DefaultMapProperties)
     }
+
+    val showCard = remember { mutableStateOf(true) }
 
     SideEffect {
         mapProperties = mapProperties
@@ -83,30 +97,62 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
             .copy(zoomButtonVisibility = ZoomButtonVisibility.NEVER)
     }
 
-
-    OpenStreetMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraState = cameraState,
-        properties = mapProperties
-    ) {
-        Marker(
-            state = starMarker,
-
-        )
-        Marker(
-            state = endMarker
-        )
-        Polyline(geoPoints = geoPoint,
-            color = AtlasDarker
-        )
+    BackHandler {
+        if (showCard.value) {
+            showCard.value = false
+        } else {
+            routeViewModel.resetValues()
+            navController.navigate("home")
+        }
     }
-    RouteDetailsCard(
-        rute = routeViewModel.routeState.value!!,
-        activeAdd = true,
-        onDismiss = {},
-        onAdd = {rute -> routeViewModel.addRoute(rute)}
-    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        OpenStreetMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraState = cameraState,
+            properties = mapProperties
+        ) {
+            Marker(
+                state = starMarker,
+
+                )
+            Marker(
+                state = endMarker
+            )
+            Polyline(
+                geoPoints = geoPoint,
+                color = AtlasDarker
+            )
+        }
+        AnimatedVisibility(
+            visible = showCard.value,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it }
+        ) {
+            RouteDetailsCard(
+                rute = routeViewModel.routeState.value!!,
+                activeAdd = true,
+                onDismiss = { showCard.value = false },
+                onAdd = { rute -> routeViewModel.addRoute(rute) }
+            )
+        }
+        if (!showCard.value) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(48.dp)
+            )
+            {
+                Card(modifier = Modifier
+                    .clickable { showCard.value = true }
+                    .padding(8.dp),
+                    elevation = CardDefaults.cardElevation())
+                { Text(text = "Show Details", modifier = Modifier.padding(8.dp)) }
+            }
+        }
+    }
 }
+
 
 
 

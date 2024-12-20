@@ -32,17 +32,20 @@ class H19AddRuteTest {
         val start = Location(39.992573, -0.064749,"Castellon")
         val end = Location(39.479126, -0.342623,"Valencia")
         val vehicle = VehicleModel("Coche", VehicleType.Car, Diesel(), 4.0)
-        val rute: RouteModel
+        val route: RouteModel
         runBlocking {
-            rute = routeService.createRute(start, end, vehicle, RouteType.FASTER)
+            route = routeService.createRute(start, end, vehicle, RouteType.FASTER)
         }
         //When
-        val result: Boolean
+        var result: Boolean
         runBlocking {
-            result = routeService.addRoute(rute)
+            result = routeService.addRoute(route)
         }
         //Then
-        assertTrue("Rute is not added",result)
+        assertTrue("Route is not added",result)
+        runBlocking {
+            routeService.removeRoute(route.id)
+        }
     }
 
     @Test(expected = ServiceNotAvailableException::class)
@@ -52,13 +55,13 @@ class H19AddRuteTest {
         val start = Location(39.992573, -0.064749,"Castellon")
         val end = Location(39.479126, -0.342623,"Valencia")
         val vehicle = VehicleModel("Coche",VehicleType.Car, Diesel(), 4.0)
-        val rute: RouteModel
+        val routeModel: RouteModel
         runBlocking {
-            rute = routeService.createRute(start, end, vehicle, RouteType.FASTER)
+            routeModel = routeService.createRute(start, end, vehicle, RouteType.FASTER)
         }
         //When
         runBlocking {
-            routeService.addRoute(rute)
+            routeService.addRoute(routeModel)
         }
         //Then
 

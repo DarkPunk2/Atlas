@@ -13,16 +13,16 @@ import com.project.atlas.services.RouteService
 import kotlinx.coroutines.launch
 
 class RouteViewModel: ViewModel() {
-    private val _routeState = MutableLiveData<RouteModel>()
+    private var _routeState = MutableLiveData<RouteModel>()
     val routeState: LiveData<RouteModel> = _routeState
 
-    private val _vehicle = MutableLiveData<VehicleModel>()
+    private var _vehicle = MutableLiveData<VehicleModel>()
     val vehicleState: LiveData<VehicleModel> = _vehicle
 
-    private val _start = MutableLiveData<Location>()
+    private var _start = MutableLiveData<Location>()
     val start: LiveData<Location> = _start
 
-    private val _end = MutableLiveData<Location>()
+    private var _end = MutableLiveData<Location>()
     val end: LiveData<Location> = _end
 
     private val _ruteList = MutableLiveData<List<RouteModel>>()
@@ -59,5 +59,12 @@ class RouteViewModel: ViewModel() {
 
     suspend fun getRutes(){
         _ruteList.postValue(routeService.getRoutes())
+    }
+
+    fun resetValues(){
+        _routeState = MutableLiveData<RouteModel>()
+        _vehicle = MutableLiveData<VehicleModel>()
+        _start = MutableLiveData<Location>()
+        _end = MutableLiveData<Location>()
     }
 }
