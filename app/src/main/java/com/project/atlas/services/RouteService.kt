@@ -26,7 +26,6 @@ class RouteService(private val db: RouteDatabase) {
             rute = response.getRute(),
             bbox = response.bbox
         )
-        addRoute(route)
         return route
     }
 
