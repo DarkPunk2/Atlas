@@ -7,6 +7,7 @@ import com.project.atlas.exceptions.UserAlreadyExistException
 import com.project.atlas.interfaces.UserInterface
 import com.project.atlas.models.UserModel
 import com.project.atlas.services.AuthService
+import com.project.atlas.services.FireBaseAuthService
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -22,7 +23,7 @@ class H1UserRegisterTest {
 
     @Before
     fun setUp(){
-        user = AuthService()
+        user = AuthService(FireBaseAuthService())
     }
 
     @Test
@@ -30,7 +31,7 @@ class H1UserRegisterTest {
         //Given
 
         //When
-        val email = "usuario@gmail.com"
+        val email = "create@test.test"
         val pass = "Contraseñavalida@13"    //Debe contener una mayuscula,
                                             // una minuscula un special char y un número
         //UserInterface
@@ -50,14 +51,7 @@ class H1UserRegisterTest {
     @Test(expected=UserAlreadyExistException::class)
     fun acceptationTest_2() {
         //Given
-        //Añade al usuario a Firebase
-        user = AuthService()
-        firebaseAuth.createUserWithEmailAndPassword("usuario@gmail.com","contraseñaValida@13")
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    firebaseUser = firebaseAuth.currentUser!!
-                }
-            }
+
         //When
         val email = "usuario@gmail.com"
         val pass = "Contraseñavalida@13"    //Debe contener una mayuscula,
@@ -66,7 +60,6 @@ class H1UserRegisterTest {
            user.createUser(email, pass)
        }
         //Then
-        //Borra el usuario
-        firebaseUser.delete()
+
     }
 }

@@ -5,16 +5,13 @@
       <SelectionState runConfigName="MainActivity">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="H20GetRuteTest">
+      <SelectionState runConfigName="Tests in 'com.project.atlas.it_1Test'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.project.atlas'">
+      <SelectionState runConfigName="Tests in 'com.project.atlas.it_2Test'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="H1UserRegisterTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="acceptationTest_1()">
+      <SelectionState runConfigName="Tests in 'com.project.atlas.it_3Test'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

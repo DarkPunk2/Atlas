@@ -1,4 +1,4 @@
-package com.project.atlas.views.rute
+package com.project.atlas.views.routes
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,23 +25,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.project.atlas.models.RuteModel
-import com.project.atlas.models.VehicleType
+import com.project.atlas.models.RouteModel
 import com.project.atlas.ui.theme.AtlasGreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RuteDetailsCard(
-    rute: RuteModel,
+fun RouteDetailsCard(
+    route: RouteModel,
     activeAdd: Boolean,
+    activeDelete: Boolean,
     onDismiss: () -> Unit,
-    onAdd: (RuteModel) -> Unit
+    onAdd: (RouteModel) -> Unit,
+    onDelete: (RouteModel) -> Unit
 ) {
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    var showAdd = activeAdd
+    var showAdd by remember { mutableStateOf(activeAdd) }
+    var showDelete by remember { mutableStateOf(activeDelete) }
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
@@ -57,7 +58,7 @@ fun RuteDetailsCard(
         ) {
             // Título
             Text(
-                text = "${rute.start.alias} to ${rute.end.alias}",
+                text = "${route.start.alias} to ${route.end.alias}",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -70,11 +71,11 @@ fun RuteDetailsCard(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Duration", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text( rute.duration.toString(), style = MaterialTheme.typography.bodyMedium)
+                    Text( route.duration.toString(), style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Distance", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(rute.distance.toString(), style = MaterialTheme.typography.bodyMedium)
+                    Text(route.distance.toString(), style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Cost", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
@@ -91,13 +92,22 @@ fun RuteDetailsCard(
                 if (showAdd) {
                     // Botón de añadir
                     Button(
-                        onClick = { onAdd(rute)
+                        onClick = { onAdd(route)
                                   showAdd = false},
                         colors = ButtonDefaults.buttonColors(containerColor = AtlasGreen)
                     ) {
                         Text("Store rute", color = Color.Black)
                     }
-                } else {
+                } else if (showDelete){
+                    Button(
+                        onClick = { onDelete(route)
+                            showDelete = false},
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    ) {
+                        Text("Delete rute", color = Color.Black)
+                    }
+                }
+                else {
                     Spacer(modifier = Modifier.width(120.dp))
                 }
             }

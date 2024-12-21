@@ -1,6 +1,6 @@
 package com.project.atlas.apisRequest
 
-data class ResponseDataForRute(
+data class ResponseDataForRoute(
     val bbox: List<Double>,
     val metadata: Metadata,
     val routes: List<Route>

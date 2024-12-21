@@ -122,7 +122,7 @@ fun OsmdroidMapView(mapViewModel: MapViewModel) {
         enter = slideInVertically { it },
         exit = slideOutVertically { it }
     ) {
-        AddLocationView(onBack = { showCard.value = false }, viewModel, lat.value, lon.value)
+        AddLocationView(onDismiss = { showCard.value = false }, viewModel, lat.value, lon.value)
     }
 }
 

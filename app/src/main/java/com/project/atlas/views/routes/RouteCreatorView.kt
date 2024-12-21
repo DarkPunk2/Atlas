@@ -1,6 +1,7 @@
-package com.project.atlas.views.rute
+package com.project.atlas.views.routes
 
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,24 +26,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.project.atlas.models.Location
-import com.project.atlas.models.RuteType
+import com.project.atlas.models.RouteType
 import com.project.atlas.ui.theme.AtlasGreen
-import com.project.atlas.viewModels.RuteViewModel
+import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.vehicles.DropdownSelector
 
 
 @Composable
-fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) {
-    var selectedType by remember { mutableStateOf<RuteType?>(null) }
-    val ruteState by ruteViewModel.ruteState.observeAsState()
-    ruteViewModel.addStart(Location(39.992573, -0.064749,"Castellon"))
-    ruteViewModel.addEnd(Location(39.479126, -0.342623,"Valencia"))
+fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewModel) {
+    var selectedType by remember { mutableStateOf<RouteType?>(null) }
+    val ruteState by routeViewModel.routeState.observeAsState()
+    val navigateToRuteView by routeViewModel.navigateToRuteView.observeAsState()
 
     LaunchedEffect(ruteState) {
-        ruteState?.let {
+        if (navigateToRuteView == true){
+            routeViewModel.seeAdd(true)
             navController.navigate("viewRute")
         }
+    }
+
+    BackHandler {
+        routeViewModel.resetValues()
+        navController.navigate("home")
     }
 
     Column(
@@ -60,10 +65,11 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
         Spacer(modifier = Modifier.height(15.dp))
         OutlinedButton(
             onClick = {
-
+                routeViewModel.seeSelectStart(true)
+                navController.navigate("locations")
             }, modifier = Modifier.fillMaxWidth()
         ) { Text(
-            text = ruteViewModel.start.value?.alias ?:"Select start location",
+            text = routeViewModel.start.value?.alias ?:"Select start location",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 5.dp)
@@ -72,10 +78,11 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedButton(
             onClick = {
-
+                routeViewModel.seeSelectEnd(true)
+                navController.navigate("locations")
             }, modifier = Modifier.fillMaxWidth()
         ) { Text(
-            text = ruteViewModel.end.value?.alias ?:"Select end location",
+            text = routeViewModel.end.value?.alias ?:"Select end location",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 5.dp)
@@ -87,7 +94,7 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
                 navController.navigate("selectVehicles")
             }, modifier = Modifier.fillMaxWidth()
         ) { Text(
-            text = ruteViewModel.vehicleState.value?.alias ?: "Select vehicle",
+            text = routeViewModel.vehicleState.value?.alias ?: "Select vehicle",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 5.dp)
@@ -97,7 +104,7 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
 
         DropdownSelector(
             label = "Type",
-            items = RuteType.entries.toList(),
+            items = RouteType.entries.toList(),
             selectedItem = selectedType,
             onItemSelected = { selectedType = it }
         )
@@ -105,10 +112,10 @@ fun RuteCreatorView(navController: NavController, ruteViewModel: RuteViewModel) 
         Spacer(modifier = Modifier.height(15.dp))
         Button(
             onClick = {
-                ruteViewModel.createRute(start = ruteViewModel.start.value,
-                    end = ruteViewModel.end.value,
-                    vehicle = ruteViewModel.vehicleState.value,
-                    ruteType = selectedType
+                routeViewModel.createRute(start = routeViewModel.start.value,
+                    end = routeViewModel.end.value,
+                    vehicle = routeViewModel.vehicleState.value,
+                    routeType = selectedType
                 )
             },
             modifier = Modifier.fillMaxWidth(),
