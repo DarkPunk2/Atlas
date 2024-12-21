@@ -1,18 +1,34 @@
 package com.project.atlas.views
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,65 +40,28 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.project.atlas.R
+import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.viewModels.MapViewModel
+import com.project.atlas.views.locations.LocationCard
 
 @Composable
 fun HomePage(modifier: Modifier = Modifier,navController: NavController ) {
-
-    Image(
+    Box(Modifier.fillMaxSize()) {
+        OsmdroidMapView(MapViewModel())
+        Image(
             painter = painterResource(id = R.drawable.atlas_lettering_black),
             contentDescription = "letterning",
             modifier = Modifier.absolutePadding(2.dp, 1.dp,3.dp,3.dp).size(100.dp)
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            //painter = painterResource(id = R.drawable.atlaslogo),
-            painter = painterResource(id = R.drawable.atlas_t),
-            contentDescription = "Logo",
-            modifier = Modifier.size(200.dp).background(color = Color.Transparent)
         )
-        Spacer(modifier = Modifier.height(15.dp))
-        Text(
-            text = "Home",
-            style = MaterialTheme.typography.displayMedium,
-            fontWeight = FontWeight.Bold
+        ExtendedFloatingActionButton(
+            onClick = { navController.navigate("routes") },
+            icon = { Icon(Icons.Filled.LocationOn, "My Routes") },
+            text = { Text(text = "My Routes") },
+            containerColor = AtlasGreen,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 60.dp, end = 16.dp)
         )
-        TextButton(onClick = {
-            navController.navigate("map")
-        }) {
-            Text(text = "Go to mapView Test")
-        }
-        TextButton(onClick = {
-            navController.navigate("vehicles")
-        }) {
-            Text(text = "Go to vehicles")
-        }
-        TextButton(onClick = {
-            navController.navigate("routes")
-        }) {
-            Text(text = "Go to routes")
-        }
-        TextButton(onClick = {
-            navController.navigate("locations")
-        }) {
-            Text(text = "Go to locations")
-        }
-        TextButton(onClick = {
-            navController.navigate("selectVehicles")
-        }) {
-            Text(text = "Go to selection")
-        }
-        TextButton(onClick = {
-            navController.navigate("createRute")
-        }) {
-            Text(text = "Go to rute creation")
-        }
     }
 }
 

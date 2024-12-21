@@ -1,13 +1,17 @@
 package com.project.atlas.views.routes
 
+import android.graphics.drawable.Drawable
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -20,9 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.google.maps.android.PolyUtil
+import com.project.atlas.R
 import com.project.atlas.ui.theme.AtlasDarker
 import com.project.atlas.viewModels.RouteViewModel
 import com.utsman.osmandcompose.CameraProperty
@@ -74,11 +82,15 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
             GeoPoint(it.latitude, it.longitude)
         }
     }
+    val context = LocalContext.current
 
     val start = routeViewModel.routeState.value!!.start
     val starMarker = rememberMarkerState(
         geoPoint = GeoPoint(start.lat, start.lon)
     )
+    val startIcon: Drawable? by remember {
+        mutableStateOf(ContextCompat.getDrawable(context, R.drawable.start_icon))
+    }
 
     val end = routeViewModel.routeState.value!!.end
     val endMarker = rememberMarkerState(
@@ -102,7 +114,7 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
             showCard.value = false
         } else {
             routeViewModel.resetValues()
-            navController.navigate("createRute")
+            navController.navigate("routes")
         }
     }
 
@@ -114,7 +126,7 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
         ) {
             Marker(
                 state = starMarker,
-
+                icon = startIcon
                 )
             Marker(
                 state = endMarker
@@ -124,6 +136,11 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
                 color = AtlasDarker
             )
         }
+        Image(
+            painter = painterResource(id = R.drawable.atlas_lettering_black),
+            contentDescription = "letterning",
+            modifier = Modifier.absolutePadding(2.dp, 1.dp,3.dp,3.dp).size(100.dp)
+        )
         AnimatedVisibility(
             visible = showCard.value,
             enter = slideInVertically { it },
@@ -134,11 +151,16 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
                 activeAdd = routeViewModel.showAddButton.value!!,
                 activeDelete = routeViewModel.showRemoveButton.value!!,
                 onDismiss = { showCard.value = false },
-                onAdd = { route -> routeViewModel.addRoute(route)
-                        routeViewModel.seeAdd(false)},
-                onDelete = { routeViewModel.deleteRoute()
+                onAdd = { route ->
+                    routeViewModel.addRoute(route)
+                    routeViewModel.seeAdd(false)
+                },
+                onDelete = {
+                    routeViewModel.deleteRoute()
                     routeViewModel.seeRemove(false)
-                navController.navigate("routes")}
+                    routeViewModel.resetValues()
+                    navController.navigate("routes")
+                }
             )
         }
         if (!showCard.value) {
