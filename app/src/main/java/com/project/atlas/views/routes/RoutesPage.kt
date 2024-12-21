@@ -1,5 +1,6 @@
 package com.project.atlas.views.vehicles
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -55,7 +56,6 @@ fun ListRoute(
     val routeList by routeViewModel.ruteList.observeAsState(emptyList())
     var isLoading by remember { mutableStateOf(true) }
     var showDetails by remember { mutableStateOf<RouteModel?>(null) }
-    var showAddForm by remember { mutableStateOf(false) }
 
     // Variables para SnackBar
     var showSnackbar by remember { mutableStateOf(false) }
@@ -66,6 +66,10 @@ fun ListRoute(
     LaunchedEffect(Unit) {
         routeViewModel.getRutes()
         isLoading = false
+    }
+
+    BackHandler {
+        navController.navigate("home")
     }
 
     if (showSnackbar) {
@@ -150,8 +154,8 @@ fun ListRoute(
                     )
                 } else {
                     LazyColumn {
-                        items(routeList){ route ->
-                            RouteItem(rute = route, onClick = {
+                        items(routeList) { route ->
+                            RouteItem(route = route, onClick = {
                                 routeViewModel.addRouteState(route)
                                 routeViewModel.seeRemove(true)
                                 navController.navigate("viewRute")
@@ -167,7 +171,7 @@ fun ListRoute(
 }
 
 @Composable
-fun RouteItem(rute: RouteModel, onClick: () -> Unit, function: () -> Unit) {
+fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
     var isFavorite by remember { mutableStateOf(false) }
     val launched = remember { mutableStateOf(false) }
 
@@ -199,7 +203,7 @@ fun RouteItem(rute: RouteModel, onClick: () -> Unit, function: () -> Unit) {
                 // Icono representativo del vehículo asociado a la ruta
                 Image(
                     painter = painterResource(
-                        id = when (rute.vehicle.type.toString()) {
+                        id = when (route.vehicle.type.toString()) {
                             "Car" -> R.drawable.car
                             "Bike" -> R.drawable.bike
                             "Cycle" -> R.drawable.cycle
@@ -217,12 +221,12 @@ fun RouteItem(rute: RouteModel, onClick: () -> Unit, function: () -> Unit) {
                 Column(modifier = Modifier.weight(2f)) {
                     // Información de la ruta (origen y destino)
                     Text(
-                        text = "From: ${rute.start.alias}",
+                        text = "From: ${route.start.alias}",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.Black
                     )
                     Text(
-                        text = "To: ${rute.end.alias}",
+                        text = "To: ${route.end.alias}",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.Black
                     )
@@ -231,20 +235,26 @@ fun RouteItem(rute: RouteModel, onClick: () -> Unit, function: () -> Unit) {
 
                     // Tipo de ruta y distancia/duración
                     Text(
-                        text = "Type: ${rute.routeType.getPreference()}",
+                        text = "Type: ${route.routeType.getPreference()}",
                         style = MaterialTheme.typography.bodySmall,
                         color = AtlasGreen
                     )
-                    val formattedDistance = if (rute.distance >= 1000) {
-                        String.format("%.1f km", rute.distance / 1000.0)
+                    val formattedDistance = if (route.distance >= 1000) {
+                        String.format("%.1f km", route.distance / 1000.0)
                     } else {
-                        "${rute.distance.toInt()} m"
+                        "${route.distance.toInt()} m"
                     }
 
-                    val formattedDuration = if (rute.duration >= 3600) {
-                        String.format("%.1f h", rute.duration / 3600.0) // Convertir segundos a horas
+                    val formattedDuration = if (route.duration >= 3600) {
+                        String.format(
+                            "%.1f h",
+                            route.duration / 3600.0
+                        ) // Convertir segundos a horas
                     } else {
-                        String.format("%d min", (rute.duration / 60).toInt()) // Convertir segundos a minutos
+                        String.format(
+                            "%d min",
+                            (route.duration / 60).toInt()
+                        ) // Convertir segundos a minutos
                     }
 
 
