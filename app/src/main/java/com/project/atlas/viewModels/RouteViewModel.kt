@@ -16,6 +16,12 @@ class RouteViewModel: ViewModel() {
     private val _navigateToRuteView = MutableLiveData(false)
     val navigateToRuteView: LiveData<Boolean> = _navigateToRuteView
 
+    private val _showAddButton = MutableLiveData(false)
+    val showAddButton: LiveData<Boolean> = _showAddButton
+
+    private val _showRemoveButton = MutableLiveData(false)
+    val showRemoveButton: LiveData<Boolean> = _showRemoveButton
+
     private var _routeState = MutableLiveData<RouteModel?>()
     val routeState: LiveData<RouteModel?> = _routeState
 
@@ -49,10 +55,22 @@ class RouteViewModel: ViewModel() {
         }
     }
 
-    fun addRoute(ruteModel: RouteModel){
+    fun addRoute(routeModel: RouteModel){
         viewModelScope.launch {
-            routeService.addRoute(ruteModel)
+            routeService.addRoute(routeModel)
         }
+    }
+
+    fun deleteRoute(){
+        viewModelScope.launch {
+            if (_routeState.value != null) {
+                routeService.removeRoute(_routeState.value!!.id)
+            }
+        }
+    }
+
+    fun addRouteState(routeModel: RouteModel){
+        _routeState.value = routeModel
     }
 
     fun addVehicle(vehicle: VehicleModel){
@@ -77,6 +95,14 @@ class RouteViewModel: ViewModel() {
 
     fun seeSelectEnd(boolean: Boolean){
         _showEndSelect.value = boolean
+    }
+
+    fun seeAdd(boolean: Boolean){
+        _showAddButton.value = boolean
+    }
+
+    fun seeRemove(boolean: Boolean){
+        _showRemoveButton.value = boolean
     }
 
     fun resetValues(){

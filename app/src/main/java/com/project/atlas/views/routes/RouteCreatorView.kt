@@ -40,6 +40,7 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
 
     LaunchedEffect(ruteState) {
         if (navigateToRuteView == true){
+            routeViewModel.seeAdd(true)
             navController.navigate("viewRute")
         }
     }

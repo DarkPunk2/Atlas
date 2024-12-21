@@ -130,10 +130,15 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
             exit = slideOutVertically { it }
         ) {
             RouteDetailsCard(
-                rute = routeViewModel.routeState.value!!,
-                activeAdd = true,
+                route = routeViewModel.routeState.value!!,
+                activeAdd = routeViewModel.showAddButton.value!!,
+                activeDelete = routeViewModel.showRemoveButton.value!!,
                 onDismiss = { showCard.value = false },
-                onAdd = { rute -> routeViewModel.addRoute(rute) }
+                onAdd = { route -> routeViewModel.addRoute(route)
+                        routeViewModel.seeAdd(false)},
+                onDelete = { routeViewModel.deleteRoute()
+                    routeViewModel.seeRemove(false)
+                navController.navigate("routes")}
             )
         }
         if (!showCard.value) {
