@@ -24,7 +24,7 @@ import com.project.atlas.views.routes.RouteViewerPage
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
     val navController = rememberNavController()
     val vehicleViewModel: VehicleViewModel = viewModel()
-    val ruteViewModel: RouteViewModel = viewModel()
+    val routeViewModel: RouteViewModel = viewModel()
     NavHost(navController = navController, startDestination =  "login", builder = {
         composable("login"){
             LoginPage(modifier, navController, userViewModel)
@@ -39,22 +39,22 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
             SignUpPage(modifier, navController, userViewModel)
         }
         composable("locations"){
-            LocationsListView(navController)
+            LocationsListView(navController, routeViewModel)
         }
         composable("vehicles"){
             listVehicle(modifier, navController, vehicleViewModel)
         }
         composable("routes"){
-            listRoute(modifier, navController, ruteViewModel)
+            listRoute(modifier, navController, routeViewModel)
         }
         composable("selectVehicles"){
-            SelectVehicle(modifier, navController, vehicleViewModel, ruteViewModel)
+            SelectVehicle(modifier, navController, vehicleViewModel, routeViewModel)
         }
         composable("createRute"){
-            RouteCreatorView(navController, ruteViewModel)
+            RouteCreatorView(navController, routeViewModel)
         }
         composable("viewRute"){
-            RouteViewerPage(navController, ruteViewModel)
+            RouteViewerPage(navController, routeViewModel)
         }
     })
 }

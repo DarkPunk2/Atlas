@@ -102,7 +102,7 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
             showCard.value = false
         } else {
             routeViewModel.resetValues()
-            navController.navigate("home")
+            navController.navigate("createRute")
         }
     }
 
