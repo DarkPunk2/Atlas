@@ -49,4 +49,25 @@ class FireBaseAuthService {
         }
     }
 
+    fun logout(): Boolean {
+        auth.signOut()
+        return auth.currentUser == null
+    }
+
+    suspend fun deleteUser(): Boolean {
+        val currentUser = auth.currentUser ?: throw UserNotFoundException("No current user found")
+
+        return suspendCoroutine { continuation ->
+            currentUser.delete()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        auth.signOut()
+                        continuation.resume(true)
+                    } else {
+                        continuation.resumeWithException(UserNotFoundException(task.exception?.message ?: "User not found"))
+                    }
+                }
+        }
+    }
+
 }

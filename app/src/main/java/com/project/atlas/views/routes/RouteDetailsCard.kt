@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,15 +32,34 @@ import com.project.atlas.ui.theme.AtlasGreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouteDetailsCard(
-    rute: RouteModel,
+    route: RouteModel,
     activeAdd: Boolean,
+    activeDelete: Boolean,
     onDismiss: () -> Unit,
-    onAdd: (RouteModel) -> Unit
+    onAdd: (RouteModel) -> Unit,
+    onDelete: (RouteModel) -> Unit
 ) {
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
     var showAdd by remember { mutableStateOf(activeAdd) }
+    var showDelete by remember { mutableStateOf(activeDelete) }
+    val formattedDistance = if (route.distance >= 1000) {
+        String.format("%.1f km", route.distance / 1000.0)
+    } else {
+        "${route.distance.toInt()} m"
+    }
+    val formattedDuration = if (route.duration >= 3600) {
+        String.format(
+            "%.1f h",
+            route.duration / 3600.0
+        ) // Convertir segundos a horas
+    } else {
+        String.format(
+            "%d min",
+            (route.duration / 60).toInt()
+        ) // Convertir segundos a minutos
+    }
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
@@ -56,7 +74,7 @@ fun RouteDetailsCard(
         ) {
             // Título
             Text(
-                text = "${rute.start.alias} to ${rute.end.alias}",
+                text = "${route.start.alias} to ${route.end.alias}",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -69,11 +87,11 @@ fun RouteDetailsCard(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Duration", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text( rute.duration.toString(), style = MaterialTheme.typography.bodyMedium)
+                    Text( formattedDuration, style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Distance", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(rute.distance.toString(), style = MaterialTheme.typography.bodyMedium)
+                    Text(formattedDistance, style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Cost", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
@@ -90,13 +108,22 @@ fun RouteDetailsCard(
                 if (showAdd) {
                     // Botón de añadir
                     Button(
-                        onClick = { onAdd(rute)
+                        onClick = { onAdd(route)
                                   showAdd = false},
                         colors = ButtonDefaults.buttonColors(containerColor = AtlasGreen)
                     ) {
                         Text("Store rute", color = Color.Black)
                     }
-                } else {
+                } else if (showDelete){
+                    Button(
+                        onClick = { onDelete(route)
+                            showDelete = false},
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    ) {
+                        Text("Delete rute", color = Color.Black)
+                    }
+                }
+                else {
                     Spacer(modifier = Modifier.width(120.dp))
                 }
             }

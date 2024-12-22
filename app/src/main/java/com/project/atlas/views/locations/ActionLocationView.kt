@@ -23,15 +23,20 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.project.atlas.components.CustomBottomSheet
 import com.project.atlas.models.Location
+import com.project.atlas.ui.theme.AtlasDarker
 import com.project.atlas.viewModels.LocationsViewModel
+import com.project.atlas.viewModels.RouteViewModel
 
 @Composable
 fun ActionLocationView(
     onDismiss: () -> Unit,
     viewModel: LocationsViewModel,
-    location: Location
+    location: Location,
+    routeViewModel: RouteViewModel,
+    navController: NavController
 ) {
 
     val showEditCard = remember { mutableStateOf(false) }
@@ -118,6 +123,35 @@ fun ActionLocationView(
                         )
                     ) {
                         Text("Remove location")
+                    }
+                    if (routeViewModel.showStartSelect.value!!) {
+                        FilledTonalButton(
+                            onClick = {
+                                routeViewModel.addStart(location)
+                                routeViewModel.seeSelectStart(false)
+                                onDismiss()
+                                navController.navigate("createRute")
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AtlasDarker
+                            )
+                        ) {
+                            Text("Select location")
+                        }
+                    }
+                    if (routeViewModel.showEndSelect.value!!) {
+                        FilledTonalButton(
+                            onClick = {
+                                routeViewModel.addEnd(location)
+                                routeViewModel.seeSelectEnd(false)
+                                navController.navigate("createRute")
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AtlasDarker
+                            )
+                        ) {
+                            Text("Select location")
+                        }
                     }
                 }
 

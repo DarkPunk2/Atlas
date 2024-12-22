@@ -61,4 +61,17 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+
+    fun logout(){
+        authService.logoutUser()
+        _authState.value = UserModel.getAuthState()
+    }
+
+    fun delete(){
+        viewModelScope.launch {
+            if (authService.deleteUser()){
+                _authState.value = UserModel.getAuthState()
+            }
+        }
+    }
 }

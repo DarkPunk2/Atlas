@@ -1,9 +1,6 @@
 package com.project.atlas.it_1Test
 
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.TaskCompletionSource
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
+
 import com.google.firebase.auth.FirebaseUser
 import com.project.atlas.exceptions.IncorrectEmailException
 import com.project.atlas.exceptions.IncorrectPasswordException
@@ -18,7 +15,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import java.util.concurrent.CompletableFuture
+
 
 
 class H2UserLoginTest {
@@ -47,7 +44,6 @@ class H2UserLoginTest {
     fun h2P2Test() = runBlocking{
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
-        val firebaseUser = mock(FirebaseUser::class.java)
         `when`(firebaseAuth.signInWithEmailAndPassword(anyString(), anyString())).thenAnswer{
             throw UserNotFoundException("User not found")
         }

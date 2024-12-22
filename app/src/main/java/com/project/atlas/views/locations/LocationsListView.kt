@@ -43,6 +43,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.project.atlas.models.Location
 import com.project.atlas.viewModels.LocationsViewModel
+import com.project.atlas.viewModels.RouteViewModel
+import com.project.atlas.views.NavigationMenu
 
 @Composable
 fun LocationCard(
@@ -116,7 +118,10 @@ fun LocationCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationsListView(navController: NavController) {
+fun LocationsListView(
+    navController: NavController,
+    routeViewModel: RouteViewModel,
+) {
     val viewModel: LocationsViewModel = viewModel()
     val locations = remember { mutableStateOf(viewModel.getAllLocations()) }
 
@@ -173,6 +178,9 @@ fun LocationsListView(navController: NavController) {
                         }
                     }
                 }
+                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                    NavigationMenu(navController, 1 )
+                }
             }
         },
         floatingActionButton = {
@@ -180,7 +188,8 @@ fun LocationsListView(navController: NavController) {
                 onClick = { showAddLocation.value = true },
                 icon = { Icon(Icons.Filled.Add, "Add location") },
                 text = { Text(text = "Add location") },
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 140.dp)
             )
         }
     )
@@ -196,7 +205,9 @@ fun LocationsListView(navController: NavController) {
                 selectedLocation.value = null
             },
             viewModel,
-            location
+            location,
+            routeViewModel,
+            navController
         )
     }
 
