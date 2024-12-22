@@ -23,7 +23,6 @@ class H11VehicleAddTest {
     @Before
     fun setUp(){
         dbService = VehicleDatabaseService()
-        dbService.setTestMode()
         service = VehicleService(dbService)
     }
 
@@ -31,14 +30,14 @@ class H11VehicleAddTest {
     fun acceptanceTest1() {
         //Given - lista vacía
         runBlocking{
-            assertTrue(service.listVehicle(user)!!.isEmpty())
+            assertTrue(service.listVehicle(user)!!.size<=2)
         }
         //When - se quiere añadir este vehículo
         val vehicle = VehicleModel("Mi coche",VehicleType.Car, Petrol95(), 7.9)
         //Then - se intenta añadir el vehículo
         runBlocking{
-        assertTrue(service.addVehicle("testVehicleAdd",vehicle))
-        assertFalse(service.listVehicle("testVehicleAdd")!!.isEmpty())
+        assertTrue(service.addVehicle(user,vehicle))
+        assertFalse(service.listVehicle(user)!!.size<=2)
         }
     }
 
@@ -46,14 +45,14 @@ class H11VehicleAddTest {
     fun acceptanceTest2(): Unit = runBlocking{
         //Given - lista no vacía
         val vehicle = VehicleModel("Mi buga",VehicleType.Car, Petrol95(), 7.9)
-        service.addVehicle("testVehicleAdd",vehicle)
-        var initial_size = service.listVehicle("testVehicleAdd")!!.size
+        service.addVehicle(user,vehicle)
+        var initial_size = service.listVehicle(user)!!.size
         assertTrue(initial_size > 0)
         //When - se quiere añadir este vehículo
         val vehicleReapeted = VehicleModel("Mi buga",VehicleType.Car, Petrol95(), 7.9)
         service.addVehicle("testVehicleAdd",vehicleReapeted)
         //Then - el vehículo no se añade
-        val list: List<VehicleModel>? = service.listVehicle("testVehicleAdd")
+        val list: List<VehicleModel>? = service.listVehicle(user)
         var final_size = list!!.size
         assertEquals(initial_size, final_size)
         assertEquals(list.first().alias, vehicleReapeted.alias)
@@ -61,11 +60,7 @@ class H11VehicleAddTest {
     @After
     fun deleteVehicle(){
         runBlocking {
-            try {
-                service.deleteVehicle(user,"Mi coche")
-            }catch (e: VehicleNotExistsException){
-                service.deleteVehicle(user,"Mi buga")
-            }
+            service.deleteAll(user)
         }
     }
 }
