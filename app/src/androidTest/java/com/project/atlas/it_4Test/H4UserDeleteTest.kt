@@ -1,48 +1,46 @@
 package com.project.atlas.it_4Test
 
-
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.project.atlas.exceptions.SessionNotFoundException
 import com.project.atlas.interfaces.UserInterface
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.UserModel
 import com.project.atlas.services.AuthService
 import com.project.atlas.services.FireBaseAuthService
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
+import org.junit.runner.RunWith
 
 
-class H3UserLogoutTest {
-    private lateinit var user: UserInterface
+@RunWith(AndroidJUnit4::class)
+class H4UserDeleteTest {
+    private var user: UserInterface = AuthService(FireBaseAuthService())
 
     @Test
     fun h2P1Test() = runBlocking{
         //Given
-        val firebaseAuth = mock(FireBaseAuthService::class.java)
-        `when`(firebaseAuth.logout()).thenReturn(true)
-        user = AuthService(firebaseAuth)
-
-        UserModel.setMail("login@test.test")
-        UserModel.setAuthState(AuthState.Authenticated)
+        val email = "deleteuser@test.test"
+        val password = "contraseñaValida@13"
+        user.createUser(email,password)
         //When
-        user.logoutUser()
+        val result: Boolean
+        result = user.deleteUser()
         //Then
+        assertTrue("User is not deleted",result)
         assertEquals("", UserModel.eMail)
         assertEquals(AuthState.Unauthenticated,UserModel.getAuthState())
     }
     @Test(expected= SessionNotFoundException::class)
-    fun h2P2Test() {
+    fun h2P3Test() {
         //Given
-        val firebaseAuth = mock(FireBaseAuthService::class.java)
-        `when`(firebaseAuth.logout()).thenReturn(false)
-        user = AuthService(firebaseAuth)
-
         UserModel.setMail("")
         UserModel.setAuthState(AuthState.Unauthenticated)
         //When
-        user.logoutUser()
+        runBlocking {
+            user.deleteUser()
+        }
         //Then
 
     }

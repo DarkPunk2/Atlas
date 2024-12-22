@@ -3,6 +3,7 @@ package com.project.atlas.services
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
+import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.exceptions.UserAlreadyExistException
 import com.project.atlas.exceptions.UserNotFoundException
 import com.project.atlas.models.AuthState
@@ -53,4 +54,23 @@ class FireBaseAuthService {
         auth.signOut()
         return auth.currentUser == null
     }
+
+    class UserNotFoundException(message: String) : Exception(message)
+
+    suspend fun deleteUser(): Boolean {
+        val currentUser = auth.currentUser ?: throw UserNotFoundException("No current user found")
+
+        return suspendCoroutine { continuation ->
+            currentUser.delete()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        auth.signOut()
+                        continuation.resume(true)
+                    } else {
+                        continuation.resumeWithException(UserNotFoundException(task.exception?.message ?: "User not found"))
+                    }
+                }
+        }
+    }
+
 }
