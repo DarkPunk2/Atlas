@@ -23,9 +23,7 @@ class VehicleDatabaseService : VehicleInterface {
 
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var usersCollection:String = "users"
-    public var isTesting = false
     fun setTestMode(){
-        isTesting = true
         usersCollection = "usersTest"
     }
     fun vehicleToHashMap (vehicle: VehicleModel): HashMap<String, Serializable> {
@@ -37,11 +35,9 @@ class VehicleDatabaseService : VehicleInterface {
         )
         return dbVehicle
     }
-
-
     public suspend fun createDefaults(user: String) : Boolean {
-        val vWalk = VehicleModel(VehicleType.Walk.toString(), VehicleType.Walk, Calories(), 60.0)
-        val vCycle = VehicleModel(VehicleType.Cycle.toString(), VehicleType.Cycle, Calories(), 30.0)
+        val vWalk = VehicleModel(VehicleType.Walk.toString(), VehicleType.Walk, Calories(), 3.8)
+        val vCycle = VehicleModel(VehicleType.Cycle.toString(), VehicleType.Cycle, Calories(), 7.0)
         val dbWalk = vehicleToHashMap(vWalk)
         val dbCycle = vehicleToHashMap(vCycle)
 
@@ -182,7 +178,7 @@ class VehicleDatabaseService : VehicleInterface {
         )
     }
 
-    private suspend fun checkForDuplicates(user: String, vehicleAlias: String): Boolean {
+    override suspend fun checkForDuplicates(user: String, vehicleAlias: String): Boolean {
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
                 .document(user)

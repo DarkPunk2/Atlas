@@ -15,7 +15,6 @@ import org.junit.Test
 
 
 class H12VehicleListTest {
-
     private lateinit var dbService: VehicleDatabaseService
     private lateinit var service: VehicleInterface
     private val user : String = "testVehicleList"
