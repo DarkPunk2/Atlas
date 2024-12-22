@@ -61,6 +61,7 @@ fun RouteDetailsCard(
         ) // Convertir segundos a minutos
     }
 
+
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
         sheetState = bottomSheetState,

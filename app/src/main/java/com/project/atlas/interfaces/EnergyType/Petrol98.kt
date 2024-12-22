@@ -3,7 +3,7 @@ import com.project.atlas.interfaces.EnergyType
 class Petrol98: EnergyType() {
     override val typeName = "Petrol 98"
     override val magnitude = "L/100 KM"
-    override fun calculateCost(distance: Double, consumption: Double) : Double {
+    override fun calculateCost(distance: Double, consumption: Double, price: Double): Double {
         TODO("Not yet implemented")
     }
 }

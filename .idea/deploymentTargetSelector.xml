@@ -5,9 +5,6 @@
       <SelectionState runConfigName="Tests in 'com.project.atlas'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="H14VehicleUpdateTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="H20GetRuteTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
