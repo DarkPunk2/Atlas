@@ -16,7 +16,7 @@ import com.project.atlas.views.SignUpPage
 import com.project.atlas.views.vehicles.listVehicle
 import com.project.atlas.views.locations.LocationsListView
 import com.project.atlas.views.vehicles.SelectVehicle
-import com.project.atlas.views.vehicles.ListRoute
+import com.project.atlas.views.routes.ListRoute
 import com.project.atlas.views.routes.RouteCreatorView
 import com.project.atlas.views.routes.RouteViewerPage
 
@@ -30,7 +30,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
             LoginPage(modifier, navController, userViewModel)
         }
         composable("home"){
-            HomePage(modifier, navController)
+            HomePage(modifier, navController, userViewModel)
         }
         composable("map"){
             MapPage(modifier, navController)

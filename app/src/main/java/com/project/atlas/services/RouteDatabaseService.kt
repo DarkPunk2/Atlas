@@ -9,7 +9,7 @@ import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.atlas.exceptions.RouteNotFoundException
-import com.project.atlas.exceptions.VehicleNotExistsException
+import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.interfaces.RouteDatabase
 import com.project.atlas.models.Location
@@ -19,6 +19,7 @@ import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.models.VehicleType
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class RouteDatabaseService: RouteDatabase {
@@ -32,9 +33,6 @@ class RouteDatabaseService: RouteDatabase {
     }
 
     override suspend fun add(route: RouteModel): Boolean {
-        if (checkForDuplicates(UserModel.eMail, route.id)) {
-            return false
-        }
         val dbRute = ruteToMap(route)
 
         return suspendCoroutine { continuation ->
@@ -48,13 +46,12 @@ class RouteDatabaseService: RouteDatabase {
                 }
                 .addOnFailureListener { exception ->
                     Log.e("Firebase", "Error adding rute: ${exception.message}")
-                    continuation.resume(false)
+                    continuation.resumeWithException(ServiceNotAvailableException(exception.message ?: "Service not available"))
                 }
         }
     }
 
     override suspend fun remove(routeID: String): Boolean {
-        if(!checkForDuplicates(UserModel.eMail, routeID)) throw RouteNotFoundException("La ruta ${routeID} no existe en la base de datos")
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
                 .document(UserModel.eMail)
@@ -62,6 +59,10 @@ class RouteDatabaseService: RouteDatabase {
                 .document(routeID).delete()
                 .addOnSuccessListener {
                     continuation.resume(true)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error adding rute: ${exception.message}")
+                    continuation.resumeWithException(ServiceNotAvailableException(exception.message ?: "Service not available"))
                 }
         }
     }
@@ -163,7 +164,7 @@ class RouteDatabaseService: RouteDatabase {
         }
     }
 
-    private suspend fun checkForDuplicates(user: String, id: String): Boolean {
+    override suspend fun checkForDuplicates(user: String, id: String): Boolean {
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
                 .document(user)

@@ -6,4 +6,5 @@ interface RouteDatabase {
     suspend fun add(route: RouteModel): Boolean
     suspend fun getAll(): List<RouteModel>
     suspend fun remove(routeID: String): Boolean
+    suspend fun checkForDuplicates(user: String, id: String): Boolean
 }
