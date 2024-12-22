@@ -1,6 +1,7 @@
 package com.project.atlas.views
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -63,6 +64,9 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
                 (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> Unit
         }
+    }
+    BackHandler {
+
     }
 
     Column(

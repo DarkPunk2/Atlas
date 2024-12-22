@@ -95,7 +95,7 @@ fun ListRoute(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.popBackStack()
+                            navController.navigate("home")
                         }
                     ) {
                         Icon(
