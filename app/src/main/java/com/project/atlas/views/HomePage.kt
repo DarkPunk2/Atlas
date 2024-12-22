@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 fun HomePage(
     modifier: Modifier = Modifier,
     navController: NavController,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -88,7 +88,7 @@ fun HomePage(
             containerColor = AtlasGreen,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 60.dp, end = 16.dp)
+                .padding(bottom = 180.dp, end = 16.dp)
         )
         IconButton(
             onClick = {
@@ -106,6 +106,11 @@ fun HomePage(
                 tint = Color.Black
             )
         }
+
+        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+            NavigationMenu(navController, 0)
+        }
+
         if (drawerState.isOpen) {
             Box(modifier = Modifier
                 .fillMaxSize()

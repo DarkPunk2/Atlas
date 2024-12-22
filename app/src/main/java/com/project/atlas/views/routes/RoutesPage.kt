@@ -1,4 +1,4 @@
-package com.project.atlas.views.vehicles
+package com.project.atlas.views.routes
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -43,6 +43,7 @@ import com.project.atlas.R
 import com.project.atlas.models.RouteModel
 import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.viewModels.RouteViewModel
+import com.project.atlas.views.NavigationMenu
 import kotlinx.coroutines.delay
 
 
@@ -164,6 +165,9 @@ fun ListRoute(
                             }
                         }
                     }
+                }
+                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                    NavigationMenu(navController, 3 )
                 }
             }
         }
