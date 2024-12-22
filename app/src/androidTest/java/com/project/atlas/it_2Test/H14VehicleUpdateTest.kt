@@ -24,7 +24,6 @@ class H14VehicleUpdateTest {
     @Before
     fun setUp(){
         dbService = VehicleDatabaseService()
-        dbService.setTestMode()
         service = VehicleService(dbService)
     }
 

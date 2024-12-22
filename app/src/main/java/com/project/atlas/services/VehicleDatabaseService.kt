@@ -5,6 +5,8 @@ import Diesel
 import Electricity
 import Petrol98
 import android.util.Log
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.atlas.exceptions.VehicleNotExistsException
@@ -23,9 +25,7 @@ class VehicleDatabaseService : VehicleInterface {
 
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var usersCollection:String = "users"
-    fun setTestMode(){
-        usersCollection = "usersTest"
-    }
+
     fun vehicleToHashMap (vehicle: VehicleModel): HashMap<String, Serializable> {
         val dbVehicle = hashMapOf(
         "alias" to vehicle.alias as Serializable,
@@ -35,7 +35,7 @@ class VehicleDatabaseService : VehicleInterface {
         )
         return dbVehicle
     }
-    public suspend fun createDefaults(user: String) : Boolean {
+    override suspend fun createDefaults(user: String) : Boolean {
         val vWalk = VehicleModel(VehicleType.Walk.toString(), VehicleType.Walk, Calories(), 3.8)
         val vCycle = VehicleModel(VehicleType.Cycle.toString(), VehicleType.Cycle, Calories(), 7.0)
         val dbWalk = vehicleToHashMap(vWalk)
@@ -190,7 +190,30 @@ class VehicleDatabaseService : VehicleInterface {
                 }
         }
     }
-    public suspend fun checkForVehicles(user: String): Boolean {
+
+    override suspend fun deleteAll(user: String): Boolean {
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(user)
+                .collection("vehicles")
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val tasks = mutableListOf<Task<Void>>()
+                    for (document in querySnapshot.documents) {
+                        tasks.add(document.reference.delete())
+                    }
+                    Tasks.whenAllComplete(tasks).addOnSuccessListener {
+                        continuation.resume(true)
+                    }.addOnFailureListener { exception ->
+                        continuation.resume(false)
+                    }
+                }.addOnFailureListener { exception ->
+                    continuation.resume(false)
+                }
+        }
+    }
+
+    override suspend fun checkForVehicles(user: String): Boolean {
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
                 .document(user)

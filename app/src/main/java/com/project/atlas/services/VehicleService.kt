@@ -20,7 +20,7 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
     }
 
     override suspend fun listVehicle(user: String): List<VehicleModel>? {
-        if(!checkForVehicles(user)) dbService.createDefaults(user)
+        if(!checkForVehicles(user)) createDefaults(user)
         return dbService.listVehicle(user)
     }
     override suspend fun deleteVehicle(user: String, vehicleAlias:String): Boolean {
@@ -41,7 +41,16 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
     override suspend fun checkForDuplicates(user: String, vehicleAlias: String): Boolean {
         return dbService.checkForDuplicates(user, vehicleAlias)
     }
-suspend fun checkForVehicles(user:String): Boolean {
+
+    override suspend fun deleteAll(user: String): Boolean {
+        return dbService.deleteAll(user)
+    }
+
+    override suspend fun createDefaults(user: String): Boolean {
+        return dbService.createDefaults(user)
+    }
+
+    override suspend fun checkForVehicles(user:String): Boolean {
     return dbService.checkForVehicles(user)
 }
     @SuppressLint("SuspiciousIndentation")

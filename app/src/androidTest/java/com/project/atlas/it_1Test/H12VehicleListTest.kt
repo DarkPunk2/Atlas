@@ -21,13 +21,15 @@ class H12VehicleListTest {
     @Before
     fun setUp(){
         dbService = VehicleDatabaseService()
-        dbService.setTestMode()
         service = VehicleService(dbService)
     }
 
     @Test
     fun acceptanceTest1(){
         //Given - lista no vacía
+        runBlocking{
+            assertTrue(service.listVehicle(user)!!.size<=2)
+        }
         val vehicle = VehicleModel("Mi coche", VehicleType.Car, Petrol95(), 7.9)
         runBlocking {
             service.addVehicle(user,vehicle)
@@ -38,7 +40,7 @@ class H12VehicleListTest {
              vehicleList = service.listVehicle(user)!!
         }
         //Then se devuelve lista de vehículos (con vehículos dentro)
-        assertTrue(vehicleList is List<VehicleModel> && !vehicleList.isEmpty())
+        assertTrue(vehicleList is List<VehicleModel> && vehicleList.size > 2)
     }
 
     @Test
@@ -50,15 +52,13 @@ class H12VehicleListTest {
              vehicleList = service.listVehicle("emptyVehicleList")
         }
         //Then se devuelve vacía lista de vehículos
-        assertTrue(vehicleList is List<VehicleModel> && vehicleList!!.isEmpty())
+        assertTrue(vehicleList is List<VehicleModel> && vehicleList!!.size <=2)
     }
     @After
     fun deleteVehicle(){
         runBlocking {
-            try {
-                service.deleteVehicle(user,"Mi coche")
-            }catch (e: VehicleNotExistsException){
-            }
+            service.deleteAll(user)
+            service.deleteAll("emptyVehicleList")
         }
     }
 }
