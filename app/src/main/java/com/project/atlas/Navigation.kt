@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.project.atlas.viewModels.RuteViewModel
 import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.viewModels.VehicleViewModel
+import com.project.atlas.views.EnergyTypeTest
 import com.project.atlas.views.HomePage
 import com.project.atlas.views.LoginPage
 import com.project.atlas.views.MapPage
@@ -51,6 +52,9 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
         }
         composable("viewRute"){
             RuteViewerPage(navController, ruteViewModel)
+        }
+        composable("fuelTest"){
+            EnergyTypeTest()
         }
     })
 }
