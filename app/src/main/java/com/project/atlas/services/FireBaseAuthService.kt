@@ -49,4 +49,8 @@ class FireBaseAuthService {
         }
     }
 
+    fun logout(): Boolean {
+        auth.signOut()
+        return auth.currentUser == null
+    }
 }

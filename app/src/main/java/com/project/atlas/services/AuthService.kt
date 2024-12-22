@@ -2,6 +2,7 @@ package com.project.atlas.services
 
 import com.project.atlas.exceptions.IncorrectEmailException
 import com.project.atlas.exceptions.IncorrectPasswordException
+import com.project.atlas.exceptions.SessionNotFoundException
 import com.project.atlas.interfaces.UserInterface
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.UserModel
@@ -71,6 +72,15 @@ class AuthService(externalAuth: FireBaseAuthService) : UserInterface {
             UserModel.setAuthState(AuthState.Unauthenticated)
             throw e
         }
+    }
+
+    override fun logoutUser() {
+        if (UserModel.getAuthState() == AuthState.Unauthenticated){
+            throw SessionNotFoundException("User is not login")
+        }
+        UserModel.setAuthState(AuthState.Unauthenticated)
+        UserModel.setMail("")
+        auth.logout()
     }
 }
 
