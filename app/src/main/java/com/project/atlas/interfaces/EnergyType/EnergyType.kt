@@ -6,5 +6,5 @@ abstract class EnergyType {
     override fun toString(): String {
         return typeName
     }
-    abstract fun calculateCost(distance: Double, consumption: Double)
+    abstract fun calculateCost(distance: Double, consumption: Double, fuelPrice: Double): Double
 }

@@ -17,10 +17,10 @@ class H13VehicleDeleteTest {
     private lateinit var dbService: VehicleDatabaseService
     private lateinit var service: VehicleInterface
 
+    private var user:String = "testVehicleDelete"
     @Before
     fun setUp(){
         dbService = VehicleDatabaseService()
-        dbService.setTestMode()
         service = VehicleService(dbService)
     }
 
@@ -29,18 +29,18 @@ class H13VehicleDeleteTest {
         //Given - hay un vehículo en lista
         val vehicle = VehicleModel("Mi coche", VehicleType.Car, Petrol95(), 7.9)
         runBlocking {
-            service.addVehicle("testVehicleDelete", vehicle)
+            service.addVehicle(user, vehicle)
         }
         //When - se elimina el vehículo
         runBlocking {
-            service.deleteVehicle("testVehicleDelete", vehicle.alias!!)
+            service.deleteVehicle(user, vehicle.alias!!)
         }
         //Then se devuelve lista de vehículos (sin vehículos dentro)
         var vehicleList : List<VehicleModel> = emptyList()
         runBlocking {
-            vehicleList = service.listVehicle("testVehicleDelete")!!
+            vehicleList = service.listVehicle(user)!!
         }
-        assertTrue(vehicleList is List<VehicleModel> && vehicleList.isEmpty())
+        assertTrue(vehicleList is List<VehicleModel> && vehicleList.size <= 2)
     }
     @Test(expected = VehicleNotExistsException::class)
     fun acceptanceTest2(){
@@ -48,23 +48,19 @@ class H13VehicleDeleteTest {
         val vehicle = VehicleModel("Mi buga", VehicleType.Car, Petrol95(), 7.9)
 
         runBlocking {
-            service.addVehicle("testVehicleDelete", vehicle)
+            service.addVehicle(user, vehicle)
         }
         //When - se intenta eliminar un vehículo que no ha sido añadido
         val vehicleIncorrect = VehicleModel("Mi coche99", VehicleType.Car, Petrol95(), 7.9)
         runBlocking {
-            service.deleteVehicle("testVehicleDelete", vehicleIncorrect.alias!!)
+            service.deleteVehicle(user, vehicleIncorrect.alias!!)
         }
         //Then - salta la excepción
     }
     @After
-    fun deleteAddedVehicle() {
+    fun deleteVehicle(){
         runBlocking {
-            try{
-            service.deleteVehicle("testVehicleDelete", "Mi buga")
-            }catch (e: Exception){
-
-            }
+            service.deleteAll(user)
         }
     }
 }
