@@ -22,7 +22,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -47,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,7 +59,7 @@ import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.ui.theme.AtlasGreen
-import com.project.atlas.viewModels.RouteViewModel
+import com.project.atlas.viewModels.RuteViewModel
 import com.project.atlas.viewModels.VehicleViewModel
 import kotlinx.coroutines.delay
 
@@ -65,7 +69,7 @@ fun SelectVehicle(
     modifier: Modifier,
     navController: NavController,
     vehicleViewModel: VehicleViewModel,
-    routeViewModel: RouteViewModel
+    ruteViewModel: RuteViewModel
 ) {
     val vehicleList by vehicleViewModel.vehicleList.observeAsState(emptyList())
     var isLoading by remember { mutableStateOf(true) }
@@ -158,7 +162,7 @@ fun SelectVehicle(
             vehicle = vehicle,
             onDismiss = { showDetails = null },
             onSelect = {
-                routeViewModel.addVehicle(vehicle)
+                ruteViewModel.addVehicle(vehicle)
                 navController.popBackStack()
             }
         )

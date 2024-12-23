@@ -9,8 +9,4 @@ interface VehicleInterface {
     suspend fun deleteVehicle(user:String, vehicleAlias:String):Boolean
     suspend fun updateVehicle(user: String, vehicleAlias:String, vehicle: VehicleModel): Boolean
     suspend fun getVehicle(user: String, vehicleAlias:String):VehicleModel
-    suspend fun checkForDuplicates(user: String, vehicleAlias: String): Boolean
-    suspend fun deleteAll(user: String) : Boolean
-    suspend fun createDefaults(user: String) : Boolean
-    suspend fun checkForVehicles(user: String) : Boolean
 }
