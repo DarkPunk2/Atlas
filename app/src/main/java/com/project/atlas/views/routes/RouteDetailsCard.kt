@@ -44,6 +44,23 @@ fun RouteDetailsCard(
     )
     var showAdd by remember { mutableStateOf(activeAdd) }
     var showDelete by remember { mutableStateOf(activeDelete) }
+    val formattedDistance = if (route.distance >= 1000) {
+        String.format("%.1f km", route.distance / 1000.0)
+    } else {
+        "${route.distance.toInt()} m"
+    }
+    val formattedDuration = if (route.duration >= 3600) {
+        String.format(
+            "%.1f h",
+            route.duration / 3600.0
+        ) // Convertir segundos a horas
+    } else {
+        String.format(
+            "%d min",
+            (route.duration / 60).toInt()
+        ) // Convertir segundos a minutos
+    }
+
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
@@ -71,11 +88,11 @@ fun RouteDetailsCard(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Duration", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text( route.duration.toString(), style = MaterialTheme.typography.bodyMedium)
+                    Text( formattedDuration, style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Distance", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(route.distance.toString(), style = MaterialTheme.typography.bodyMedium)
+                    Text(formattedDistance, style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Cost", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)

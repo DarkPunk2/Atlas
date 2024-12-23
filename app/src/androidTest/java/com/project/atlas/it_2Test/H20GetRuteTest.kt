@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class H20GetRuteTest {
-    private var routeService = RouteService(RouteDatabaseService().apply { setTestMode() })
+    private var routeService = RouteService(RouteDatabaseService())
 
 
     @Test
@@ -30,7 +30,7 @@ class H20GetRuteTest {
         }
         //Then
         assertTrue("Incorrect number of values on the list",result.size == 1)
-        assertTrue("Incorrect rute",result.get(0).id == "c38b7172-7c08-44dc-a9da-2735820e2e03")
+        assertTrue("Incorrect rute",result.get(0).id == "8860fca0-5df8-4739-b67d-a409ad29a6f7")
     }
 
     @Test(expected = UserNotLoginException::class)

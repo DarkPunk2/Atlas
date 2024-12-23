@@ -1,5 +1,7 @@
 package com.project.atlas.services
 
+import com.project.atlas.exceptions.RouteAlreadyInDataBaseException
+import com.project.atlas.exceptions.RouteNotFoundException
 import com.project.atlas.exceptions.UserNotLoginException
 import com.project.atlas.interfaces.RouteDatabase
 import com.project.atlas.models.AuthState
@@ -29,8 +31,11 @@ class RouteService(private val db: RouteDatabase) {
         return route
     }
 
-    suspend fun addRoute(rute: RouteModel): Boolean{
-        return db.add(rute)
+    suspend fun addRoute(route: RouteModel): Boolean{
+        if (db.checkForDuplicates(UserModel.eMail, route.id)) {
+            throw RouteAlreadyInDataBaseException("Route already exists in the database")
+        }
+        return db.add(route)
     }
 
     suspend fun getRoutes(): List<RouteModel>{
@@ -41,6 +46,9 @@ class RouteService(private val db: RouteDatabase) {
     }
 
     suspend fun removeRoute(routeID: String): Boolean{
+        if (!db.checkForDuplicates(UserModel.eMail, routeID)) {
+            throw RouteNotFoundException("Route $routeID does not exist in the database")
+        }
         return db.remove(routeID)
     }
 
