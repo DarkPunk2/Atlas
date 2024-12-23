@@ -8,13 +8,25 @@ import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
 import com.project.atlas.models.VehicleModel
+import com.project.atlas.repository.FuelPriceRepository
+import com.project.atlas.services.FuelPriceService
 import com.project.atlas.services.RouteDatabaseService
 import com.project.atlas.services.RouteService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RouteViewModel: ViewModel() {
     private val _navigateToRuteView = MutableLiveData(false)
     val navigateToRuteView: LiveData<Boolean> = _navigateToRuteView
+
+
+    private var pricesCalculated = false // Flag para evitar cálculos repetidos
+    val fuelPriceService = FuelPriceService(FuelPriceRepository())
+    private val _routePrice = MutableStateFlow<Double?>(null)
+
+    private val _fuelErrorMessage = MutableStateFlow("")
+    val fuelErrorMessage: StateFlow<String> get() = _fuelErrorMessage
 
     private val _showAddButton = MutableLiveData(false)
     val showAddButton: LiveData<Boolean> = _showAddButton
@@ -54,6 +66,37 @@ class RouteViewModel: ViewModel() {
             }
         }
     }
+
+    private val calculatedPrices = mutableMapOf<String, Double?>() // Mapa para almacenar precios calculados
+
+    fun calculatePricesForRoutesIfNeeded() {
+        viewModelScope.launch {
+            val updatedRoutes = _ruteList.value?.map { route ->
+                if (calculatedPrices.containsKey(route.id)) {
+                    // Si el precio ya fue calculado, usarlo del mapa
+                    route.copy(price = calculatedPrices[route.id])
+                } else {
+                    // Si el precio no está calculado, calcularlo y guardarlo en el mapa
+                    try {
+                        val price = fuelPriceService.calculateRoutePrice(route)
+                        calculatedPrices[route.id] = price // Guardar en el mapa
+                        route.copy(price = price)
+                    } catch (e: Exception) {
+                        calculatedPrices[route.id] = null // Guardar como no disponible
+                        route
+                    }
+                }
+            } ?: emptyList()
+
+            _ruteList.postValue(updatedRoutes)
+            pricesCalculated = true // Marca los precios como calculados
+        }
+    }
+
+
+
+
+
 
     fun addRoute(routeModel: RouteModel){
         viewModelScope.launch {

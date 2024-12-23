@@ -9,5 +9,4 @@ class Calories: EnergyType() {
         var result = (distance * consumption * 70) / velocity
         return result
     }
-
 }

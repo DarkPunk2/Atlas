@@ -160,6 +160,11 @@ fun HomePage(
                 Spacer(modifier = Modifier.height(56.dp))
             }
         }
+        TextButton(onClick = {
+            navController.navigate("fuelTest")
+        }) {
+            Text(text = "Test Combustible")
+        }
     }
 }
 

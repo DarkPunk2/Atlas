@@ -1,6 +1,5 @@
 import com.project.atlas.interfaces.EnergyType
 import com.project.atlas.services.ElectricityPriceService
-import kotlinx.coroutines.runBlocking
 
 class Electricity: EnergyType() {
     override val typeName = "Electricity"

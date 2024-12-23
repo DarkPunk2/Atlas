@@ -96,6 +96,7 @@ class RouteDatabaseService: RouteDatabase {
             "duration" to rute.duration,
             "rute" to rute.rute,
             "bbox" to rute.bbox
+
         )
     }
 
