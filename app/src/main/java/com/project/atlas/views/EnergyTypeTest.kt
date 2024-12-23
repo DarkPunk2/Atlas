@@ -41,6 +41,8 @@ fun EnergyTypeTest(
     var latitudInput by remember { mutableStateOf("") }
     var longitudInput by remember { mutableStateOf("") }
     val routeList by routeViewModel.ruteList.observeAsState(emptyList())
+    val routePrice by viewModel.routePrice.collectAsState()
+
 
     var firstRute by remember { mutableStateOf<RouteModel?>(null) } // Variable para la ruta en posición 0
     var calculatedPrice by remember { mutableStateOf<Double?>(null) } // Resultado del cálculo
@@ -57,6 +59,11 @@ fun EnergyTypeTest(
         }
     }
 
+    LaunchedEffect(routePrice){
+        if (routePrice != null){
+            calculatedPrice = routePrice
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -91,8 +98,7 @@ fun EnergyTypeTest(
             firstRute?.let { route ->
                 coroutineScope.launch {
                     try {
-
-                        calculatedPrice = viewModel.calculateRoutePrice(route) // Llama a la función suspendida
+                        viewModel.calculatePriceForRoute(route)
                         calculationError = null // Resetea cualquier error previo
                     } catch (e: Exception) {
                         calculationError = "Error al calcular el precio: ${e.message}"
