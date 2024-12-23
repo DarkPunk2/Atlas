@@ -16,7 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.project.atlas.models.RuteModel
 import com.project.atlas.viewModels.FuelPriceViewModel
+import com.project.atlas.viewModels.RuteViewModel
+import kotlinx.coroutines.launch
 
 // Retrofit API interface
 
@@ -28,19 +31,30 @@ import com.project.atlas.viewModels.FuelPriceViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnergyTypeTest(
-    viewModel: FuelPriceViewModel = androidx.lifecycle.viewmodel.compose.viewModel() // Inyecta el ViewModel
+    viewModel: FuelPriceViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    ruteViewModel: RuteViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     var selectedFuel by remember { mutableStateOf("Gasolina 95") }
     val fuelOptions = listOf("Gasolina 95", "Gasolina 98", "Diesel")
     var latitudInput by remember { mutableStateOf("") }
     var longitudInput by remember { mutableStateOf("") }
 
-    val priceInfo by viewModel.priceInfo.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
-    val nearestPrice by viewModel.nearestPrice.collectAsState()
-    val municipioId by viewModel.municipioId.collectAsState()
+    var firstRute by remember { mutableStateOf<RuteModel?>(null) } // Variable para la ruta en posición 0
+    var calculatedPrice by remember { mutableStateOf<Double?>(null) } // Resultado del cálculo
+    var calculationError by remember { mutableStateOf<String?>(null) } // Error en el cálculo
+    val coroutineScope = rememberCoroutineScope()
 
-    var inputError by remember { mutableStateOf(false) }
+    // Cargar los datos de la ruta
+    LaunchedEffect(Unit) {
+        try {
+            val rutes = ruteViewModel.getRutes() // Llamada a la función suspendida
+            if (rutes.isNotEmpty()) {
+                firstRute = rutes[3] // Guarda la ruta en la posición 0
+            }
+        } catch (e: Exception) {
+            calculationError = "Error al cargar la ruta: ${e.message}"
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -50,109 +64,66 @@ fun EnergyTypeTest(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // TextView superior para mostrar los datos de la ruta
         Text(
-            text = "Selecciona el tipo de combustible",
-            style = MaterialTheme.typography.titleMedium,
+            text = if (firstRute != null) {
+                """
+                Datos de la ruta:
+                Inicio: ${firstRute!!.start}
+                Vehículo: ${firstRute!!.vehicle}
+                Destino: ${firstRute!!.end}
+                Distancia: ${firstRute!!.distance} km
+                """.trimIndent()
+            } else {
+                "Cargando datos de la ruta..."
+            },
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Dropdown menu for fuel type selection
-        var expanded by remember { mutableStateOf(false) }
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded }
-        ) {
-            TextField(
-                value = selectedFuel,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Tipo de combustible") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor()
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                fuelOptions.forEach { fuelOption ->
-                    DropdownMenuItem(
-                        text = { Text(fuelOption) },
-                        onClick = {
-                            selectedFuel = fuelOption
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
-
         Spacer(modifier = Modifier.padding(16.dp))
 
-        // Input for latitude and longitude
-        TextField(
-            value = latitudInput,
-            onValueChange = { latitudInput = it },
-            label = { Text("Ingrese la latitud") },
-            isError = inputError,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        TextField(
-            value = longitudInput,
-            onValueChange = { longitudInput = it },
-            label = { Text("Ingrese la longitud") },
-            isError = inputError,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        if (inputError) {
-            Text(
-                text = "Por favor, ingrese coordenadas válidas",
-                color = Color.Red,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.padding(16.dp))
-
-        // Button to fetch nearest fuel price
+        // Botón para calcular el precio de la ruta
         Button(onClick = {
-            val latitud = latitudInput.toDoubleOrNull()
-            val longitud = longitudInput.toDoubleOrNull()
+            firstRute?.let { route ->
+                coroutineScope.launch {
+                    try {
 
-            if (latitud != null && longitud != null) {
-                inputError = false
-                val idProducto = when (selectedFuel) {
-                    "Gasolina 95" -> 1
-                    "Gasolina 98" -> 3
-                    "Diesel" -> 4
-                    else -> 0
+                        calculatedPrice = viewModel.calculateRoutePrice(route) // Llama a la función suspendida
+                        calculationError = null // Resetea cualquier error previo
+                    } catch (e: Exception) {
+                        calculationError = "Error al calcular el precio: ${e.message}"
+                        calculatedPrice = null
+                    }
                 }
-                viewModel.fetchFuelData(latitud, longitud, Diesel())
-
-            } else {
-                inputError = true
-
+            } ?: run {
+                calculationError = "No se encontró una ruta válida."
             }
         }) {
-            Text(text = "Buscar gasolinera más cercana")
+            Text(text = "Calcular Precio de la Ruta")
         }
 
         Spacer(modifier = Modifier.padding(16.dp))
 
-        // Display results or errors
-        if (errorMessage.isNotEmpty()) {
+        // TextView inferior para mostrar el resultado del cálculo o errores
+        if (calculationError != null) {
             Text(
-                text = errorMessage,
+                text = calculationError!!,
                 color = Color.Red,
                 style = MaterialTheme.typography.bodyMedium
             )
-        } else if (nearestPrice != null) {
+        } else if (calculatedPrice != null) {
             Text(
-                text = "Estación más cercana: ${nearestPrice!!.Rótulo}, Precio: ${nearestPrice!!.PrecioProducto}",
-                style = MaterialTheme.typography.bodyMedium
+                text = "Precio estimado de la ruta: ${"%.2f".format(calculatedPrice)} €",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        } else {
+            Text(
+                text = "Introduce los datos y calcula el precio de la ruta.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -160,9 +131,3 @@ fun EnergyTypeTest(
 
 
 
-
-@Preview
-@Composable
-fun EnergyTypeTestPreview() {
-    EnergyTypeTest()
-}

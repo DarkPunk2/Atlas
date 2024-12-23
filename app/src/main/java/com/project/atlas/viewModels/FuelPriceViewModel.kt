@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.project.atlas.interfaces.EnergyType
 import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.models.FuelPriceModel
+import com.project.atlas.models.RuteModel
 import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.GeocodeApiService
 import kotlinx.coroutines.delay
@@ -40,41 +41,35 @@ class FuelPriceViewModel : ViewModel() {
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> get() = _errorMessage
 
-    // Método principal para manejar la búsqueda completa
-    fun fetchFuelData(lat: Double, long: Double, energyType: EnergyType) {
-        var idProduct = 1
-        when (energyType) {
-            is Petrol98 -> {
-                idProduct = 1
-            }
-            is Petrol95 -> {
-                idProduct = 3
-            }
-            is Diesel -> {
-                idProduct = 4
-            }
+    suspend fun fetchFuelData(lat: Double, long: Double, energyType: EnergyType): Double? {
+        var idProduct = when (energyType) {
+            is Petrol98 -> 1
+            is Petrol95 -> 3
+            is Diesel -> 4
+            else -> 1 // Default
         }
 
-        viewModelScope.launch {
-            try {
-                // Paso 1: Obtener el ID de la región
-                fetchRegionId(lat, long)
+        return try {
+            // Paso 1: Obtener el ID de la región
+            fetchRegionId(lat, long)
 
-                // Asegurarse de que municipioId esté disponible
-                while (_municipioId.value.isEmpty()) {
-                    delay(100)
-                }
-
-                // Paso 2: Obtener los precios del combustible
-                fetchFuelPrices(_municipioId.value, idProduct)
-
-                // Paso 3: Obtener el precio más cercano
-                fetchNearestFuelPrice(lat, long)
-            } catch (e: Exception) {
-                _errorMessage.value = "Error al realizar la búsqueda: ${e.message}"
+            // Asegurarse de que municipioId esté disponible
+            while (_municipioId.value.isEmpty()) {
+                delay(100)
             }
+
+            // Paso 2: Obtener los precios del combustible
+            fetchFuelPrices(_municipioId.value, idProduct)
+
+            // Paso 3: Obtener el precio más cercano
+            val price = fetchNearestFuelPrice(lat, long)
+            return price
+        } catch (e: Exception) {
+            _errorMessage.value = "Error al realizar la búsqueda: ${e.message}"
+            null
         }
     }
+
 
     // Paso 1: Obtener el ID de la región
     private suspend fun fetchRegionId(lat: Double, long: Double) {
@@ -108,14 +103,15 @@ class FuelPriceViewModel : ViewModel() {
     }
 
     // Paso 3: Obtener la estación más cercana
-    private fun fetchNearestFuelPrice(latitude: Double, longitude: Double) {
+    private fun fetchNearestFuelPrice(latitude: Double, longitude: Double): Double? {
         val nearest = _priceInfo.value.minByOrNull { station ->
             val lat = station.Latitud.replace(",", ".").toDoubleOrNull() ?: 0.0
             val lon = station.Longitud.replace(",", ".").toDoubleOrNull() ?: 0.0
             calculateDistance(latitude, longitude, lat, lon)
         }
-        _nearestPrice.value = nearest
+        return nearest?.PrecioProducto?.replace(",", ".")?.toDoubleOrNull() // Reemplaza la coma antes de convertir
     }
+
 
     // Función para normalizar cadenas
     private fun String.normalize(): String {
@@ -135,16 +131,19 @@ class FuelPriceViewModel : ViewModel() {
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
         return earthRadius * c
     }
-    /*
-    private fun calculateRoutePrice(route: RouteModel) {
+
+    suspend fun calculateRoutePrice(route: RuteModel): Double? {
         val energyType: EnergyType? = route.vehicle.energyType
         val distance = route.distance
         val consumption = route.vehicle.consumption
-        val fuelPrice = fetchFuelData(route.start.lat, route.start.lon, energyType)
+        val fuelPrice = fetchFuelData(route.start.lat, route.start.lon, energyType!!)
 
         if (consumption != null) {
-            energyType?.calculateCost(distance, consumption, fuelPrice)
+            if (fuelPrice != null) {
+                return energyType?.calculateCost(distance/1000, consumption, fuelPrice)
+            }
         }
 
-    }*/
+        return null
+    }
 }

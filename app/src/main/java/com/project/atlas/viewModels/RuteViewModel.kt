@@ -47,4 +47,9 @@ class RuteViewModel: ViewModel() {
     fun addEnd(end: Location){
         _end.value = end
     }
+
+    suspend fun getRutes(): List<RuteModel> {
+        return ruteService.getRutes()
+    }
+
 }

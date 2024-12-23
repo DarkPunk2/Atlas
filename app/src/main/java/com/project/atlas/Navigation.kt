@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.project.atlas.viewModels.FuelPriceViewModel
 import com.project.atlas.viewModels.RuteViewModel
 import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.viewModels.VehicleViewModel
@@ -25,6 +26,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
     val navController = rememberNavController()
     val vehicleViewModel: VehicleViewModel = viewModel()
     val ruteViewModel: RuteViewModel = viewModel()
+    val fuelPriceViewModel: FuelPriceViewModel = viewModel()
     NavHost(navController = navController, startDestination =  "login", builder = {
         composable("login"){
             LoginPage(modifier, navController, userViewModel)
@@ -54,7 +56,9 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
             RuteViewerPage(navController, ruteViewModel)
         }
         composable("fuelTest"){
-            EnergyTypeTest()
+            EnergyTypeTest(
+                viewModel = fuelPriceViewModel
+            )
         }
     })
 }
