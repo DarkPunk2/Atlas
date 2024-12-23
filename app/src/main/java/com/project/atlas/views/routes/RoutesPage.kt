@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
@@ -60,8 +61,8 @@ fun ListRoute(
 
     // Variables para SnackBar
     var showSnackbar by remember { mutableStateOf(false) }
-    var snackbarMessage by remember { mutableStateOf("") }
-    var snackbarColor by remember { mutableStateOf(AtlasGreen) }
+    val snackbarMessage by remember { mutableStateOf("") }
+    val snackbarColor by remember { mutableStateOf(AtlasGreen) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
@@ -130,7 +131,12 @@ fun ListRoute(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+                    .padding(
+                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        top = paddingValues.calculateTopPadding(),
+                        end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        bottom = 0.dp
+                    )
             ) {
                 if (showLoading) {
                     Box(

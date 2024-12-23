@@ -10,9 +10,9 @@ import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.viewModels.VehicleViewModel
 import com.project.atlas.views.HomePage
-import com.project.atlas.views.LoginPage
+import com.project.atlas.views.user.LoginPage
 import com.project.atlas.views.MapPage
-import com.project.atlas.views.SignUpPage
+import com.project.atlas.views.user.SignUpPage
 import com.project.atlas.views.vehicles.listVehicle
 import com.project.atlas.views.locations.LocationsListView
 import com.project.atlas.views.vehicles.SelectVehicle

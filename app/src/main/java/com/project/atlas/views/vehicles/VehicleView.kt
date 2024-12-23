@@ -52,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.interfaces.EnergyType
@@ -147,7 +148,12 @@ fun listVehicle(
             Box(
                 modifier = Modifier
                     .fillMaxSize() // Ocupa todo el espacio disponible en la pantalla
-                    .padding(paddingValues) // Aplica el padding respectivo
+                    .padding(
+                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        top = paddingValues.calculateTopPadding(),
+                        end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        bottom = 0.dp
+                    ) // Aplica el padding respectivo
             ) {
                 if (showLoading) {
                     Box(
