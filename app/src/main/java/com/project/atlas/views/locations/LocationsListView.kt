@@ -43,6 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.project.atlas.models.Location
 import com.project.atlas.viewModels.LocationsViewModel
+import com.project.atlas.viewModels.RouteViewModel
 
 @Composable
 fun LocationCard(
@@ -116,7 +117,7 @@ fun LocationCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationsListView(navController: NavController) {
+fun LocationsListView(navController: NavController, routeViewModel: RouteViewModel) {
     val viewModel: LocationsViewModel = viewModel()
     val locations = remember { mutableStateOf(viewModel.getAllLocations()) }
 
@@ -196,7 +197,9 @@ fun LocationsListView(navController: NavController) {
                 selectedLocation.value = null
             },
             viewModel,
-            location
+            location,
+            routeViewModel,
+            navController
         )
     }
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.project.atlas.exceptions.IncorrectEmailException
 import com.project.atlas.exceptions.IncorrectPasswordException
 import com.project.atlas.exceptions.UserAlreadyExistException
@@ -12,12 +13,13 @@ import com.project.atlas.interfaces.UserInterface
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.UserModel
 import com.project.atlas.services.AuthService
+import com.project.atlas.services.FireBaseAuthService
 import kotlinx.coroutines.launch
 
 class UserViewModel : ViewModel() {
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
-    private val authService: UserInterface = AuthService()
+    private val authService: UserInterface = AuthService(FireBaseAuthService())
 
     init {
         authService.initUser()

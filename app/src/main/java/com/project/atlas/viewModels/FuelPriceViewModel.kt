@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.project.atlas.interfaces.EnergyType
 import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.models.FuelPriceModel
-import com.project.atlas.models.RuteModel
+import com.project.atlas.models.RouteModel
 import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.GeocodeApiService
 import kotlinx.coroutines.delay
@@ -132,7 +132,7 @@ class FuelPriceViewModel : ViewModel() {
         return earthRadius * c
     }
 
-    suspend fun calculateRoutePrice(route: RuteModel): Double? {
+    suspend fun calculateRoutePrice(route: RouteModel): Double? {
         val energyType: EnergyType? = route.vehicle.energyType
         val distance = route.distance
         val consumption = route.vehicle.consumption

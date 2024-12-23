@@ -10,15 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.project.atlas.models.RuteModel
+import com.project.atlas.models.RouteModel
 import com.project.atlas.viewModels.FuelPriceViewModel
-import com.project.atlas.viewModels.RuteViewModel
+import com.project.atlas.viewModels.RouteViewModel
 import kotlinx.coroutines.launch
 
 // Retrofit API interface
@@ -32,29 +33,30 @@ import kotlinx.coroutines.launch
 @Composable
 fun EnergyTypeTest(
     viewModel: FuelPriceViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
-    ruteViewModel: RuteViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    routeViewModel: RouteViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
+
     var selectedFuel by remember { mutableStateOf("Gasolina 95") }
     val fuelOptions = listOf("Gasolina 95", "Gasolina 98", "Diesel")
     var latitudInput by remember { mutableStateOf("") }
     var longitudInput by remember { mutableStateOf("") }
+    val routeList by routeViewModel.ruteList.observeAsState(emptyList())
 
-    var firstRute by remember { mutableStateOf<RuteModel?>(null) } // Variable para la ruta en posición 0
+    var firstRute by remember { mutableStateOf<RouteModel?>(null) } // Variable para la ruta en posición 0
     var calculatedPrice by remember { mutableStateOf<Double?>(null) } // Resultado del cálculo
     var calculationError by remember { mutableStateOf<String?>(null) } // Error en el cálculo
     val coroutineScope = rememberCoroutineScope()
 
-    // Cargar los datos de la ruta
     LaunchedEffect(Unit) {
-        try {
-            val rutes = ruteViewModel.getRutes() // Llamada a la función suspendida
-            if (rutes.isNotEmpty()) {
-                firstRute = rutes[3] // Guarda la ruta en la posición 0
-            }
-        } catch (e: Exception) {
-            calculationError = "Error al cargar la ruta: ${e.message}"
+        routeViewModel.getRutes() // Llama a la función que carga las rutas
+    }
+
+    LaunchedEffect(routeList) { // Se ejecutará cada vez que cambie `routeList`
+        if (routeList.isNotEmpty()) {
+            firstRute = routeList[0] // Accede a la primera ruta (o la posición que necesites)
         }
     }
+
 
     Column(
         modifier = Modifier

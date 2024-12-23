@@ -3,9 +3,9 @@ package com.project.atlas.services
 import GeocodeResponse
 import GeocodeService
 import android.util.Log
-import com.project.atlas.apisRequest.RequestDataForRute
-import com.project.atlas.apisRequest.ResponseDataForRute
-import com.project.atlas.exceptions.InvalidRuteException
+import com.project.atlas.apisRequest.RequestDataForRoute
+import com.project.atlas.apisRequest.ResponseDataForRoute
+import com.project.atlas.exceptions.InvalidRouteException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -79,22 +79,22 @@ object ApiClient {
         }
     }
 
-    suspend fun fetchRute(coordinates: List<List<Double>>, ruteType: String, vehicleType: String): ResponseDataForRute {
-        val body = RequestDataForRute(coordinates, ruteType)
+    suspend fun fetchRoute(coordinates: List<List<Double>>, ruteType: String, vehicleType: String): ResponseDataForRoute {
+        val body = RequestDataForRoute(coordinates, ruteType)
         return suspendCancellableCoroutine { continuation ->
-            val call = geocodeService.getRute(vehicleType, body)
+            val call = geocodeService.getRoute(vehicleType, body)
 
-            call.enqueue(object : Callback<ResponseDataForRute> {
-                override fun onResponse(call: Call<ResponseDataForRute>, response: Response<ResponseDataForRute>) {
+            call.enqueue(object : Callback<ResponseDataForRoute> {
+                override fun onResponse(call: Call<ResponseDataForRoute>, response: Response<ResponseDataForRoute>) {
                     if (response.isSuccessful && response.body() != null) {
                         continuation.resume(response.body()!!)
                     } else {
-                        continuation.resumeWithException(InvalidRuteException("Error: ${response.code()} ${response.message()}"))
+                        continuation.resumeWithException(InvalidRouteException("Error: ${response.code()} ${response.message()}"))
                     }
                 }
 
-                override fun onFailure(call: Call<ResponseDataForRute>, t: Throwable) {
-                    continuation.resumeWithException(InvalidRuteException("Error: ${t.message ?: "Unknown error"}"))
+                override fun onFailure(call: Call<ResponseDataForRoute>, t: Throwable) {
+                    continuation.resumeWithException(InvalidRouteException("Error: ${t.message ?: "Unknown error"}"))
                 }
             })
 
