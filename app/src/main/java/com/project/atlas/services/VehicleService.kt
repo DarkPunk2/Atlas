@@ -14,13 +14,16 @@ import com.project.atlas.models.VehicleType
 
 
 class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInterface {
+
+
+
     override suspend fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
         checkBusinessRules(vehicle)
         return dbService.addVehicle(user, vehicle)
     }
 
     override suspend fun listVehicle(user: String): List<VehicleModel>? {
-        if(!checkForVehicles(user)) createDefaults(user)
+        if(!dbService.isTesting && !dbService.checkForVehicles(user)) dbService.createDefaults(user)
         return dbService.listVehicle(user)
     }
     override suspend fun deleteVehicle(user: String, vehicleAlias:String): Boolean {
@@ -38,37 +41,13 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
         return vehicle
     }
 
-    override suspend fun checkForDuplicates(user: String, vehicleAlias: String): Boolean {
-        return dbService.checkForDuplicates(user, vehicleAlias)
-    }
-
-    override suspend fun deleteAll(user: String): Boolean {
-        return dbService.deleteAll(user)
-    }
-
-    override suspend fun createDefaults(user: String): Boolean {
-        return dbService.createDefaults(user)
-    }
-
-    override suspend fun checkForVehicles(user:String): Boolean {
-    return dbService.checkForVehicles(user)
-}
     @SuppressLint("SuspiciousIndentation")
     @Throws(VehicleWrongBusinessRulesException::class)
     fun checkBusinessRules(vehicle: VehicleModel){
-        if (checkAlias(vehicle.alias)){
-            if(checkConsumption(vehicle.consumption)){
-                if(checkTypeWithEnergyType(vehicle)){
-                    return
-                }else{
-                    throw VehicleWrongBusinessRulesException("Energy type no válido")
-                }
-            }else{
-                throw VehicleWrongBusinessRulesException("Consumption no válido")
-            }
-        }else{
-            throw VehicleWrongBusinessRulesException("Alias no válido")
+        if (checkAlias(vehicle.alias) && checkConsumption(vehicle.consumption) && checkTypeWithEnergyType(vehicle)){
+            return
         }
+        throw VehicleWrongBusinessRulesException("Vehículo no válido")
     }
 
     private fun checkConsumption(consumption: Double?): Boolean {

@@ -36,6 +36,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -47,14 +48,16 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.project.atlas.interfaces.EnergyType
 import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.viewModels.VehicleViewModel
@@ -63,7 +66,6 @@ import com.project.atlas.models.VehicleType
 import com.project.atlas.R
 import com.project.atlas.ui.theme.AtlasGold
 import com.project.atlas.ui.theme.AtlasGreen
-import com.project.atlas.views.NavigationMenu
 import kotlinx.coroutines.delay
 
 
@@ -148,12 +150,7 @@ fun listVehicle(
             Box(
                 modifier = Modifier
                     .fillMaxSize() // Ocupa todo el espacio disponible en la pantalla
-                    .padding(
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        top = paddingValues.calculateTopPadding(),
-                        end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        bottom = 0.dp
-                    ) // Aplica el padding respectivo
+                    .padding(paddingValues) // Aplica el padding respectivo
             ) {
                 if (showLoading) {
                     Box(
@@ -185,12 +182,6 @@ fun listVehicle(
                             }
                         }
                     }
-                }
-                Box(modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                ) {
-                    NavigationMenu(navController, 2)
                 }
             }
         }
