@@ -15,15 +15,15 @@ class FuelPriceViewModel() : ViewModel() {
     private val _routePrice = MutableStateFlow<Double?>(null)
     val routePrice: StateFlow<Double?> get() = _routePrice
 
-    private val _errorMessage = MutableStateFlow("")
-    val errorMessage: StateFlow<String> get() = _errorMessage
+    private val _fuelErrorMessage = MutableStateFlow("")
+    val fuelRrrorMessage: StateFlow<String> get() = _fuelErrorMessage
 
     fun calculatePriceForRoute(route: RouteModel) {
         viewModelScope.launch {
             try {
                 _routePrice.value = fuelPriceService.calculateRoutePrice(route)
             } catch (e: Exception) {
-                _errorMessage.value = "Error al calcular el precio de la ruta: ${e.message}"
+                _fuelErrorMessage.value = "Error al calcular el precio de la ruta: ${e.message}"
             }
         }
     }

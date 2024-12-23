@@ -16,6 +16,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.project.atlas.models.RouteModel
+import com.project.atlas.repository.FuelPriceRepository
+import com.project.atlas.services.FuelPriceService
 import com.project.atlas.ui.theme.AtlasGreen
 
 
@@ -42,8 +45,13 @@ fun RouteDetailsCard(
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+
+    val fuelPriceService = FuelPriceService(FuelPriceRepository())
     var showAdd by remember { mutableStateOf(activeAdd) }
     var showDelete by remember { mutableStateOf(activeDelete) }
+    var cost by remember { mutableStateOf<Double?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+
     val formattedDistance = if (route.distance >= 1000) {
         String.format("%.1f km", route.distance / 1000.0)
     } else {
@@ -59,6 +67,19 @@ fun RouteDetailsCard(
             "%d min",
             (route.duration / 60).toInt()
         ) // Convertir segundos a minutos
+    }
+
+    LaunchedEffect(route.id) {
+        if (cost == null && !isLoading) {
+            isLoading = true
+            try {
+                cost = fuelPriceService.calculateRoutePrice(route) // Llamada al servicio
+            } catch (e: Exception) {
+                cost = null // En caso de error
+            } finally {
+                isLoading = false
+            }
+        }
     }
 
 
@@ -96,7 +117,14 @@ fun RouteDetailsCard(
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Cost", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text("N/A", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = when {
+                            isLoading -> "Calculating..." // Mostrar estado de carga
+                            cost != null -> String.format("$%.2f", cost) // Mostrar costo calculado
+                            else -> "Error" // Si ocurre un error
+                        },
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))

@@ -70,6 +70,12 @@ fun ListRoute(
         isLoading = false
     }
 
+    LaunchedEffect(key1 = routeList) {
+        if (routeList.any { it.price == null }) {
+            routeViewModel.calculatePricesForRoutesIfNeeded()
+        }
+    }
+
     BackHandler {
         navController.navigate("home")
     }
@@ -270,6 +276,12 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
 
                     Text(
                         text = "Distance: $formattedDistance | Duration: $formattedDuration",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+
+                    Text(
+                        text = "Price: ${route.price?.let { String.format("$%.2f", it) } ?: "Calculating..."}",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )

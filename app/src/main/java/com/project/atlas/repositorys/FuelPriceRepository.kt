@@ -46,9 +46,6 @@ class FuelPriceRepository {
         }
     }
 
-
-
-
     suspend fun getRegions(): List<Provincia> {
         return try {
             fuelPriceApi.obtenerMunicipios().map { provincia ->
