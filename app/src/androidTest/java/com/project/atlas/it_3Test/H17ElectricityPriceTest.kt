@@ -17,19 +17,19 @@ class H17ElectricityPriceTest {
 
     @Test
     fun acceptanceTest1(){
-        var total_cost = vehicle.energyType!!.calculateCost(500.0, vehicle.consumption!!)
+        var total_cost = vehicle.energyType!!.calculateCost(500.0, vehicle.consumption!!, 14.0)
         assertTrue(total_cost >= 0)
     }
 
     @Test
     fun acceptanceTest2(){
-        var total_cost = walk.energyType!!.calculateCost(20.0, walk.consumption!!)
+        var total_cost = walk.energyType!!.calculateCost(20.0, walk.consumption!!, 0.0)
         assertTrue(total_cost == 1064.toDouble())
     }
 
     @Test
     fun acceptanceTest3(){
-        var total_cost = cycle.energyType!!.calculateCost(20.0, cycle.consumption!!)
+        var total_cost = cycle.energyType!!.calculateCost(20.0, cycle.consumption!!, 0.0)
         assertTrue(total_cost == 490.toDouble())
     }
 }
