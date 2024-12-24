@@ -70,4 +70,8 @@ class FireBaseAuthService {
         }
     }
 
+    fun restorePassword(): Boolean{
+        return false
+    }
+
 }

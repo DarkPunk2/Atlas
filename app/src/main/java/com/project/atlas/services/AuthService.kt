@@ -100,6 +100,11 @@ class AuthService(externalAuth: FireBaseAuthService) : UserInterface {
             return false
         }
     }
+
+    override fun recoverPassword(email: String): Boolean {
+        TODO("Not yet implemented")
+    }
+
 }
 
 

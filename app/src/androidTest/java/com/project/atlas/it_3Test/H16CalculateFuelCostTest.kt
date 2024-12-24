@@ -41,9 +41,6 @@ class H16CalculateFuelCostTest {
             rute = routeService.createRute(start, end, vehicle, RouteType.FASTER)
         }
         runBlocking {
-            routeService.addRoute(rute)
-        }
-        runBlocking {
             precioCombustible = fuelPriceService.fetchFuelData(start.lat,start.lon, vehicle.energyType!!)
         }
 
