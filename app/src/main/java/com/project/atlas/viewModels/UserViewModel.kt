@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.project.atlas.exceptions.IncorrectEmailException
 import com.project.atlas.exceptions.IncorrectPasswordException
 import com.project.atlas.exceptions.UserAlreadyExistException
@@ -71,6 +70,18 @@ class UserViewModel : ViewModel() {
         viewModelScope.launch {
             if (authService.deleteUser()){
                 _authState.value = UserModel.getAuthState()
+            }
+        }
+    }
+
+    fun recoverPassword(email: String){
+        viewModelScope.launch {
+            try {
+                authService.recoverPassword(email)
+            }catch (inMail: IncorrectEmailException){
+                _authState.value = AuthState.Error(inMail.message.toString())
+            }catch (userNotFound: UserNotFoundException){
+                _authState.value = AuthState.Error(userNotFound.message.toString())
             }
         }
     }

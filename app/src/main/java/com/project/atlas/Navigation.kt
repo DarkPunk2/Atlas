@@ -21,6 +21,7 @@ import com.project.atlas.views.vehicles.SelectVehicle
 import com.project.atlas.views.routes.ListRoute
 import com.project.atlas.views.routes.RouteCreatorView
 import com.project.atlas.views.routes.RouteViewerPage
+import com.project.atlas.views.user.RecoverPasswordPage
 
 @Composable
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
@@ -65,6 +66,9 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
             EnergyTypeTest(
                 viewModel = fuelPriceViewModel
             )
+        }
+        composable("recover"){
+            RecoverPasswordPage(modifier, navController, userViewModel)
         }
     })
 }

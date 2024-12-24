@@ -9,6 +9,7 @@ on:
     branches:
       - "master"
       - "it-3"
+      - "it-4"
 
 jobs:
   build:

@@ -9,6 +9,7 @@ import com.project.atlas.models.UserModel
 import com.project.atlas.services.AuthService
 import com.project.atlas.services.FireBaseAuthService
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -44,7 +45,7 @@ class H1UserRegisterTest {
             firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener {
                 firebaseUser = firebaseAuth.currentUser!!
                 firebaseUser.delete()
-            }
+            }.await()
         }
     }
 

@@ -8,6 +8,7 @@ import com.project.atlas.exceptions.UserAlreadyExistException
 import com.project.atlas.exceptions.UserNotFoundException
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.UserModel
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -26,7 +27,9 @@ class FireBaseAuthService {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        createFirestoreDocument(email)
+                        runBlocking {
+                            createFirestoreDocument(email)
+                        }
                         continuation.resume(task.result?.user)
                     } else {
                         val exception = when (task.exception) {
@@ -39,11 +42,12 @@ class FireBaseAuthService {
         }
     }
 
-    private fun createFirestoreDocument(email: String) {
-        db.collection("users").document("user@example.com").set(email)
+    private suspend fun createFirestoreDocument(email: String) {
+        val user = hashMapOf("email" to email)
+        db.collection("users").document(email).set(user)
             .addOnFailureListener { e ->
                 throw Exception(e.message)
-            }
+            }.await()
     }
 
     suspend fun signInWithEmailAndPassword(email: String, password: String): FirebaseUser? {
@@ -76,6 +80,9 @@ class FireBaseAuthService {
             currentUser.delete()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        runBlocking {
+                            clearFireStore(UserModel.eMail)
+                        }
                         auth.signOut()
                         continuation.resume(true)
                     } else {
@@ -87,6 +94,13 @@ class FireBaseAuthService {
                     }
                 }
         }
+    }
+
+    private suspend fun clearFireStore(email: String) {
+        db.collection("users").document(email).delete()
+            .addOnFailureListener { e ->
+                throw Exception(e.message)
+            }.await()
     }
 
     suspend fun restorePassword(email: String): Boolean {
