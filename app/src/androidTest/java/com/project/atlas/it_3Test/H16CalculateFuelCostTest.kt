@@ -2,7 +2,6 @@ package com.project.atlas.it_3Test
 
 import Diesel
 import com.project.atlas.exceptions.InvalidRouteException
-import com.project.atlas.exceptions.VehicleWrongBusinessRulesException
 import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
@@ -13,9 +12,9 @@ import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.FuelPriceService
 import com.project.atlas.services.RouteDatabaseService
 import com.project.atlas.services.RouteService
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -57,8 +56,11 @@ class H16CalculateFuelCostTest {
         assertTrue(precioCombustible != null && precioRuta != null)
 
         val precioTeorico = vehicle.energyType?.calculateCost(rute.distance/1000, precioCombustible!!, vehicle.consumption!!)
-
-        assertTrue(precioTeorico == precioRuta)
+        if (precioTeorico != null && precioRuta != null) {
+            assertEquals(precioTeorico, precioRuta, 0.0001)
+        }else{
+            assertTrue("Prices can't be null",false)
+        }
 
     }
 
