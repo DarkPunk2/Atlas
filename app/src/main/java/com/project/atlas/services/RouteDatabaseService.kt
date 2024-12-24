@@ -8,18 +8,21 @@ import Petrol98
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.atlas.exceptions.RouteNotFoundException
+import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.interfaces.Petrol95
-import com.project.atlas.interfaces.RuteDatabase
+import com.project.atlas.interfaces.RouteDatabase
 import com.project.atlas.models.Location
-import com.project.atlas.models.RuteModel
-import com.project.atlas.models.RuteType
+import com.project.atlas.models.RouteModel
+import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.models.VehicleType
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class RuteDatabaseService: RuteDatabase {
+class RouteDatabaseService: RouteDatabase {
     private val db = FirebaseFirestore.getInstance()
 
     private var usersCollection:String = "users"
@@ -29,29 +32,42 @@ class RuteDatabaseService: RuteDatabase {
         usersCollection = "usersTest"
     }
 
-    override suspend fun add(rute: RuteModel): Boolean {
-        if (checkForDuplicates(UserModel.eMail, rute.id)) {
-            return false
-        }
-        val dbRute = ruteToMap(rute)
+    override suspend fun add(route: RouteModel): Boolean {
+        val dbRute = ruteToMap(route)
 
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
                 .document(UserModel.eMail)
                 .collection(collectionId)
-                .document(rute.id)
+                .document(route.id)
                 .set(dbRute)
                 .addOnSuccessListener {
                     continuation.resume(true)
                 }
                 .addOnFailureListener { exception ->
                     Log.e("Firebase", "Error adding rute: ${exception.message}")
-                    continuation.resume(false)
+                    continuation.resumeWithException(ServiceNotAvailableException(exception.message ?: "Service not available"))
                 }
         }
     }
 
-    private fun ruteToMap(rute: RuteModel): Map<String, Any> {
+    override suspend fun remove(routeID: String): Boolean {
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(UserModel.eMail)
+                .collection(collectionId)
+                .document(routeID).delete()
+                .addOnSuccessListener {
+                    continuation.resume(true)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error adding rute: ${exception.message}")
+                    continuation.resumeWithException(ServiceNotAvailableException(exception.message ?: "Service not available"))
+                }
+        }
+    }
+
+    private fun ruteToMap(rute: RouteModel): Map<String, Any> {
         return mapOf(
             "id" to rute.id,
             "start" to mapOf(
@@ -75,14 +91,16 @@ class RuteDatabaseService: RuteDatabase {
                 },
                 "consumption" to rute.vehicle.consumption
             ),
-            "ruteType" to rute.ruteType.name,
+            "ruteType" to rute.routeType.name,
             "distance" to rute.distance,
             "duration" to rute.duration,
-            "rute" to rute.rute
+            "rute" to rute.rute,
+            "bbox" to rute.bbox
+
         )
     }
 
-    private fun DocumentSnapshot.toRuteModel(): RuteModel {
+    private fun DocumentSnapshot.toRuteModel(): RouteModel {
         val start = get("start") as Map<String, Any>
         val end = get("end") as Map<String, Any>
         val vehicle = get("vehicle") as Map<String, Any>
@@ -99,7 +117,7 @@ class RuteDatabaseService: RuteDatabase {
                 }
         }
 
-        return RuteModel(
+        return RouteModel(
             id = getString("id")!!,
             start = Location(
                 lat = start["lat"] as Double,
@@ -117,17 +135,18 @@ class RuteDatabaseService: RuteDatabase {
                 energyType = energyType,
                 consumption = vehicle["consumption"] as Double?
             ),
-            ruteType = RuteType.valueOf(getString("ruteType")!!),
+            routeType = RouteType.valueOf(getString("ruteType")!!),
             distance = getDouble("distance")!!,
             duration = getDouble("duration")!!,
-            rute = getString("rute")!!
+            rute = getString("rute")!!,
+            bbox = get("bbox") as List<Double>
         )
     }
 
 
 
 
-    override suspend fun getAll(): List<RuteModel> {
+    override suspend fun getAll(): List<RouteModel> {
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
                 .document(UserModel.eMail)
@@ -146,11 +165,7 @@ class RuteDatabaseService: RuteDatabase {
         }
     }
 
-    override fun remove(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    private suspend fun checkForDuplicates(user: String, id: String): Boolean {
+    override suspend fun checkForDuplicates(user: String, id: String): Boolean {
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
                 .document(user)

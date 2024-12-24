@@ -6,39 +6,54 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.atlas.models.Location
-import com.project.atlas.services.ApiClient
+import com.project.atlas.services.GeocodeApiService
 import com.project.atlas.services.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-class LocationsViewModel: ViewModel() {
+class LocationsViewModel : ViewModel() {
     private val locationsList = SnapshotStateList<Location>()
     private val locationRepository = LocationRepository()
 
-    fun addLocation(location: Location ) {
+    fun addLocation(location: Location) {
+        if (abs(location.lat) > 90.0 || abs(location.lon) > 180.0) {
+            throw IllegalArgumentException()
+        }
         locationsList.add(location)
     }
 
     fun addLocation(lat: Double, lon: Double, alias: String) {
-        if(abs(lat)<=90.0 && abs(lon)<=180.0) {
-            viewModelScope.launch {
-                val newAlias = if (alias.isEmpty()) {
-                    ApiClient.fetchToponymByLatLong(
-                        "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
-                        lat.toString(),
-                        lon.toString()
-                    )
-                } else {
-                    alias
-                }
-
-                //Sanitize alias to remove any / characters and everything until a comma
-                val sanitizedAlias = newAlias.replace(Regex("/[^,]*,"), ",")
-                val newLocation = Location(lat, lon, sanitizedAlias)
-                locationRepository.addLocation(newLocation)
-                addLocation(newLocation)
+        viewModelScope.launch {
+            val newAlias = if (alias.isEmpty()) {
+                GeocodeApiService.fetchToponymByLatLong(
+                    "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
+                    lat.toString(),
+                    lon.toString()
+                )
+            } else {
+                alias
             }
+
+            //Sanitizar alias para eliminar cualquier carácter después de una '/' hasta una ',' .
+            val sanitizedAlias = newAlias.replace(Regex("/[^,]*,"), ",")
+            val newLocation = Location(lat, lon, sanitizedAlias)
+            locationRepository.addLocation(newLocation)
+            addLocation(newLocation)
+        }
+    }
+
+    fun addLocation(toponym: String) {
+        if (toponym.isNotEmpty()) {
+            GeocodeApiService.fetchGeocode(
+                "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
+                toponym
+            ) { lat, lon, topo ->
+                addLocation(lat, lon, topo)
+                Log.d("location", "Nueva ubicación agregada: $topo")
+            }
+        } else {
+            Log.e("location", "No se encontraron resultados en la geocodificación.")
         }
     }
 
@@ -47,7 +62,7 @@ class LocationsViewModel: ViewModel() {
     }
 
     fun getLocation(index: Int): Location {
-        if (index<getNumLocations()) {
+        if (index < getNumLocations()) {
             return locationsList.get(index)
         }
         throw IndexOutOfBoundsException()
@@ -72,7 +87,25 @@ class LocationsViewModel: ViewModel() {
         }
     }
 
-    fun updateAlias(location: Location, newAlias: String) {
+    fun updateLocation(location: Location, lat: Double, lon: Double) {
+        this.updateLocation(location, lat, lon, location.alias)
+    }
 
+    fun updateLocation(location: Location, alias: String) {
+        this.updateLocation(location, location.lat, location.lon, alias)
+    }
+
+    fun updateLocation(location: Location, lat: Double, lon: Double, alias: String) {
+        var newAlias = location.alias
+        if (abs(lat) > 90.0 || abs(lon) > 180.0) {
+            throw IllegalArgumentException()
+        }
+        if (alias != location.alias) {
+            newAlias = alias
+        }
+        locationRepository.updateLocation(location, lat, lon, newAlias)
+        location.lat = lat
+        location.lon = lon
+        location.alias = newAlias
     }
 }

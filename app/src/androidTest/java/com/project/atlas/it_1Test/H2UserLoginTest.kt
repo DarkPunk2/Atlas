@@ -1,25 +1,22 @@
 package com.project.atlas.it_1Test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.auth.FirebaseAuth
 import com.project.atlas.exceptions.IncorrectEmailException
 import com.project.atlas.exceptions.IncorrectPasswordException
 import com.project.atlas.exceptions.UserNotFoundException
 import com.project.atlas.interfaces.UserInterface
 import com.project.atlas.models.UserModel
 import com.project.atlas.services.AuthService
+import com.project.atlas.services.FireBaseAuthService
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
-import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
 class H2UserLoginTest {
-    private var user: UserInterface = AuthService()
+    private var user: UserInterface = AuthService(FireBaseAuthService())
 
     @Test
     fun h2P1Test() = runBlocking{

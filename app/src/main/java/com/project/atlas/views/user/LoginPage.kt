@@ -1,7 +1,9 @@
-package com.project.atlas.views
+package com.project.atlas.views.user
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
@@ -30,9 +34,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,6 +61,10 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
         mutableStateOf("")
     }
 
+    val emailFocusRequester = remember { FocusRequester() }
+    val passwordFocusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
     val authState = userViewModel.authState.observeAsState()
     val context = LocalContext.current
 
@@ -64,11 +76,15 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
             else -> Unit
         }
     }
+    BackHandler {
+
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .padding(20.dp)
+            .clickable(onClick = { focusManager.clearFocus() }),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -95,6 +111,9 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
             label = { Text("E-mail") },
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth()
+                .focusRequester(emailFocusRequester),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions( onNext = { passwordFocusRequester.requestFocus() } )
         )
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
@@ -109,6 +128,9 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth()
+                .focusRequester(passwordFocusRequester),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions( onNext = { focusManager.clearFocus() } )
         )
         Spacer(modifier = Modifier.height(15.dp))
         Button(

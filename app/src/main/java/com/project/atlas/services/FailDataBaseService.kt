@@ -1,19 +1,23 @@
 package com.project.atlas.services
 
 import com.project.atlas.exceptions.ServiceNotAvailableException
-import com.project.atlas.interfaces.RuteDatabase
-import com.project.atlas.models.RuteModel
+import com.project.atlas.interfaces.RouteDatabase
+import com.project.atlas.models.RouteModel
 
-class FailDataBaseService: RuteDatabase {
-    override suspend fun add(rute: RuteModel): Boolean {
+class FailDataBaseService: RouteDatabase {
+    override suspend fun add(route: RouteModel): Boolean {
         throw ServiceNotAvailableException("Service is not available")
     }
 
-    override suspend fun getAll(): List<RuteModel> {
+    override suspend fun getAll(): List<RouteModel> {
         throw ServiceNotAvailableException("Service is not available")
     }
 
-    override fun remove(): Boolean {
+    override suspend fun remove(routeID: String): Boolean {
+        throw ServiceNotAvailableException("Service is not available")
+    }
+
+    override suspend fun checkForDuplicates(user: String, id: String): Boolean {
         throw ServiceNotAvailableException("Service is not available")
     }
 }
