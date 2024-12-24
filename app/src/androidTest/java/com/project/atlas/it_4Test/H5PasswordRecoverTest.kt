@@ -25,7 +25,7 @@ class H5PasswordRecoverTest {
         assertTrue("Email not send to user", result)
     }
     @Test(expected= UserNotFoundException::class)
-    fun h2P2Test() {
+    fun h2P2Test(): Unit = runBlocking {
         //Given
 
         //When

@@ -6,5 +6,5 @@ interface UserInterface {
     suspend fun loginUser(email: String, password: String)
     fun logoutUser()
     suspend fun deleteUser(): Boolean
-    fun recoverPassword(email: String): Boolean
+    suspend fun recoverPassword(email: String): Boolean
 }

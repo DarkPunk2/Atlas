@@ -8,6 +8,7 @@ import com.project.atlas.services.FireBaseAuthService
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
@@ -19,7 +20,8 @@ class H5PasswordRecoverTest {
     fun h2P1Test() = runBlocking{
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
-        `when`(firebaseAuth.restorePassword()).thenReturn(true)
+        `when`(firebaseAuth.restorePassword(anyString())).thenReturn(true)
+        `when`(firebaseAuth.checkUserExists(anyString())).thenReturn(true)
         user = AuthService(firebaseAuth)
 
         //When
@@ -32,9 +34,9 @@ class H5PasswordRecoverTest {
     fun h2P2Test(): Unit = runBlocking{
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
-        `when`(firebaseAuth.restorePassword()).thenReturn(false)
+        `when`(firebaseAuth.restorePassword(anyString())).thenAnswer{throw UserNotFoundException("User not register")}
+        `when`(firebaseAuth.checkUserExists(anyString())).thenReturn(false)
         user = AuthService(firebaseAuth)
-
 
         //When
         user.recoverPassword("notlogin@test.test")

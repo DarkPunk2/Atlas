@@ -8,10 +8,10 @@
       <SelectionState runConfigName="Tests in 'com.project.atlas'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="H16CalculateFuelCostTest">
+      <SelectionState runConfigName="H5PasswordRecoverTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="h16pa1Test()">
+      <SelectionState runConfigName="h2P1Test()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
