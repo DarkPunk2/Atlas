@@ -25,10 +25,10 @@ class LocationRepository {
             .document(location.alias)
             .set(dbLocation)
             .addOnSuccessListener { documentReference ->
-                Log.d("Firestore", "DocumentSnapshot added with ID: ${location.alias}")
+                Log.d(TAG, "DocumentSnapshot added with ID: ${location.alias}")
             }
             .addOnFailureListener { e ->
-                Log.w("Firestore", "Error adding document", e)
+                Log.w(TAG, "Error adding document", e)
             }
     }
 
@@ -46,13 +46,13 @@ class LocationRepository {
                     val newLocation: Location = document.toObject(Location::class.java)
                     locationsList.add(newLocation)
                 }
-                Log.d("Firestore", "Locations retrieved from database")
-                Log.d("Firestore", "Locations size repository: ${locationsList.size}")
+                Log.d(TAG, "Locations retrieved from database")
+                Log.d(TAG, "Locations size repository: ${locationsList.size}")
             } else {
-                Log.d("Firestore", "No results found in database")
+                Log.d(TAG, "No results found in database")
             }
         } catch (e: Exception) {
-            Log.w("Firestore", "Error getting documents.", e)
+            Log.w(TAG, "Error getting documents.", e)
         }
         return locationsList
     }
@@ -63,27 +63,7 @@ class LocationRepository {
             .collection("locations")
             .document(location.alias)
             .delete()
-            .addOnSuccessListener { Log.d("Firestore", "DocumentSnapshot successfully deleted!") }
-            .addOnFailureListener { e -> Log.w("Firestore", "Error deleting document", e) }
-    }
-
-    fun updateLocation(location: Location, lat: Double, lon: Double, alias: String) {
-        val dbLocation = hashMapOf(
-            "lat" to lat,
-            "lon" to lon,
-            "alias" to alias
-        )
-
-        db.collection("users")
-            .document(UserModel.eMail)
-            .collection("locations")
-            .document(location.alias)
-            .update(dbLocation as Map<String, Any>)
-            .addOnSuccessListener {
-                Log.d("Firestore", "Ubicación actualizada correctamente")
-            }
-            .addOnFailureListener { e ->
-                Log.e("Firestore", "Error al actualizar la ubicación", e)
-            }
+            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
+            .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
     }
 }

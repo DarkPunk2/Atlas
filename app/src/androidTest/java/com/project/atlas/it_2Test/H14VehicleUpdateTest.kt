@@ -24,6 +24,7 @@ class H14VehicleUpdateTest {
     @Before
     fun setUp(){
         dbService = VehicleDatabaseService()
+        dbService.setTestMode()
         service = VehicleService(dbService)
     }
 
@@ -56,6 +57,16 @@ class H14VehicleUpdateTest {
         assertTrue(vehicle.type.equals(vehicle_updated.type))
         assertTrue(vehicle.energyType!!.typeName != vehicle_updated.energyType!!.typeName)
         assertFalse(vehicle.consumption == vehicle_updated.consumption)
+    }
+    @After
+    fun deleteVehicle(){
+        runBlocking {
+            try {
+                service.deleteVehicle("testVehicleUpdate","Mi coche")
+            }catch (e: VehicleNotExistsException){
+                service.deleteVehicle("testVehicleUpdate","Mi buga")
+            }
+        }
     }
     @Test(expected = VehicleWrongBusinessRulesException::class)
     fun acceptanceTest2(){
@@ -101,16 +112,6 @@ class H14VehicleUpdateTest {
         assertTrue(vehicle.type.equals(vehicle_updated.type))
         assertTrue(vehicle.energyType!!.typeName == vehicle_updated.energyType!!.typeName)
         assertFalse(vehicle.consumption == vehicle_updated.consumption)
-    }
-    @After
-    fun deleteVehicle(){
-        runBlocking {
-            try {
-                service.deleteVehicle("testVehicleUpdate","Mi coche")
-            }catch (e: VehicleNotExistsException){
-                service.deleteVehicle("testVehicleUpdate","Mi buga")
-            }
-        }
     }
 
 }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,29 +23,27 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.project.atlas.models.Location
 import com.project.atlas.viewModels.LocationsViewModel
-import com.project.atlas.viewModels.RouteViewModel
-import com.project.atlas.views.NavigationMenu
 
 @Composable
 fun LocationCard(
@@ -64,15 +63,13 @@ fun LocationCard(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 3.dp
+                containerColor = MaterialTheme.colorScheme.inverseSurface,
             ),
             modifier = Modifier
-                .padding(16.dp, 0.dp, 16.dp, 16.dp)
+                .padding(10.dp, 10.dp, 10.dp, 0.dp)
                 .fillMaxWidth()
-                .clickable { onClick() },
+                .shadow(4.dp)
+                .clickable { onClick() }
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -108,7 +105,7 @@ fun LocationCard(
                     Icon(
                         imageVector = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = "Go Back",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        tint = MaterialTheme.colorScheme.inverseOnSurface
                     )
                 }
             }
@@ -116,27 +113,30 @@ fun LocationCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationsListView(
-    navController: NavController,
-    routeViewModel: RouteViewModel,
-) {
+fun LocationsListView(navController: NavController) {
     val viewModel: LocationsViewModel = viewModel()
     val locations = remember { mutableStateOf(viewModel.getAllLocations()) }
-
-
+    val showCard = remember { mutableStateOf(false) }
+    val showActionCard = remember { mutableStateOf(false) }
     val selectedLocation = remember { mutableStateOf<Location?>(null) }
 
-    //Cards
-    val showAddLocation = remember { mutableStateOf(false) }
-    val showActionCard = remember { mutableStateOf(false) }
-    val showEditCard = remember { mutableStateOf(false) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.onSurface, RectangleShape)
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.inverseSurface, RectangleShape)
+                        .padding(top = 8.dp, bottom = 8.dp)
+                        .fillMaxWidth()
+                ) {
                     IconButton(
                         onClick = {
                             navController.popBackStack()
@@ -145,82 +145,70 @@ fun LocationsListView(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                             contentDescription = "Go Back",
-                            tint = MaterialTheme.colorScheme.onSurface
+                            tint = MaterialTheme.colorScheme.inverseOnSurface
                         )
                     }
-                },
-                title = { Text("Saved Locations") },
-            )
-        },
-        content = { paddingValues ->
-            Box {
+                    Text(
+                        text = "Saved locations",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.inverseOnSurface
+                    )
+                }
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        locations.value.forEach { location ->
-                            LocationCard(
-                                alias = location.alias,
-                                coords = "(${location.lat}, ${location.lon})",
-                                favorite = false,
-                                onClick = {
-                                    selectedLocation.value = location
-                                    showActionCard.value = true
-                                    Log.d("locations", "correcto")
-                                }
-                            )
-                        }
+                    locations.value.forEach { location ->
+                        LocationCard(
+                            alias = location.alias,
+                            coords = "(${location.lat}, ${location.lon})",
+                            favorite = false,
+                            onClick = {
+                                selectedLocation.value = location
+                                showActionCard.value = true
+                                Log.d("locations", "correcto")
+                            }
+                        )
                     }
                 }
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    NavigationMenu(navController, 1 )
-                }
             }
-        },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { showAddLocation.value = true },
-                icon = { Icon(Icons.Filled.Add, "Add location") },
-                text = { Text(text = "Add location") },
-                containerColor = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 140.dp)
-            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                ExtendedFloatingActionButton(
+                    onClick = { showCard.value = true },
+                    icon = { Icon(Icons.Filled.Add, "Add location") },
+                    text = { Text(text = "Add location") },
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
         }
-    )
-
-    if (showAddLocation.value) {
-        SearchByToponymView(onDismiss = { showAddLocation.value = false }, viewModel)
-    }
-
-    selectedLocation.value?.let { location ->
-        ActionLocationView(
-            onDismiss = {
-                showActionCard.value = false
-                selectedLocation.value = null
-            },
-            viewModel,
-            location,
-            routeViewModel,
-            navController
-        )
-    }
-
-    /*if (showEditCard.value) {
-        selectedLocation.value?.let { location ->
-            EditLocationView(
-                onBack = {
-                    showEditCard.value = false
-                    selectedLocation.value = null
-                },
-                viewModel,
-                location
-            )
+        AnimatedVisibility(
+            visible = showCard.value,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it }
+        ) {
+            AddLocationView(onBack = { showCard.value = false }, viewModel, 0.0, 0.0)
         }
-    }*/
+        AnimatedVisibility(
+            visible = showActionCard.value,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it }
+        ) {
+            selectedLocation.value?.let { location ->
+                LocationActionView(
+                    onBack = {
+                        showActionCard.value = false
+                        selectedLocation.value = null
+                    },
+                    viewModel,
+                    location
+                )
+            }
+        }
+    }
 }

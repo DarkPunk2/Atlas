@@ -1,5 +1,5 @@
-import com.project.atlas.apisRequest.RequestDataForRoute
-import com.project.atlas.apisRequest.ResponseDataForRoute
+import com.project.atlas.apisRequest.RequestDataForRute
+import com.project.atlas.apisRequest.ResponseDataForRute
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -24,10 +24,10 @@ interface GeocodeService {
 
     @Headers("Authorization: 5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f", "Content-Type: application/json")
     @POST("v2/directions/{vehicle}")
-    fun getRoute(
+    fun getRute(
         @Path("vehicle") vehicle: String,
-        @Body coordinates: RequestDataForRoute
-    ): Call<ResponseDataForRoute>
+        @Body coordinates: RequestDataForRute
+    ): Call<ResponseDataForRute>
 
 }
 
