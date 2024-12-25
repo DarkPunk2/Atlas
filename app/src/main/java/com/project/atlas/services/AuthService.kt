@@ -113,6 +113,17 @@ class AuthService(externalAuth: FireBaseAuthService) : UserInterface {
         return auth.restorePassword(email)
     }
 
+    override suspend fun changePassword(newPassword: String, confirmPassword: String): Boolean {
+        val regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$".toRegex()
+        if (!newPassword.matches(regex)) {
+            throw IncorrectPasswordException("New password is invalid")
+        }
+        if (newPassword != confirmPassword){
+            throw IncorrectPasswordException("Password don't match")
+        }
+        return auth.changePassword(newPassword)
+    }
+
 }
 
 

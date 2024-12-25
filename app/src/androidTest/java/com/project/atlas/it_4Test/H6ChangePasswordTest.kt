@@ -16,7 +16,7 @@ class H6ChangePasswordTest {
     private var user: UserInterface = AuthService(FireBaseAuthService())
 
     @Test
-    fun h2P1Test() = runBlocking{
+    fun h2P1Test(): Unit = runBlocking{
         //Given
         val email = "changepassword@test.test"
         val password = "contraseñaValida@13"
