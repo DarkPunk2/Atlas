@@ -120,6 +120,17 @@ class FireBaseAuthService {
         }
     }
 
+    suspend fun changePassword(newPassword: String): Boolean {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            it.updatePassword(newPassword).await()
+            return true
+        } ?: run {
+            throw UserNotFoundException("User is not log in")
+        }
+    }
+
+
     suspend fun checkUserExists(email: String): Boolean {
         val db = FirebaseFirestore.getInstance()
         return try {

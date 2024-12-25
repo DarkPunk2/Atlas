@@ -26,7 +26,7 @@ class H21DeleteRouteTest {
         UserModel.setMail("testDeleteRute@test.test")
     }
     @Test
-    fun h19P1Test(){
+    fun h21P1Test(){
         //Given
         val start = Location(39.992573, -0.064749,"Castellon")
         val end = Location(39.479126, -0.342623,"Valencia")
@@ -48,7 +48,7 @@ class H21DeleteRouteTest {
     }
 
     @Test(expected = RouteNotFoundException::class)
-    fun h19P2Test(){
+    fun h21P2Test(){
         //Given
 
         //When

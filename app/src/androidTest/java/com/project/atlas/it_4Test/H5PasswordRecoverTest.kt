@@ -16,7 +16,7 @@ class H5PasswordRecoverTest {
     private var user: UserInterface = AuthService(FireBaseAuthService())
 
     @Test
-    fun h2P1Test() = runBlocking{
+    fun h5P1Test() = runBlocking{
         //Given
 
         //When
@@ -25,7 +25,7 @@ class H5PasswordRecoverTest {
         assertTrue("Email not send to user", result)
     }
     @Test(expected= UserNotFoundException::class)
-    fun h2P2Test(): Unit = runBlocking {
+    fun h5P2Test(): Unit = runBlocking {
         //Given
 
         //When
