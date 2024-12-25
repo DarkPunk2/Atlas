@@ -128,6 +128,13 @@ fun HomePage(
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(16.dp)
             ) {
+                Spacer(modifier = Modifier.height(56.dp))
+                TextButton(onClick = {
+                    userViewModel.goChangePage()
+                    navController.navigate("changePassword")
+                }) {
+                    Text("Change Password")
+                }
                 Spacer(modifier = Modifier.weight(1f))
                 HorizontalDivider()
 

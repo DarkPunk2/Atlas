@@ -17,7 +17,7 @@ class H5PasswordRecoverTest {
     private lateinit var user: UserInterface
 
     @Test
-    fun h2P1Test() = runBlocking{
+    fun h5P1Test() = runBlocking{
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
         `when`(firebaseAuth.restorePassword(anyString())).thenReturn(true)
@@ -31,7 +31,7 @@ class H5PasswordRecoverTest {
     }
 
     @Test(expected= UserNotFoundException::class)
-    fun h2P2Test(): Unit = runBlocking{
+    fun h5P2Test(): Unit = runBlocking{
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
         `when`(firebaseAuth.restorePassword(anyString())).thenAnswer{throw UserNotFoundException("User not register")}

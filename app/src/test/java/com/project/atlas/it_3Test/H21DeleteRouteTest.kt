@@ -26,7 +26,7 @@ class H21DeleteRouteTest {
         UserModel.setMail("testDeleteRute@test.test")
     }
     @Test
-    fun h19P1Test()= runBlocking{
+    fun h21P1Test()= runBlocking{
         //Given
         val database = mock(RouteDatabaseService::class.java)
         `when`(database.checkForDuplicates(anyString(), anyString())).thenReturn(true)
@@ -46,7 +46,7 @@ class H21DeleteRouteTest {
     }
 
     @Test(expected = RouteNotFoundException::class)
-    fun h19P2Test(): Unit = runBlocking{
+    fun h21P2Test(): Unit = runBlocking{
         //Given
         val database = mock(RouteDatabaseService::class.java)
         `when`(database.checkForDuplicates(anyString(), anyString())).thenReturn(false)

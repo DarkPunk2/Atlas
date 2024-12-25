@@ -21,16 +21,16 @@ import com.project.atlas.views.vehicles.SelectVehicle
 import com.project.atlas.views.routes.ListRoute
 import com.project.atlas.views.routes.RouteCreatorView
 import com.project.atlas.views.routes.RouteViewerPage
+import com.project.atlas.views.user.ChangePasswordPage
 import com.project.atlas.views.user.RecoverPasswordPage
 
 @Composable
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
     val navController = rememberNavController()
     val vehicleViewModel: VehicleViewModel = viewModel()
-    val ruteViewModel: RouteViewModel = viewModel()
     val fuelPriceViewModel: FuelPriceViewModel = viewModel()
-
     val routeViewModel: RouteViewModel = viewModel()
+
     NavHost(navController = navController, startDestination =  "login", builder = {
         composable("login"){
             LoginPage(modifier, navController, userViewModel)
@@ -69,6 +69,9 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
         }
         composable("recover"){
             RecoverPasswordPage(modifier, navController, userViewModel)
+        }
+        composable("changePassword"){
+            ChangePasswordPage(modifier, navController, userViewModel)
         }
     })
 }

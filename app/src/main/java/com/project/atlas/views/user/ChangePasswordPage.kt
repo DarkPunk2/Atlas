@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -29,10 +31,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
@@ -41,11 +47,19 @@ import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.ui.theme.AtlasGreen
 
 @Composable
-fun RecoverPasswordPage(modifier: Modifier = Modifier,navController: NavController, userViewModel: UserViewModel) {
-    var email by remember {
+fun ChangePasswordPage(modifier: Modifier = Modifier,navController: NavController, userViewModel: UserViewModel) {
+    var oldPassword by remember {
+        mutableStateOf("")
+    }
+    var newPassword by remember {
+        mutableStateOf("")
+    }
+    var confPassword by remember {
         mutableStateOf("")
     }
 
+    val newPasswordFocusRequester = remember { FocusRequester() }
+    val confPasswordFocusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     val changeState = userViewModel.changeState.observeAsState()
@@ -53,7 +67,7 @@ fun RecoverPasswordPage(modifier: Modifier = Modifier,navController: NavControll
 
     LaunchedEffect(changeState.value) {
         when(changeState.value){
-            is ChangeState.Changed -> navController.navigate("login")
+            is ChangeState.Changed -> navController.navigate("home")
             is ChangeState.Error -> Toast.makeText(context,
                 (changeState.value as ChangeState.Error).message, Toast.LENGTH_SHORT).show()
             else -> Unit
@@ -74,33 +88,70 @@ fun RecoverPasswordPage(modifier: Modifier = Modifier,navController: NavControll
         )
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = "Recover password",
+            text = "Change password",
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(15.dp))
         OutlinedTextField(
-            value = email,
+            value = oldPassword,
             onValueChange = { newValue ->
-                email = newValue
+                oldPassword = newValue
             },
             leadingIcon = {
-                Icon(imageVector = Icons.Rounded.Email, contentDescription = null)
+                Icon(imageVector = Icons.Rounded.Lock, contentDescription = null)
             },
-            label = { Text("E-mail") },
+            visualTransformation = PasswordVisualTransformation(),
+            label = { Text("Old password") },
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions( onNext = { newPasswordFocusRequester.requestFocus() } )
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        OutlinedTextField(
+            value = newPassword,
+            onValueChange = { newValue ->
+                newPassword = newValue
+            },
+            leadingIcon = {
+                Icon(imageVector = Icons.Rounded.Lock, contentDescription = null)
+            },
+            visualTransformation = PasswordVisualTransformation(),
+            label = { Text("New password") },
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth()
+                .focusRequester(newPasswordFocusRequester),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions( onNext = { confPasswordFocusRequester.requestFocus() } )
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        OutlinedTextField(
+            value = confPassword,
+            onValueChange = { newValue ->
+                confPassword = newValue
+            },
+            leadingIcon = {
+                Icon(imageVector = Icons.Rounded.Lock, contentDescription = null)
+            },
+            visualTransformation = PasswordVisualTransformation(),
+            label = { Text("Repeat password") },
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.fillMaxWidth()
+                .focusRequester(confPasswordFocusRequester),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions( onNext = { focusManager.clearFocus() } )
         )
         Spacer(modifier = Modifier.height(15.dp))
         Button(
             onClick = {
-                userViewModel.recoverPassword(email)
+                userViewModel.changePassword(oldPassword,newPassword,confPassword)
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors( containerColor = AtlasGreen )
         ) {
             Text(
-                text = "Send email",
+                text = "Change",
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(vertical = 5.dp)
