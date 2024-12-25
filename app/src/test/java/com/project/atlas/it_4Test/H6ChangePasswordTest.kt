@@ -19,10 +19,10 @@ class H6ChangePasswordTest {
     fun h6P1Test(): Unit = runBlocking{
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
-        `when`(firebaseAuth.changePassword(anyString())).thenReturn(true)
+        `when`(firebaseAuth.changePassword(anyString(),anyString())).thenReturn(true)
         user = AuthService(firebaseAuth)
         //When
-        val result = user.changePassword("NewPassword@13", "NewPassword@13")
+        val result = user.changePassword("contraseñaValida@13","NewPassword@13", "NewPassword@13")
         //Then
         assertTrue("Password not changed", result)
     }
@@ -30,10 +30,10 @@ class H6ChangePasswordTest {
     fun h6P4Test(): Unit = runBlocking {
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
-        `when`(firebaseAuth.changePassword(anyString())).thenReturn(false)
+        `when`(firebaseAuth.changePassword(anyString(),anyString())).thenReturn(false)
         user = AuthService(firebaseAuth)
         //When
-        user.changePassword("NewPassword@13", "OtherPassword@13")
+        user.changePassword("contraseñaValida@13","NewPassword@13", "OtherPassword@13")
         //Then
 
     }
@@ -41,10 +41,10 @@ class H6ChangePasswordTest {
     fun h6P5Test(): Unit = runBlocking {
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
-        `when`(firebaseAuth.changePassword(anyString())).thenReturn(false)
+        `when`(firebaseAuth.changePassword(anyString(),anyString())).thenReturn(false)
         user = AuthService(firebaseAuth)
         //When
-        user.changePassword("NewPassword", "NewPassword")
+        user.changePassword("contraseñaValida@13","NewPassword", "NewPassword")
         //Then
 
     }

@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.atlas.exceptions.UserAlreadyExistException
 import com.project.atlas.exceptions.UserNotFoundException
+import com.project.atlas.exceptions.WrongPasswordException
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.UserModel
 import kotlinx.coroutines.runBlocking
@@ -120,13 +121,22 @@ class FireBaseAuthService {
         }
     }
 
-    suspend fun changePassword(newPassword: String): Boolean {
-        val user = FirebaseAuth.getInstance().currentUser
-        user?.let {
-            it.updatePassword(newPassword).await()
-            return true
-        } ?: run {
-            throw UserNotFoundException("User is not log in")
+    suspend fun changePassword(oldPassword: String,newPassword: String): Boolean {
+        return suspendCoroutine { continuation ->
+            auth.signInWithEmailAndPassword(UserModel.eMail, oldPassword)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        user?.let {
+                            it.updatePassword(newPassword)
+                            continuation.resume(true)
+                        } ?: run {
+                            throw UserNotFoundException("User is not log in")
+                        }
+                    } else {
+                        throw WrongPasswordException("Old password is incorrect")
+                    }
+                }
         }
     }
 

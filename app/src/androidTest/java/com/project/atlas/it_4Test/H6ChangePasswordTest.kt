@@ -22,7 +22,7 @@ class H6ChangePasswordTest {
         val password = "contraseñaValida@13"
         user.createUser(email,password)
         //When
-        val result = user.changePassword("NewPassword@13", "NewPassword@13")
+        val result = user.changePassword("contraseñaValida@13","NewPassword@13", "NewPassword@13")
         //Then
         assertTrue("Password not changed", result)
         user.deleteUser()
@@ -32,7 +32,7 @@ class H6ChangePasswordTest {
         //Given
 
         //When
-        user.changePassword("NewPassword@13", "OtherPassword@13")
+        user.changePassword("contraseñaValida@13","NewPassword@13", "OtherPassword@13")
         //Then
 
     }
@@ -41,7 +41,7 @@ class H6ChangePasswordTest {
         //Given
 
         //When
-        user.changePassword("NewPassword", "NewPassword")
+        user.changePassword("contraseñaValida@13","NewPassword", "NewPassword")
         //Then
 
     }
