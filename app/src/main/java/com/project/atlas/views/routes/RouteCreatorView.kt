@@ -1,6 +1,7 @@
 package com.project.atlas.views.routes
 
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,13 +25,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.models.RouteType
 import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.viewModels.RouteViewModel
-import com.project.atlas.views.NavigationMenu
 import com.project.atlas.views.vehicles.DropdownSelector
 
 
@@ -39,12 +40,21 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
     var selectedType by remember { mutableStateOf<RouteType?>(null) }
     val ruteState by routeViewModel.routeState.observeAsState()
     val navigateToRuteView by routeViewModel.navigateToRuteView.observeAsState()
+    val errorState = routeViewModel.errorState.observeAsState()
 
     LaunchedEffect(ruteState) {
         if (navigateToRuteView == true) {
             routeViewModel.seeAdd(true)
             navController.navigate("viewRute")
         }
+    }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(errorState.value) {
+        if (errorState.value != null)
+        Toast.makeText(context,
+            errorState.value!!.message, Toast.LENGTH_SHORT).show()
     }
 
     BackHandler {
