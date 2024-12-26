@@ -20,10 +20,12 @@ class RouteViewModel: ViewModel() {
     private val _navigateToRuteView = MutableLiveData(false)
     val navigateToRuteView: LiveData<Boolean> = _navigateToRuteView
 
+    private val _errorState = MutableLiveData<Exception>()
+    val errorState: LiveData<Exception> = _errorState
+
 
     private var pricesCalculated = false // Flag para evitar cálculos repetidos
     val fuelPriceService = FuelPriceService(FuelPriceRepository())
-    private val _routePrice = MutableStateFlow<Double?>(null)
 
     private val _fuelErrorMessage = MutableStateFlow("")
     val fuelErrorMessage: StateFlow<String> get() = _fuelErrorMessage
@@ -61,8 +63,13 @@ class RouteViewModel: ViewModel() {
     fun createRute(start: Location?, end: Location?, vehicle: VehicleModel?, routeType: RouteType?) {
         if (start != null && end != null && vehicle != null && routeType != null) {
             viewModelScope.launch {
-                _routeState.value = routeService.createRute(start, end, vehicle, routeType)
-                _navigateToRuteView.value = true
+                try {
+                    _routeState.value = routeService.createRute(start, end, vehicle, routeType)
+                    _navigateToRuteView.value = true
+                } catch (e: Exception){
+                    _errorState.value = e
+                }
+
             }
         }
     }

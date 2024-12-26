@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.osmdroid.android)
     implementation(libs.osm.android.compose)
+    testImplementation(libs.kotlin.mockito.kotlin)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     implementation(platform(libs.firebase.bom.v3360))
