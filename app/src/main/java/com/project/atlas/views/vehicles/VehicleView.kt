@@ -3,6 +3,7 @@ package com.project.atlas.views.vehicles
 import Diesel
 import Electricity
 import Petrol98
+import android.app.Application
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -48,6 +49,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -279,7 +281,9 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
         onDismissRequest = { onDismiss() },
         title = { Text(text = "Add Vehicle") },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp) // Espaciado entre componentes
+            ) {
                 // Alias
                 TextField(
                     value = alias,
@@ -291,10 +295,12 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     isError = aliasError,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done))
+                        imeAction = ImeAction.Done
+                    )
+                )
                 if (aliasError) {
                     Text(
-                        text = if (alias!!.isBlank()) "Alias cannot be blank" else "Alias already exists",
+                        text = if (alias.isBlank()) "Alias cannot be blank" else "Alias already exists",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -303,7 +309,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                 // Tipo de Vehículo
                 DropdownSelector(
                     label = "Type",
-                    items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter) /*VehicleType.entries*/,
+                    items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter),
                     selectedItem = selectedType,
                     onItemSelected = { selectedType = it }
                 )
@@ -332,13 +338,15 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     label = { Text("Consumption ${selectedEnergyType?.magnitude ?: "not selected"}") },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done),
+                        imeAction = ImeAction.Done
+                    ),
                     isError = consumptionError
                 )
                 if (consumptionError) {
                     Text("Consumption must be greater than 0", color = Color.Red, style = MaterialTheme.typography.bodySmall)
                 }
             }
+
         },
         confirmButton = {
             Button(
@@ -349,7 +357,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                 },
                 enabled = isValid,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
+                    containerColor = if (isValid) AtlasGreen else Color.Gray
                 )
             ) {
                 Text("Add", color = Color.Black)
@@ -358,7 +366,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
         dismissButton = {
             Button(
                 onClick = { onDismiss() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("Cancel")
             }
@@ -546,11 +554,14 @@ fun <T> DropdownSelector(
             OutlinedButton(
                 onClick = { expanded = true }
                 ) {
-                Text(text = selectedItem?.toString() ?: "Select $label", color = Color.Black)
+                Text(
+                    text = selectedItem?.toString() ?: "Select $label",
+                    color = MaterialTheme.colorScheme.onBackground)
+
             }
             DropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { expanded = false },
             ) {
                 items.forEach { item ->
                     DropdownMenuItem(
@@ -568,7 +579,8 @@ fun <T> DropdownSelector(
 
 @Composable
 fun VehicleItem(vehicle: VehicleModel, onClick: () -> Unit) {
-    AtlasTheme(dynamicColor = false){
+    AtlasTheme(ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
+        dynamicColor = false){
     var isFavorite = false
     val launched = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -725,9 +737,9 @@ fun VehicleDetailsDialog(
                     // Botón de eliminar
                     Button(
                         onClick = { showDeleteConfirmation = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Text("Delete", color = Color.White)
+                        Text("Delete")
                     }
                 } else {
 

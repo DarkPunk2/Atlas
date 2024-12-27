@@ -1,5 +1,6 @@
 package com.project.atlas.views.routes
 
+import android.app.Application
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -36,6 +37,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -194,7 +196,10 @@ fun ListRoute(
 
 @Composable
 fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
-    AtlasTheme(dynamicColor = false) {
+    AtlasTheme(
+        dynamicColor = false,
+        isDarkTheme = ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
+    ) {
         var isFavorite by remember { mutableStateOf(false) }
         val launched = remember { mutableStateOf(false) }
 
@@ -289,7 +294,7 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
                         Text(
                             text = "Distance: $formattedDistance | Duration: $formattedDuration",
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (isSystemInDarkTheme()) SubtittleGrey else Color.Gray
+                            color = MaterialTheme.colorScheme.onSecondary
 
                         )
 
@@ -303,7 +308,7 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
                                 } ?: "Calculating..."
                             }",
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (isSystemInDarkTheme()) SubtittleGrey else Color.Gray
+                            color = MaterialTheme.colorScheme.onSecondary
                         )
                     }
 

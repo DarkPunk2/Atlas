@@ -147,9 +147,9 @@ fun RouteDetailsCard(
                     Button(
                         onClick = { onDelete(route)
                             showDelete = false},
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Text("Delete rute", color = Color.Black)
+                        Text("Delete rute")
                     }
                 }
                 else {

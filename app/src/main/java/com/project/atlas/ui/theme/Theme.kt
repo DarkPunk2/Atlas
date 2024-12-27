@@ -34,25 +34,27 @@ private val LightColorScheme = lightColorScheme(
     background = Color(0xFFFFFBFE), // Color claro para fondo
     surface = Color(0xFFFFFBFE),
     onPrimary = Black,
-    onSecondary = Black,
+    onSecondary = SubtittleDarkGray,
     onTertiary = Color.Black,
     onBackground = Black, // Color oscuro para texto
     onSurface = Black,
-    secondaryContainer = SnowWhite
+    secondaryContainer = ItemWhite,
+    error = OnErrorLight
+
 )
 
 @Composable
 fun AtlasTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(), // Detecta tema oscuro del sistema
+    isDarkTheme: Boolean = isSystemInDarkTheme(), // Detecta tema oscuro del sistema
     dynamicColor: Boolean = true,               // Habilita colores dinámicos
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
+        isDarkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
@@ -62,3 +64,5 @@ fun AtlasTheme(
         content = content
     )
 }
+
+

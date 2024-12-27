@@ -1,5 +1,6 @@
 package com.project.atlas.views.vehicles
 
+import android.app.Application
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -47,14 +48,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.ui.theme.AtlasTheme
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.VehicleViewModel
 import kotlinx.coroutines.delay
@@ -168,55 +172,60 @@ fun SelectVehicle(
 
 @Composable
 fun VehicleSelectItem(vehicle: VehicleModel, onClick: () -> Unit) {
-    val launched = remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        launched.value = true
-    }
-    AnimatedVisibility(
-        visible = launched.value,
-        enter = slideInVertically { it },
-        exit = slideOutVertically { it }
-    ){
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .clickable { onClick() },
-            border = BorderStroke(2.dp, AtlasGreen),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+    AtlasTheme(ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
+        dynamicColor = false) {
+        val launched = remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            launched.value = true
+        }
+        AnimatedVisibility(
+            visible = launched.value,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it }
         ) {
-            Row(
+            Card(
                 modifier = Modifier
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .clickable { onClick() },
+                border = BorderStroke(2.dp, AtlasGreen),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
             ) {
-                Image(
-                    painter = painterResource(
-                        id = when (vehicle.type.name) {
-                            "Car" -> R.drawable.car
-                            "Bike" -> R.drawable.bike
-                            "Cycle" -> R.drawable.cycle
-                            "Scooter" -> R.drawable.scooter
-                            "Walk" -> R.drawable.walk
-                            else -> android.R.drawable.stat_notify_sdcard_usb
-                        }
-                    ),
-                    contentDescription = null,
+                Row(
                     modifier = Modifier
-                        .size(48.dp)
-                )
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(
+                            id = when (vehicle.type.name) {
+                                "Car" -> R.drawable.car
+                                "Bike" -> R.drawable.bike
+                                "Cycle" -> R.drawable.cycle
+                                "Scooter" -> R.drawable.scooter
+                                "Walk" -> R.drawable.walk
+                                else -> android.R.drawable.stat_notify_sdcard_usb
+                            }
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(48.dp)
+                    )
 
-                Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                Text(
-                    text = vehicle.alias!!,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(2f),
-                    color = Color.Black
-                )
+                    Text(
+                        text = vehicle.alias!!,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.weight(2f),
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
     }
