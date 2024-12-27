@@ -36,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.AuthState
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.ui.theme.BackgroundBlack
 import com.project.atlas.viewModels.MapViewModel
 import com.project.atlas.viewModels.UserViewModel
 import kotlinx.coroutines.launch
@@ -78,13 +80,23 @@ fun HomePage(
             painter = painterResource(id = R.drawable.atlas_lettering_black),
             contentDescription = "letterning",
             modifier = Modifier
+                .padding(start = 32.dp)
                 .absolutePadding(2.dp, 1.dp, 3.dp, 3.dp)
-                .size(100.dp)
+                .size(100.dp),
+            colorFilter = ColorFilter.tint(BackgroundBlack)
+
         )
         ExtendedFloatingActionButton(
             onClick = { navController.navigate("routes") },
-            icon = { Icon(Icons.Filled.LocationOn, "My Routes") },
-            text = { Text(text = "My Routes") },
+            icon = { Icon(
+                Icons.Filled.LocationOn,
+                "My Routes",
+                tint = BackgroundBlack // Cambiar el color del icono a blanco
+            )},
+                text = {
+                Text(text = "My Routes",
+                     color = BackgroundBlack
+                    )},
             containerColor = AtlasGreen,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -98,12 +110,12 @@ fun HomePage(
             },
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 30.dp, end = 16.dp)
+                .padding(top = 32.dp, end = 16.dp)
         ) {
             Icon(
                 Icons.Filled.Settings,
                 contentDescription = "Menu",
-                tint = Color.Black
+                tint = BackgroundBlack
             )
         }
 

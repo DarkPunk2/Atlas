@@ -3,6 +3,7 @@ package com.project.atlas.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -13,32 +14,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = AtlasGreen,
+    secondary = AtlasDarker,
+    tertiary = AtlasGold,
+    background = BackgroundBlack,
+    surface = AtlasDarkGrey,
+    onPrimary = SubtittleGrey,
+    onSecondary = SubtittleGrey,
+    onTertiary = Color.Black,
+    onBackground = TextLightGrey,
+    onSurface = TextLightGrey,
+    secondaryContainer = darkItemBackground
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = AtlasGreen,
     secondary = AtlasDarker,
-    tertiary = Color.White
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
+    tertiary = SnowWhite,
+    background = Color(0xFFFFFBFE), // Color claro para fondo
     surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    onPrimary = Black,
+    onSecondary = Black,
+    onTertiary = Color.Black,
+    onBackground = Black, // Color oscuro para texto
+    onSurface = Black,
+    secondaryContainer = SnowWhite
 )
 
 @Composable
 fun AtlasTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    darkTheme: Boolean = isSystemInDarkTheme(), // Detecta tema oscuro del sistema
+    dynamicColor: Boolean = true,               // Habilita colores dinámicos
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -46,14 +52,13 @@ fun AtlasTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = Typography, // Asegúrate de personalizar `Typography`
         content = content
     )
 }

@@ -9,6 +9,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -63,6 +65,10 @@ import com.project.atlas.models.VehicleType
 import com.project.atlas.R
 import com.project.atlas.ui.theme.AtlasGold
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.ui.theme.AtlasTheme
+import com.project.atlas.ui.theme.Black
+import com.project.atlas.ui.theme.SnowWhite
+import com.project.atlas.ui.theme.SubtittleGrey
 import com.project.atlas.views.NavigationMenu
 import kotlinx.coroutines.delay
 
@@ -562,6 +568,7 @@ fun <T> DropdownSelector(
 
 @Composable
 fun VehicleItem(vehicle: VehicleModel, onClick: () -> Unit) {
+    AtlasTheme(dynamicColor = false){
     var isFavorite = false
     val launched = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -580,7 +587,7 @@ fun VehicleItem(vehicle: VehicleModel, onClick: () -> Unit) {
             border = BorderStroke(2.dp, AtlasGreen),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
             )
         ) {
             Row(
@@ -610,7 +617,9 @@ fun VehicleItem(vehicle: VehicleModel, onClick: () -> Unit) {
                     text = vehicle.alias!!,
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.weight(2f),
-                    color = Color.Black
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
 
@@ -620,13 +629,15 @@ fun VehicleItem(vehicle: VehicleModel, onClick: () -> Unit) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                         contentDescription = null,
-                        tint = if (isFavorite) AtlasGreen else Color.Black,
+                        tint = if (isFavorite) MaterialTheme.colorScheme.primary
+                            else  MaterialTheme.colorScheme.onSecondary,
                         modifier = Modifier.size(32.dp)
                     )
                 }
             }
     }
 }
+        }
 }
 
 
@@ -660,7 +671,7 @@ fun VehicleDetailsDialog(
             Text(
                 text = "Vehicle Details",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(16.dp))
 
