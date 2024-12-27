@@ -12,8 +12,6 @@ import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.FuelPriceService
 import com.project.atlas.services.RouteDatabaseService
 import com.project.atlas.services.RouteService
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RouteViewModel: ViewModel() {
@@ -23,12 +21,10 @@ class RouteViewModel: ViewModel() {
     private val _errorState = MutableLiveData<Exception>()
     val errorState: LiveData<Exception> = _errorState
 
-
     private var pricesCalculated = false // Flag para evitar cálculos repetidos
-    val fuelPriceService = FuelPriceService(FuelPriceRepository())
+    private val fuelPriceService = FuelPriceService(FuelPriceRepository())
 
-    private val _fuelErrorMessage = MutableStateFlow("")
-    val fuelErrorMessage: StateFlow<String> get() = _fuelErrorMessage
+
 
     private val _showAddButton = MutableLiveData(false)
     val showAddButton: LiveData<Boolean> = _showAddButton
@@ -48,6 +44,9 @@ class RouteViewModel: ViewModel() {
     private var _end = MutableLiveData<Location?>()
     val end: LiveData<Location?> = _end
 
+    private var _routeTypeState = MutableLiveData<RouteType?>()
+    val routeTypeState: LiveData<RouteType?> = _routeTypeState
+
     private val _ruteList = MutableLiveData<List<RouteModel>>()
     val ruteList: LiveData<List<RouteModel>> = _ruteList
 
@@ -59,6 +58,17 @@ class RouteViewModel: ViewModel() {
 
 
     private val routeService = RouteService(RouteDatabaseService())
+
+    init {
+        viewModelScope.launch {
+            try {
+                _routeTypeState.value = routeService.getDefaultRouteType()
+            }catch (_: Exception){
+                _routeTypeState.value = null
+            }
+
+        }
+    }
 
     fun createRute(start: Location?, end: Location?, vehicle: VehicleModel?, routeType: RouteType?) {
         if (start != null && end != null && vehicle != null && routeType != null) {
@@ -101,7 +111,13 @@ class RouteViewModel: ViewModel() {
     }
 
 
-
+    fun changeDefaultRouteType(routeType: RouteType){
+        viewModelScope.launch {
+            if (routeService.addDefaultRouteType(routeType)){
+                _routeTypeState.value = routeType
+            }
+        }
+    }
 
 
 

@@ -8,7 +8,6 @@ import Petrol98
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.project.atlas.exceptions.RouteNotFoundException
 import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.interfaces.RouteDatabase
@@ -177,5 +176,49 @@ class RouteDatabaseService: RouteDatabase {
                 }
         }
     }
+
+    override suspend fun addDefaultRouteType(routeType: RouteType): Boolean {
+        val routeTypeDB = hashMapOf("routeType" to routeType)
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(UserModel.eMail)
+                .set(routeTypeDB)
+                .addOnSuccessListener {
+                    continuation.resume(true)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error adding rute: ${exception.message}")
+                    continuation.resumeWithException(ServiceNotAvailableException(exception.message ?: "Service not available"))
+                }
+        }
+    }
+
+    override suspend fun getDefaultRouteType(): RouteType {
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(UserModel.eMail)
+                .get()
+                .addOnSuccessListener { result ->
+                    val routeTypeString = result.getString("routeType")
+                    val routeType = routeTypeString?.let {
+                        try {
+                            RouteType.valueOf(it)
+                        }catch (e: IllegalArgumentException){
+                            null
+                        }
+                    }
+                    if (routeType != null) {
+                        continuation.resume(routeType)
+                    } else {
+                        continuation.resumeWithException(NoSuchElementException("No RouteType found"))
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error fetching route type: ${exception.message}")
+                    continuation.resumeWithException(ServiceNotAvailableException(exception.message ?: "Service not available"))
+                }
+        }
+    }
+
 
 }
