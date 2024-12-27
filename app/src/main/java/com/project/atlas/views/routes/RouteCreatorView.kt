@@ -37,7 +37,7 @@ import com.project.atlas.views.vehicles.DropdownSelector
 
 @Composable
 fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewModel) {
-    var selectedType by remember { mutableStateOf<RouteType?>(null) }
+    var selectedType by remember { mutableStateOf<RouteType?>(routeViewModel.routeTypeState.value) }
     val ruteState by routeViewModel.routeState.observeAsState()
     val navigateToRuteView by routeViewModel.navigateToRuteView.observeAsState()
     val errorState = routeViewModel.errorState.observeAsState()

@@ -31,8 +31,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,8 +46,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.AuthState
+import com.project.atlas.models.RouteType
 import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.viewModels.MapViewModel
+import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.UserViewModel
 import kotlinx.coroutines.launch
 
@@ -53,11 +59,13 @@ fun HomePage(
     modifier: Modifier = Modifier,
     navController: NavController,
     userViewModel: UserViewModel,
+    routeViewModel: RouteViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val authState = userViewModel.authState.observeAsState()
     val context = LocalContext.current
+    var selectedType by remember { mutableStateOf<RouteType?>(routeViewModel.routeTypeState.value) }
 
     LaunchedEffect(authState.value) {
         when(authState.value){
@@ -135,6 +143,14 @@ fun HomePage(
                 }) {
                     Text("Change Password")
                 }
+                Spacer(modifier = Modifier.width(6.dp))
+                RouteTypeSelector(
+                    items = RouteType.entries.toList(),
+                    selectedItem = selectedType,
+                    onItemSelected = { selectedType = it
+                        routeViewModel.changeDefaultRouteType(it)
+                    }
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 HorizontalDivider()
 

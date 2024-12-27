@@ -2,6 +2,7 @@ package com.project.atlas.services
 
 import com.project.atlas.exceptions.RouteAlreadyInDataBaseException
 import com.project.atlas.exceptions.RouteNotFoundException
+import com.project.atlas.exceptions.RouteTypeAlreadyAssignedException
 import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.exceptions.UserNotLoginException
 import com.project.atlas.interfaces.RouteDatabase
@@ -71,4 +72,16 @@ class RouteService(private val db: RouteDatabase) {
         return db.remove(routeID)
     }
 
+    suspend fun addDefaultRouteType(routeType: RouteType): Boolean{
+        try {
+            if (getDefaultRouteType() == routeType){
+                throw RouteTypeAlreadyAssignedException("This RouteType is already assigned")
+            }
+        }catch (e: NoSuchElementException){}
+        return db.addDefaultRouteType(routeType)
+    }
+
+    suspend fun getDefaultRouteType(): RouteType{
+        return db.getDefaultRouteType()
+    }
 }
