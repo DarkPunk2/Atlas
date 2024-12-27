@@ -23,6 +23,7 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="H24DefaultVehicleTest">
+      <SelectionState runConfigName="H25DefaultRuteTypeTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

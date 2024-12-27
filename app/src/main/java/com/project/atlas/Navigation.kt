@@ -36,7 +36,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
             LoginPage(modifier, navController, userViewModel)
         }
         composable("home"){
-            HomePage(modifier, navController, userViewModel)
+            HomePage(modifier, navController, userViewModel, routeViewModel)
         }
         composable("map"){
             MapPage(modifier, navController)

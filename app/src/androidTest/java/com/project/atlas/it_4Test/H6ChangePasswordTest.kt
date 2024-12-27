@@ -16,7 +16,7 @@ class H6ChangePasswordTest {
     private var user: UserInterface = AuthService(FireBaseAuthService())
 
     @Test
-    fun h2P1Test(): Unit = runBlocking{
+    fun h6P1Test(): Unit = runBlocking{
         //Given
         val email = "changepassword@test.test"
         val password = "contraseñaValida@13"
@@ -28,7 +28,7 @@ class H6ChangePasswordTest {
         user.deleteUser()
     }
     @Test(expected= IncorrectPasswordException::class)
-    fun h2P4Test(): Unit = runBlocking {
+    fun h6P4Test(): Unit = runBlocking {
         //Given
 
         //When
@@ -37,7 +37,7 @@ class H6ChangePasswordTest {
 
     }
     @Test(expected= IncorrectPasswordException::class)
-    fun h2P5Test(): Unit = runBlocking {
+    fun h6P5Test(): Unit = runBlocking {
         //Given
 
         //When
