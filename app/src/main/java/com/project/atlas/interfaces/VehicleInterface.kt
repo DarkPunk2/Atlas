@@ -13,4 +13,7 @@ interface VehicleInterface {
     suspend fun deleteAll(user: String) : Boolean
     suspend fun createDefaults(user: String) : Boolean
     suspend fun checkForVehicles(user: String) : Boolean
+    suspend fun setDefaultVehicle(user: String, vehicle: VehicleModel) : Boolean
+    suspend fun getDefaultVehicle(user: String) : VehicleModel?
+    suspend fun deleteDefaultVehicle(user: String) : Boolean
 }

@@ -53,6 +53,19 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
     override suspend fun checkForVehicles(user:String): Boolean {
     return dbService.checkForVehicles(user)
 }
+
+    override suspend fun setDefaultVehicle(user: String, vehicle: VehicleModel): Boolean {
+        return dbService.setDefaultVehicle(user, vehicle)
+    }
+
+    override suspend fun getDefaultVehicle(user: String): VehicleModel? {
+        return dbService.getDefaultVehicle(user)
+    }
+
+    override suspend fun deleteDefaultVehicle(user: String): Boolean {
+        return dbService.deleteDefaultVehicle(user)
+    }
+
     @SuppressLint("SuspiciousIndentation")
     @Throws(VehicleWrongBusinessRulesException::class)
     fun checkBusinessRules(vehicle: VehicleModel){

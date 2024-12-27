@@ -10,7 +10,7 @@ class ElectricityServiceViewModel {
         updatePrices()
         return electricityPriceService.getPriceByHour()
     }
-    fun updatePrices(){
+    private fun updatePrices(){
         runBlocking {
             electricityPriceService.fetchPricesByHour()
         }
