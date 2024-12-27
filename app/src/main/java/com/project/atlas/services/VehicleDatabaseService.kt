@@ -31,7 +31,8 @@ class VehicleDatabaseService : VehicleInterface {
         "alias" to vehicle.alias as Serializable,
         "type" to vehicle.type as Serializable,
         "energyType" to energyTypeToString(vehicle.energyType) as Serializable,
-        "consumption" to vehicle.consumption as Serializable
+        "consumption" to vehicle.consumption as Serializable,
+        "favourite" to vehicle.favourite as Serializable
         )
         return dbVehicle
     }
@@ -163,8 +164,10 @@ class VehicleDatabaseService : VehicleInterface {
         }
     }
     private suspend fun updateAliasAsWell(user:String, vehicleOldAlias: String, vehicleUpdated: VehicleModel):Boolean{
-        if(deleteVehicle(user, vehicleOldAlias)){
-            return addVehicle(user, vehicleUpdated)
+        var defaultAlias = getDefaultVehicle(user)?.alias
+        if(deleteVehicle(user, vehicleOldAlias) and addVehicle(user, vehicleUpdated)){
+            if(defaultAlias == vehicleOldAlias) { setDefaultVehicle(user, vehicleUpdated) }
+            return true
         }
         return false
     }
@@ -174,7 +177,8 @@ class VehicleDatabaseService : VehicleInterface {
             alias = getString("alias"),
             type = stringToVehicleType(getString("type"))!!,
             energyType = stringToEnergyType(getString("energyType")),
-            consumption = getDouble("consumption")
+            consumption = getDouble("consumption"),
+            favourite = getBoolean("favourite")!!
         )
     }
 
@@ -229,6 +233,113 @@ class VehicleDatabaseService : VehicleInterface {
                 }
         }
     }
+
+    override suspend fun setDefaultVehicle(user: String, vehicle: VehicleModel): Boolean {
+        return suspendCoroutine { continuation ->
+            // Obtén una referencia al documento del vehículo
+            val vehicleRef = db.collection(usersCollection)
+                .document(user)
+                .collection("vehicles")
+                .document(vehicle.alias!!)
+
+            // Verifica si el vehículo ya está establecido como predeterminado
+            val defaultVehicleDoc = db.collection(usersCollection)
+                .document(user)
+                .collection("defaultVehicle")
+                .document("current")
+
+            defaultVehicleDoc.get()
+                .addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot.exists() && documentSnapshot.getDocumentReference("vehicleRef") == vehicleRef) {
+                        // El vehículo ya es el predeterminado, devolver false
+                        continuation.resume(false)
+                    } else {
+                        // Crea o actualiza el documento en la colección "defaultVehicle" con la referencia al vehículo
+                        defaultVehicleDoc.set(mapOf("vehicleRef" to vehicleRef))
+                            .addOnSuccessListener {
+                                continuation.resume(true)
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.e("Firebase", "Error setting default vehicle: ${exception.message}")
+                                continuation.resume(false)
+                            }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error checking default vehicle: ${exception.message}")
+                    continuation.resume(false)
+                }
+        }
+    }
+
+
+    override suspend fun getDefaultVehicle(user: String): VehicleModel? {
+        val vWalk = VehicleModel(VehicleType.Walk.toString(), VehicleType.Walk, Calories(), 3.8)
+
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(user)
+                .collection("defaultVehicle")
+                .document("current")
+                .get()
+                .addOnSuccessListener { document ->
+                    val vehicleRef = document.getDocumentReference("vehicleRef")
+                    if (vehicleRef != null) {
+                        vehicleRef.get()
+                            .addOnSuccessListener { vehicleDoc ->
+                                if (vehicleDoc.exists()) {
+                                    // Convertir documento a VehicleModel
+                                    val vehicle = vehicleDoc.toVehicle()
+                                    continuation.resume(vehicle)
+                                } else {
+                                    // Si el documento no existe, devolver vWalk
+                                    continuation.resume(null)
+                                }
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.e("Firebase", "Error fetching vehicle data: ${exception.message}")
+                                continuation.resume(null)
+                            }
+                    } else {
+                        // Si no hay una referencia válida, devolvemos vWalk
+                        continuation.resume(null)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error fetching default vehicle document: ${exception.message}")
+                    continuation.resume(null)
+                }
+        }
+    }
+    override suspend fun deleteDefaultVehicle(user: String): Boolean {
+        return suspendCoroutine { continuation ->
+            val collectionRef = db.collection(usersCollection)
+                .document(user)
+                .collection("defaultVehicle")
+
+            collectionRef.get()
+                .addOnSuccessListener { querySnapshot ->
+                    val batch = db.batch()
+                    for (document in querySnapshot.documents) {
+                        batch.delete(document.reference)
+                    }
+                    batch.commit()
+                        .addOnSuccessListener {
+                            continuation.resume(true)
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("Firebase", "Error deleting default vehicle collection: ${exception.message}")
+                            continuation.resume(false)
+                        }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error fetching default vehicle collection: ${exception.message}")
+                    continuation.resume(false)
+                }
+        }
+    }
+
+
 
     private fun stringToEnergyType(value: String?): EnergyType? {
         return when (value) {

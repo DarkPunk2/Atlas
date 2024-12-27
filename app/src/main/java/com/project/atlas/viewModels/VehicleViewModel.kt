@@ -24,6 +24,8 @@ open class VehicleViewModel : ViewModel() {
     private val _vehicleList = MutableLiveData<List<VehicleModel>>()
     val vehicleList: LiveData<List<VehicleModel>> = _vehicleList
 
+    private val _defaultVehicle = MutableLiveData<VehicleModel?>()
+    val defaultVehicle: LiveData<VehicleModel?> = _defaultVehicle
 
     fun refreshVehicles() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -34,11 +36,34 @@ open class VehicleViewModel : ViewModel() {
                 when (it.type) { // Aquí se establece el orden personalizado
                     VehicleType.Walk -> 0  // Walk va primero
                     VehicleType.Cycle -> 1 // Cycle va segundo
-                    else -> 2              // El resto de vehículos va después
+                    else -> when(it.favourite){ // El resto de vehículos va después
+                        true ->2
+                        else ->3
+                    }
                 }
             })
+            _vehicleList.postValue(sortedList)
+        }
+    }
 
-            _vehicleList.postValue(sortedList) // Actualiza LiveData con la lista ordenada
+    fun refreshDefaultVehicle(){
+        var default: VehicleModel? = null
+        viewModelScope.launch(Dispatchers.IO) {
+            default = service.getDefaultVehicle(UserModel.eMail)
+            _defaultVehicle.postValue(default)
+        }
+    }
+
+    fun setDefaultVehicle(vehicle:VehicleModel){
+        viewModelScope.launch(Dispatchers.IO) {
+            service.setDefaultVehicle(UserModel.eMail,vehicle)
+            refreshDefaultVehicle()
+        }
+    }
+    fun deleteDefaultVehicle(){
+        viewModelScope.launch(Dispatchers.IO) {
+            service.deleteDefaultVehicle(UserModel.eMail)
+            refreshDefaultVehicle()
         }
     }
 
@@ -59,13 +84,14 @@ open class VehicleViewModel : ViewModel() {
         }
     }
 
-    // Actualiza un vehículo existente (puedes implementar esto según tus necesidades)
+    // Actualiza un vehículo existente
     fun update(oldAlias:String, vehicle: VehicleModel) {
         viewModelScope.launch(Dispatchers.IO) {
             service.updateVehicle(UserModel.eMail, oldAlias,vehicle)
             refreshVehicles()
         }
     }
+
 
     // Método para obtener la lista de vehículos observables
     fun listVehicles(): LiveData<List<VehicleModel>> = vehicleList

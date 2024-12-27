@@ -96,7 +96,7 @@ fun HomePage(
             containerColor = AtlasGreen,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 180.dp, end = 16.dp)
+                .padding(bottom = 140.dp, end = 16.dp)
         )
         IconButton(
             onClick = {

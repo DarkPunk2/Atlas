@@ -91,4 +91,6 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.play.services.maps.v1802)
     implementation(libs.android.maps.utils)
+    implementation("androidx.compose.material:material-icons-extended:1.4.3")
+
 }
