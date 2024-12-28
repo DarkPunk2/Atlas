@@ -20,6 +20,9 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -66,6 +69,7 @@ fun HomePage(
     val authState = userViewModel.authState.observeAsState()
     val context = LocalContext.current
     var selectedType by remember { mutableStateOf<RouteType?>(routeViewModel.routeTypeState.value) }
+    var showConfirmationDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState.value) {
         when(authState.value){
@@ -169,7 +173,7 @@ fun HomePage(
 
 
                 TextButton(onClick = {
-                    userViewModel.delete()
+                    showConfirmationDelete = true
                 }
                 ) {
                     Icon(
@@ -183,6 +187,32 @@ fun HomePage(
                 Spacer(modifier = Modifier.height(56.dp))
             }
         }
+    }
+    if (showConfirmationDelete) {
+        AlertDialog(
+            onDismissRequest = { showConfirmationDelete = false },
+            title = { Text("Confirm Delete") },
+            text = { Text("Are you sure you want to delete your account?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        userViewModel.delete()
+                        showConfirmationDelete = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AtlasGreen)
+                ) {
+                    Text("Yes", color = Color.Black)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showConfirmationDelete = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("No")
+                }
+            }
+        )
     }
 }
 

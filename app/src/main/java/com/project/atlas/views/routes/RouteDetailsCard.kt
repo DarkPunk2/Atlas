@@ -1,5 +1,6 @@
 package com.project.atlas.views.routes
 
+import Calories
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import com.project.atlas.models.RouteModel
 import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.FuelPriceService
 import com.project.atlas.ui.theme.AtlasGreen
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,17 +55,17 @@ fun RouteDetailsCard(
     var isLoading by remember { mutableStateOf(false) }
 
     val formattedDistance = if (route.distance >= 1000) {
-        String.format("%.1f km", route.distance / 1000.0)
+        String.format(Locale("es","ES"),"%.1f km", route.distance / 1000.0)
     } else {
         "${route.distance.toInt()} m"
     }
     val formattedDuration = if (route.duration >= 3600) {
-        String.format(
+        String.format(Locale("es","ES"),
             "%.1f h",
             route.duration / 3600.0
         ) // Convertir segundos a horas
     } else {
-        String.format(
+        String.format(Locale("es","ES"),
             "%d min",
             (route.duration / 60).toInt()
         ) // Convertir segundos a minutos
@@ -72,10 +74,10 @@ fun RouteDetailsCard(
     LaunchedEffect(route.id) {
         if (cost == null && !isLoading) {
             isLoading = true
-            try {
-                cost = fuelPriceService.calculateRoutePrice(route) // Llamada al servicio
+            cost = try {
+                fuelPriceService.calculateRoutePrice(route) // Llamada al servicio
             } catch (e: Exception) {
-                cost = null // En caso de error
+                null // En caso de error
             } finally {
                 isLoading = false
             }
@@ -120,7 +122,13 @@ fun RouteDetailsCard(
                     Text(
                         text = when {
                             isLoading -> "Calculating..." // Mostrar estado de carga
-                            cost != null -> String.format("$%.2f", cost) // Mostrar costo calculado
+                            cost != null -> {
+                                if (route.vehicle.energyType is Calories){
+                                    String.format(Locale("es","ES"),"%.2f cal", cost)
+                                }else {
+                                    String.format(Locale("es","ES"),"%.2f €", cost)
+                                }
+                            } // Mostrar costo calculado
                             else -> "Error" // Si ocurre un error
                         },
                         style = MaterialTheme.typography.bodyMedium

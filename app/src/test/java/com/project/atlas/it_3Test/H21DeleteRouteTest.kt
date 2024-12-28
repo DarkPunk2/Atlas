@@ -31,8 +31,8 @@ class H21DeleteRouteTest {
         val database = mock(RouteDatabaseService::class.java)
         `when`(database.checkForDuplicates(anyString(), anyString())).thenReturn(true)
 
-        val start = Location(39.992573, -0.064749,"Castellon")
-        val end = Location(39.479126, -0.342623,"Valencia")
+        val start = Location(39.992573, -0.064749,"Castellon","Castellon")
+        val end = Location(39.479126, -0.342623,"Valencia","Valencia")
         val vehicle = VehicleModel("Coche", VehicleType.Car, Diesel(), 4.0)
         val route = RouteModel("id",start,end,vehicle,RouteType.SHORTER,2.2,2.2,"5305873gg", listOf(0.9,0.3))
 

@@ -7,7 +7,6 @@ import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.models.FuelPriceModel
 import com.project.atlas.models.RouteModel
 import com.project.atlas.repository.FuelPriceRepository
-import com.project.atlas.services.GeocodeApiService
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.text.Normalizer
 import kotlin.coroutines.resume
@@ -39,7 +38,7 @@ class FuelPriceService(private val repository: FuelPriceRepository) {
             is Petrol98 -> 1
             is Petrol95 -> 3
             is Diesel -> 4
-            else -> 1 // Default
+            else -> return 0.0// Default
         }
 
         return try {

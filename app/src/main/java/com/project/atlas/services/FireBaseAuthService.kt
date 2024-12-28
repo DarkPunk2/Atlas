@@ -29,7 +29,7 @@ class FireBaseAuthService {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         runBlocking {
-                            createFirestoreDocument(email)
+                            createFirestoreDocument(email.lowercase())
                         }
                         continuation.resume(task.result?.user)
                     } else {
@@ -98,7 +98,7 @@ class FireBaseAuthService {
     }
 
     private suspend fun clearFireStore(email: String) {
-        db.collection("users").document(email).delete()
+        db.collection("users").document(email.lowercase()).delete()
             .addOnFailureListener { e ->
                 throw Exception(e.message)
             }.await()
