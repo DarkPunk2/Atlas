@@ -37,7 +37,7 @@ import com.project.atlas.views.vehicles.DropdownSelector
 
 @Composable
 fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewModel) {
-    var selectedType by remember { mutableStateOf<RouteType?>(null) }
+    var selectedType by remember { mutableStateOf<RouteType?>(routeViewModel.routeTypeState.value) }
     val ruteState by routeViewModel.routeState.observeAsState()
     val navigateToRuteView by routeViewModel.navigateToRuteView.observeAsState()
     val errorState = routeViewModel.errorState.observeAsState()
@@ -52,6 +52,7 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
     val context = LocalContext.current
 
     LaunchedEffect(errorState.value) {
+        routeViewModel.defaultVehicle()
         if (errorState.value != null)
         Toast.makeText(context,
             errorState.value!!.message, Toast.LENGTH_SHORT).show()
@@ -110,7 +111,11 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = routeViewModel.vehicleState.value?.alias ?: "Select vehicle",
+                    text = if (routeViewModel.vehicleState.value == null && routeViewModel.vehicleDefault.value != null) {
+                        routeViewModel.vehicleDefault.value!!.alias!!
+                    }else{
+                        routeViewModel.vehicleState.value?.alias ?: "Select vehicle"
+                    },
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(vertical = 5.dp)

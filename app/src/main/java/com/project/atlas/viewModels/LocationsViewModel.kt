@@ -6,7 +6,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.atlas.models.Location
-import com.project.atlas.services.GeocodeApiService
+import com.project.atlas.services.ApiClient
 import com.project.atlas.services.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,20 +24,19 @@ class LocationsViewModel : ViewModel() {
     }
 
     fun addLocation(lat: Double, lon: Double, alias: String) {
+        //Realizar corutina
         viewModelScope.launch {
-            val newAlias = if (alias.isEmpty()) {
-                GeocodeApiService.fetchToponymByLatLong(
+            //Conseguir latitud y longitud de la API
+            val toponym =
+                ApiClient.fetchToponymByLatLong(
                     "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                     lat.toString(),
                     lon.toString()
                 )
-            } else {
-                alias
-            }
 
-            //Sanitizar alias para eliminar cualquier carácter después de una '/' hasta una ',' .
-            val sanitizedAlias = newAlias.replace(Regex("/[^,]*,"), ",")
-            val newLocation = Location(lat, lon, sanitizedAlias)
+            //Sanitizar topónimo para eliminar cualquier carácter después de una '/' hasta una ',' .
+            val sanitizedToponym = toponym.replace(Regex("/[^,]*,"), ",")
+            val newLocation = Location(lat, lon, alias, sanitizedToponym)
             locationRepository.addLocation(newLocation)
             addLocation(newLocation)
         }
@@ -45,7 +44,7 @@ class LocationsViewModel : ViewModel() {
 
     fun addLocation(toponym: String) {
         if (toponym.isNotEmpty()) {
-            GeocodeApiService.fetchGeocode(
+            ApiClient.fetchGeocode(
                 "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                 toponym
             ) { lat, lon, topo ->

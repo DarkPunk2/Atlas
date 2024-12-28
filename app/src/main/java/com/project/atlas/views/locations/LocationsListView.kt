@@ -7,18 +7,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -27,16 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
@@ -54,7 +34,6 @@ import androidx.navigation.NavController
 import com.project.atlas.models.Location
 import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.ui.theme.AtlasTheme
-import com.project.atlas.ui.theme.SubtittleGrey
 import com.project.atlas.viewModels.LocationsViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.NavigationMenu
@@ -68,7 +47,8 @@ fun LocationCard(
 ) {
     AtlasTheme(
         dynamicColor = false,
-        isDarkTheme = ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value
+        isDarkTheme = ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application)
+            .isDarkTheme.observeAsState(false).value
     ) {
         val launched = remember { mutableStateOf(false) }
         LaunchedEffect(Unit) {
@@ -82,10 +62,10 @@ fun LocationCard(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp) // Match VehicleItem padding
+                    .padding(8.dp)
                     .clickable { onClick() },
-                border = BorderStroke(2.dp, AtlasGreen), // Match VehicleItem border
-                shape = RoundedCornerShape(16.dp), // Match VehicleItem shape
+                border = BorderStroke(2.dp, AtlasGreen),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer
                 )
@@ -95,13 +75,9 @@ fun LocationCard(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Add a placeholder for a potential icon (if applicable)
-                    // Spacer(modifier = Modifier.size(48.dp))
-
                     Spacer(modifier = Modifier.width(16.dp))
-
                     Column(
-                        modifier = Modifier.weight(2f) // Give more weight to the text column
+                        modifier = Modifier.weight(2f)
                     ) {
                         Text(
                             text = alias,
@@ -110,7 +86,6 @@ fun LocationCard(
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onBackground
-
                         )
                         Text(
                             text = coords,
@@ -120,18 +95,15 @@ fun LocationCard(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                     }
-
                     IconButton(
                         onClick = {
                             /* TODO */
                         }
                     ) {
-                        val isFavorite = false
                         Icon(
                             imageVector = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Go Back",
-                            tint = if (isFavorite) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSecondary,
+                            tint = if (favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -149,23 +121,16 @@ fun LocationsListView(
 ) {
     val viewModel: LocationsViewModel = viewModel()
     val locations = remember { mutableStateOf(viewModel.getAllLocations()) }
-
-
     val selectedLocation = remember { mutableStateOf<Location?>(null) }
-
-    //Cards
     val showAddLocation = remember { mutableStateOf(false) }
     val showActionCard = remember { mutableStateOf(false) }
-    val showEditCard = remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            navController.popBackStack()
-                        }
+                        onClick = { navController.popBackStack() }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -209,7 +174,7 @@ fun LocationsListView(
                     }
                 }
                 Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    NavigationMenu(navController, 1 )
+                    NavigationMenu(navController, 1)
                 }
             }
         },
@@ -231,17 +196,4 @@ fun LocationsListView(
             navController
         )
     }
-
-    /*if (showEditCard.value) {
-        selectedLocation.value?.let { location ->
-            EditLocationView(
-                onBack = {
-                    showEditCard.value = false
-                    selectedLocation.value = null
-                },
-                viewModel,
-                location
-            )
-        }
-    }*/
 }

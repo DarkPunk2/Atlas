@@ -26,7 +26,7 @@ class LocationsTest {
 
 
         //When
-        val location = Location(45.0, 25.0, "Parque")
+        val location = Location(45.0, 25.0, "Parque", "Castellón")
         locationsViewModel.addLocation(location)
 
         //Then
@@ -39,7 +39,7 @@ class LocationsTest {
         //Given
 
         //When
-        val location = Location(100.0, 100.0, "Parque")
+        val location = Location(100.0, 100.0, "Parque", "Castellón")
         locationsViewModel.addLocation(location)
 
         //Then
@@ -50,10 +50,10 @@ class LocationsTest {
         //Given
 
         //When
-        val location1 = Location(40.0, 0.0, "Parque")
+        val location1 = Location(40.0, 0.0, "Parque", "Castellón")
         locationsViewModel.addLocation(location1)
 
-        val location2 = Location(41.0, 1.0, "Museo")
+        val location2 = Location(41.0, 1.0, "Museo", "Castellón")
         locationsViewModel.addLocation(location2)
 
         //Then
@@ -75,7 +75,7 @@ class LocationsTest {
     @Test
     fun H9P1Test(){
         //Given
-        val location1 = Location(40.0, 0.0, "Parque")
+        val location1 = Location(40.0, 0.0, "Parque", "Castellón")
         locationsViewModel.addLocation(location1)
         //When
         locationsViewModel.updateLocation(location1, "Parque Actualizado")
@@ -87,7 +87,7 @@ class LocationsTest {
     @Test(expected = IllegalArgumentException::class)
     fun H9P2Test(){
         //Given
-        val location1 = Location(40.0, 0.0, "Parque")
+        val location1 = Location(40.0, 0.0, "Parque", "Castellón")
         locationsViewModel.addLocation(location1)
         //When
         locationsViewModel.updateLocation(location1, 100.0, 100.0)
@@ -98,7 +98,7 @@ class LocationsTest {
     @Test
     fun H10P1Test(){
         //Given
-        val location1 = Location(40.0, 0.0, "Parque")
+        val location1 = Location(40.0, 0.0, "Parque", "Castellón")
         locationsViewModel.addLocation(location1)
         //When
         locationsViewModel.removeLocation(location1)
@@ -110,7 +110,7 @@ class LocationsTest {
     @Test(expected = IllegalStateException::class)
     fun H10P2Test(){
         //Given
-        val location1 = Location(40.0, 0.0, "Parque")
+        val location1 = Location(40.0, 0.0, "Parque", "Castellón")
 
         //When
         locationsViewModel.removeLocation(location1)

@@ -7,69 +7,50 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.absolutePadding
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.AuthState
+import com.project.atlas.models.RouteType
 import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.ui.theme.BackgroundBlack
 import com.project.atlas.viewModels.MapViewModel
+import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.UserViewModel
 import kotlinx.coroutines.launch
-
-
-import androidx.lifecycle.viewmodel.compose.viewModel
-
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalLayoutDirection
 
 @Composable
 fun HomePage(
     modifier: Modifier = Modifier,
     navController: NavController,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    routeViewModel: RouteViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val authState = userViewModel.authState.observeAsState()
     val context = LocalContext.current
     val themeViewModel = ThemeViewModel.getInstance(context.applicationContext as Application)
+    var selectedType by remember { mutableStateOf<RouteType?>(routeViewModel.routeTypeState.value) }
+    var showConfirmationDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
@@ -88,7 +69,6 @@ fun HomePage(
             drawerState = drawerState,
             drawerContent = {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                    // Contenido del drawer sigue con Ltr para no afectar otros elementos
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -120,7 +100,7 @@ fun HomePage(
                             Spacer(modifier = Modifier.width(6.dp))
                             Text("Log out")
                         }
-                        TextButton(onClick = { userViewModel.delete() }) {
+                        TextButton(onClick = { showConfirmationDelete = true }) {
                             Icon(
                                 Icons.Filled.Delete,
                                 contentDescription = "DeleteIcon",
@@ -135,12 +115,11 @@ fun HomePage(
             }
         ) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                // Contenido principal
                 Box(modifier = Modifier.fillMaxSize()) {
                     OsmdroidMapView(MapViewModel())
                     Image(
                         painter = painterResource(id = R.drawable.atlas_lettering_black),
-                        contentDescription = "letterning",
+                        contentDescription = "lettering",
                         modifier = Modifier
                             .padding(start = 32.dp)
                             .absolutePadding(2.dp, 1.dp, 3.dp, 3.dp)
@@ -184,8 +163,31 @@ fun HomePage(
             }
         }
     }
+
+    if (showConfirmationDelete) {
+        AlertDialog(
+            onDismissRequest = { showConfirmationDelete = false },
+            title = { Text("Confirm Delete") },
+            text = { Text("Are you sure you want to delete your account?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        userViewModel.delete()
+                        showConfirmationDelete = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AtlasGreen)
+                ) {
+                    Text("Yes", color = Color.Black)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showConfirmationDelete = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
 }
-
-
-
-

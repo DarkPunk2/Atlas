@@ -1,5 +1,6 @@
 package com.project.atlas.views.routes
 
+import Calories
 import android.app.Application
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -8,7 +9,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,11 +49,10 @@ import com.project.atlas.R
 import com.project.atlas.models.RouteModel
 import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.ui.theme.AtlasTheme
-import com.project.atlas.ui.theme.SnowWhite
-import com.project.atlas.ui.theme.SubtittleGrey
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.NavigationMenu
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -209,23 +208,22 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
 
         AnimatedVisibility(
             visible = launched.value,
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it }
+            enter = slideInVertically { it / 2 },
+            exit = slideOutVertically { it / 2 }
         ) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
                     .clickable { onClick() },
-                border = BorderStroke(2.dp, AtlasGreen),
+                border = BorderStroke(1.dp, AtlasGreen),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer
                 )
             ) {
                 Row(
-                    modifier = Modifier
-                        .padding(16.dp),
+                    modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Icono representativo del vehículo asociado a la ruta
@@ -246,21 +244,20 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    Column(modifier = Modifier.weight(2f)) {
+                    Column(modifier = Modifier.weight(1f)) {
                         // Información de la ruta (origen y destino)
                         Text(
                             text = "From: ${route.start.alias}",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             overflow = TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground
-
                         )
                         Text(
                             text = "To: ${route.end.alias}",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             overflow = TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground
                         )
 
@@ -279,34 +276,26 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
                         }
 
                         val formattedDuration = if (route.duration >= 3600) {
-                            String.format(
-                                "%.1f h",
-                                route.duration / 3600.0
-                            ) // Convertir segundos a horas
+                            String.format("%.1f h", route.duration / 3600.0) // Convertir segundos a horas
                         } else {
-                            String.format(
-                                "%d min",
-                                (route.duration / 60).toInt()
-                            ) // Convertir segundos a minutos
+                            String.format("%d min", (route.duration / 60).toInt()) // Convertir segundos a minutos
                         }
-
 
                         Text(
                             text = "Distance: $formattedDistance | Duration: $formattedDuration",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondary
-
                         )
 
+                        // Formateo de precio con Locale específico
                         Text(
-                            text = "Price: ${
-                                route.price?.let {
-                                    String.format(
-                                        "$%.2f",
-                                        it
-                                    )
-                                } ?: "Calculating..."
-                            }",
+                            text = "Price: ${route.price?.let {
+                                if (route.vehicle.energyType is Calories) {
+                                    String.format(Locale("es", "ES"), "%.2f cal", it)
+                                } else {
+                                    String.format(Locale("es", "ES"), "%.2f €", it)
+                                }
+                            } ?: "Calculating..."}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondary
                         )
@@ -329,4 +318,5 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
         }
     }
 }
+
 

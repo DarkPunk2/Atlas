@@ -20,7 +20,8 @@ data class VehicleModel(
     var alias:String?,
     var type: VehicleType,
     var energyType: EnergyType?,
-    var consumption:Double?
+    var consumption:Double?,
+    var favourite : Boolean = false
 ){
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -33,6 +34,9 @@ data class VehicleModel(
 
     override fun hashCode(): Int {
         return listOf(alias, type, energyType, consumption).hashCode()
+    }
+    fun toggleFavourite(){
+        favourite = !favourite
     }
 }
 

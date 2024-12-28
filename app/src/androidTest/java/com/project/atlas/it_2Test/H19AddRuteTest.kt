@@ -29,8 +29,8 @@ class H19AddRuteTest {
     @Test
     fun h19P1Test(){
         //Given
-        val start = Location(39.992573, -0.064749,"Castellon")
-        val end = Location(39.479126, -0.342623,"Valencia")
+        val start = Location(39.992573, -0.064749, "Casa", "Castellon")
+        val end = Location(39.479126, -0.342623, "Trabajo", "Valencia")
         val vehicle = VehicleModel("Coche", VehicleType.Car, Diesel(), 4.0)
         val route: RouteModel
         runBlocking {
@@ -52,8 +52,8 @@ class H19AddRuteTest {
     fun h19P2Test(){
         //Given
         routeService = RouteService(FailDataBaseService())
-        val start = Location(39.992573, -0.064749,"Castellon")
-        val end = Location(39.479126, -0.342623,"Valencia")
+        val start = Location(39.992573, -0.064749, "Casa", "Castellon")
+        val end = Location(39.479126, -0.342623, "Trabajo", "Valencia")
         val vehicle = VehicleModel("Coche",VehicleType.Car, Diesel(), 4.0)
         val routeModel: RouteModel
         runBlocking {
