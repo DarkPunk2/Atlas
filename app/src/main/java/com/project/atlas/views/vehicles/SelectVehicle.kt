@@ -1,5 +1,6 @@
 package com.project.atlas.views.vehicles
 
+import android.app.Application
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -47,14 +48,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.ui.theme.AtlasTheme
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.VehicleViewModel
 import kotlinx.coroutines.delay
@@ -168,55 +172,60 @@ fun SelectVehicle(
 
 @Composable
 fun VehicleSelectItem(vehicle: VehicleModel, onClick: () -> Unit) {
-    val launched = remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        launched.value = true
-    }
-    AnimatedVisibility(
-        visible = launched.value,
-        enter = slideInVertically { it },
-        exit = slideOutVertically { it }
-    ){
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .clickable { onClick() },
-            border = BorderStroke(2.dp, AtlasGreen),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+    AtlasTheme(ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
+        dynamicColor = false) {
+        val launched = remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            launched.value = true
+        }
+        AnimatedVisibility(
+            visible = launched.value,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it }
         ) {
-            Row(
+            Card(
                 modifier = Modifier
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .clickable { onClick() },
+                border = BorderStroke(2.dp, AtlasGreen),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
             ) {
-                Image(
-                    painter = painterResource(
-                        id = when (vehicle.type.name) {
-                            "Car" -> R.drawable.car
-                            "Bike" -> R.drawable.bike
-                            "Cycle" -> R.drawable.cycle
-                            "Scooter" -> R.drawable.scooter
-                            "Walk" -> R.drawable.walk
-                            else -> android.R.drawable.stat_notify_sdcard_usb
-                        }
-                    ),
-                    contentDescription = null,
+                Row(
                     modifier = Modifier
-                        .size(48.dp)
-                )
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(
+                            id = when (vehicle.type.name) {
+                                "Car" -> R.drawable.car
+                                "Bike" -> R.drawable.bike
+                                "Cycle" -> R.drawable.cycle
+                                "Scooter" -> R.drawable.scooter
+                                "Walk" -> R.drawable.walk
+                                else -> android.R.drawable.stat_notify_sdcard_usb
+                            }
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(48.dp)
+                    )
 
-                Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                Text(
-                    text = vehicle.alias!!,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(2f),
-                    color = Color.Black
-                )
+                    Text(
+                        text = vehicle.alias!!,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.weight(2f),
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
     }
@@ -229,67 +238,85 @@ fun VehicleSelectDetailsDialog(
     onDismiss: () -> Unit,
     onSelect: (VehicleModel) -> Unit // Función para manejar la selección del vehículo
 ) {
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    AtlasTheme(ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
+        dynamicColor = false) {
+        val bottomSheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        )
 
-    ModalBottomSheet(
-        onDismissRequest = { onDismiss() },
-        sheetState = bottomSheetState,
-        containerColor = MaterialTheme.colorScheme.surface
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        ModalBottomSheet(
+            onDismissRequest = { onDismiss() },
+            sheetState = bottomSheetState,
+            containerColor = MaterialTheme.colorScheme.surface
         ) {
-            // Título
-            Text(
-                text = "Vehicle Details",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Información del vehículo
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Alias", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.alias ?: "S/N", style = MaterialTheme.typography.bodyMedium)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Type", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.type.name, style = MaterialTheme.typography.bodyMedium)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Energy", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.energyType?.typeName ?: "N/A", style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+                // Título
+                Text(
+                    text = "Vehicle Details",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Consumo
-            Text(
-                text = "Consumption",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "${vehicle.consumption} ${vehicle.energyType?.magnitude ?: ""}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = Modifier.height(24.dp))
+                // Información del vehículo
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "Alias",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(vehicle.alias ?: "S/N", style = MaterialTheme.typography.bodyMedium)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "Type",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(vehicle.type.name, style = MaterialTheme.typography.bodyMedium)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "Energy",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            vehicle.energyType?.typeName ?: "N/A",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Botón de seleccionar
-            Button(
-                onClick = { onSelect(vehicle) },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text("Select", color = Color.White)
+                // Consumo
+                Text(
+                    text = "Consumption",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "${vehicle.consumption} ${vehicle.energyType?.magnitude ?: ""}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Botón de seleccionar
+                Button(
+                    onClick = { onSelect(vehicle) },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Select", color = Color.Black)
+                }
             }
         }
     }

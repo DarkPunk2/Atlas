@@ -3,6 +3,7 @@ package com.project.atlas.views.vehicles
 import Diesel
 import Electricity
 import Petrol98
+import android.app.Application
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -52,11 +53,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -68,6 +71,7 @@ import com.project.atlas.models.VehicleType
 import com.project.atlas.R
 import com.project.atlas.ui.theme.AtlasGold
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.ui.theme.AtlasTheme
 import com.project.atlas.views.NavigationMenu
 import kotlinx.coroutines.delay
 
@@ -318,7 +322,9 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
         onDismissRequest = { onDismiss() },
         title = { Text(text = "Add Vehicle") },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp) // Espaciado entre componentes
+            ) {
                 // Alias
                 TextField(
                     value = alias,
@@ -330,10 +336,12 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     isError = aliasError,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done))
+                        imeAction = ImeAction.Done
+                    )
+                )
                 if (aliasError) {
                     Text(
-                        text = if (alias!!.isBlank()) "Alias cannot be blank" else "Alias already exists",
+                        text = if (alias.isBlank()) "Alias cannot be blank" else "Alias already exists",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -342,7 +350,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                 // Tipo de Vehículo
                 DropdownSelector(
                     label = "Type",
-                    items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter) /*VehicleType.entries*/,
+                    items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter),
                     selectedItem = selectedType,
                     onItemSelected = { selectedType = it }
                 )
@@ -371,13 +379,15 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     label = { Text("Consumption ${selectedEnergyType?.magnitude ?: "not selected"}") },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done),
+                        imeAction = ImeAction.Done
+                    ),
                     isError = consumptionError
                 )
                 if (consumptionError) {
                     Text("Consumption must be greater than 0", color = Color.Red, style = MaterialTheme.typography.bodySmall)
                 }
             }
+
         },
         confirmButton = {
             Button(
@@ -388,7 +398,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                 },
                 enabled = isValid,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
+                    containerColor = if (isValid) AtlasGreen else Color.Gray
                 )
             ) {
                 Text("Add", color = Color.Black)
@@ -397,7 +407,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
         dismissButton = {
             Button(
                 onClick = { onDismiss() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("Cancel")
             }
@@ -446,7 +456,9 @@ fun EditVehicleDialog(
         onDismissRequest = { onDismiss() },
         title = { Text("Edit Vehicle") },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp) // Espaciado entre componentes
+            ) {
                 // Alias
                 TextField(
                     value = alias!!,
@@ -475,7 +487,7 @@ fun EditVehicleDialog(
 
                 // Tipo de Energía
                 DropdownSelector(
-                    label =  "Energy type",
+                    label = "Energy type",
                     items = energyOptions,
                     selectedItem = selectedEnergyType,
                     onItemSelected = {
@@ -485,7 +497,7 @@ fun EditVehicleDialog(
                 )
                 if (energyError) {
                     Text(
-                        text ="Seleccione un tipo de energía válido",
+                        text = "Select a valid energy type",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -499,7 +511,10 @@ fun EditVehicleDialog(
                         consumptionError = it.toDoubleOrNull()?.let { it <= 0 } ?: true
                     },
                     label = { Text("Consumption ${selectedEnergyType?.magnitude ?: "not selected"}") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
                     isError = consumptionError
                 )
                 if (consumptionError) {
@@ -520,16 +535,16 @@ fun EditVehicleDialog(
                 },
                 enabled = isValid,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
+                    containerColor = if (isValid) AtlasGreen else Color.Gray
                 )
             ) {
-                Text("Save changes")
+                Text("Save changes", color = Color.Black)
             }
         },
         dismissButton = {
             Button(
                 onClick = { onDismiss() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("Cancel")
             }
@@ -611,92 +626,108 @@ fun VehicleItem(
     onClick: () -> Unit,
     onFavourite: () -> Unit,
     default: Boolean,
-    modifier: Modifier = Modifier) {
-    val launched = remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        launched.value = true
-    }
-    AnimatedVisibility(
-        visible = launched.value,
-        enter = slideInVertically { it },
-        exit = slideOutVertically { it }
-    ) {
-        Card(
-            modifier = modifier
-                .then(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable { onClick() }
-                ),
-            border = BorderStroke(2.dp, AtlasGreen),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+    modifier: Modifier = Modifier
+) {
+    AtlasTheme(ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
+        dynamicColor = false) {
+        val launched = remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            launched.value = true
+        }
+        AnimatedVisibility(
+            visible = launched.value,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it }
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(
-                        id = when (vehicle.type.name) {
-                            "Car" -> R.drawable.car
-                            "Bike" -> R.drawable.bike
-                            "Cycle" -> R.drawable.cycle
-                            "Scooter" -> R.drawable.scooter
-                            "Walk" -> R.drawable.walk
-                            else -> android.R.drawable.stat_notify_sdcard_usb
-                        }
+            Card(
+                modifier = modifier
+                    .then(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable { onClick() }
                     ),
-                    contentDescription = null,
+                border = BorderStroke(2.dp, AtlasGreen),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer // Cambiado al esquema de Material Theme
+                )
+            ) {
+                Row(
                     modifier = Modifier
-                        .size(48.dp)
-                )
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Imagen representativa del vehículo
+                    Image(
+                        painter = painterResource(
+                            id = when (vehicle.type.name) {
+                                "Car" -> R.drawable.car
+                                "Bike" -> R.drawable.bike
+                                "Cycle" -> R.drawable.cycle
+                                "Scooter" -> R.drawable.scooter
+                                "Walk" -> R.drawable.walk
+                                else -> android.R.drawable.stat_notify_sdcard_usb
+                            }
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(48.dp)
+                    )
 
-                Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                Text(
-                    text = vehicle.alias!!,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(2f),
-                    color = Color.Black
-                )
+                    // Texto del alias del vehículo
+                    Text(
+                        text = vehicle.alias!!,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.weight(2f),
+                        overflow = TextOverflow.Ellipsis, // Ajustado para cortar texto largo con puntos suspensivos
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground // Color ajustado al esquema de Material Theme
+                    )
 
-                if (default) {
-                    IconButton(
-                        onClick = {}
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = "Default mark",
-                            tint = AtlasGold,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                }
-
-                if (vehicle.type.name != VehicleType.Walk.name && vehicle.type.name != VehicleType.Cycle.name) {
-                    IconButton(
-                        onClick = {
-                            vehicle.toggleFavourite()
-                            onFavourite()
+                    // Ícono para marcar como predeterminado
+                    if (default) {
+                        IconButton(
+                            onClick = {}
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Star,
+                                contentDescription = "Default mark",
+                                tint = AtlasGold,
+                                modifier = Modifier.size(32.dp)
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = if (vehicle.favourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = null,
-                            tint = animateColorAsState(if (vehicle.favourite) AtlasGreen else Color.Black).value,
-                            modifier = Modifier.size(32.dp).animateContentSize()
-                        )
+                    }
+
+                    // Ícono para marcar como favorito (no aplicable a Walk o Cycle)
+                    if (vehicle.type.name != VehicleType.Walk.name && vehicle.type.name != VehicleType.Cycle.name) {
+                        IconButton(
+                            onClick = {
+                                vehicle.toggleFavourite()
+                                onFavourite()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (vehicle.favourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = null,
+                                tint = animateColorAsState(
+                                    if (vehicle.favourite) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSecondary
+                                ).value, // Usando colores dinámicos
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .animateContentSize() // Animación de tamaño para ícono favorito
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
 
 
 
@@ -868,9 +899,9 @@ fun VehicleDetailsDialog(
 
                     Button(
                         onClick = { showDeleteConfirmation = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Text("Delete", color = Color.White)
+                        Text("Delete")
                     }
                 } else {
                     Spacer(modifier = Modifier.width(120.dp))

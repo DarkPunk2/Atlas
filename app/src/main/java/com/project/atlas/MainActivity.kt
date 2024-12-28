@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import com.google.firebase.FirebaseApp
 import com.project.atlas.viewModels.UserViewModel
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         val userViewModel: UserViewModel by viewModels()
         setContent {
-            AtlasTheme {
+            AtlasTheme(ThemeViewModel.getInstance(application).isDarkTheme.observeAsState(false).value) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MyAppNavigation(modifier = Modifier.padding(innerPadding), userViewModel = userViewModel)
                 }

@@ -127,7 +127,7 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
                 label = "Type",
                 items = RouteType.entries.toList(),
                 selectedItem = selectedType,
-                onItemSelected = { selectedType = it }
+                onItemSelected = { selectedType = it },
             )
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -147,7 +147,8 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
                     text = "Create",
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = 5.dp)
+                    modifier = Modifier.padding(vertical = 5.dp),
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
