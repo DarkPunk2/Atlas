@@ -32,7 +32,7 @@ class RouteDatabaseService: RouteDatabase {
     }
 
     override suspend fun add(route: RouteModel): Boolean {
-        val dbRute = ruteToMap(route)
+        val dbRute = routeToMap(route)
 
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
@@ -66,35 +66,37 @@ class RouteDatabaseService: RouteDatabase {
         }
     }
 
-    private fun ruteToMap(rute: RouteModel): Map<String, Any> {
+    private fun routeToMap(route: RouteModel): Map<String, Any> {
         return mapOf(
-            "id" to rute.id,
+            "id" to route.id,
             "start" to mapOf(
-                "lat" to rute.start.lat,
-                "lon" to rute.start.lon,
-                "alias" to rute.start.alias
+                "lat" to route.start.lat,
+                "lon" to route.start.lon,
+                "alias" to route.start.alias,
+                "toponym" to route.end.toponym
             ),
             "end" to mapOf(
-                "lat" to rute.end.lat,
-                "lon" to rute.end.lon,
-                "alias" to rute.end.alias
+                "lat" to route.end.lat,
+                "lon" to route.end.lon,
+                "alias" to route.end.alias,
+                "toponym" to route.end.toponym
             ),
             "vehicle" to mapOf(
-                "alias" to rute.vehicle.alias,
-                "type" to rute.vehicle.type.name,
-                "energyType" to rute.vehicle.energyType?.let { energyType ->
+                "alias" to route.vehicle.alias,
+                "type" to route.vehicle.type.name,
+                "energyType" to route.vehicle.energyType?.let { energyType ->
                     mapOf(
                         "typeName" to energyType.typeName,
                         "magnitude" to energyType.magnitude
                     )
                 },
-                "consumption" to rute.vehicle.consumption
+                "consumption" to route.vehicle.consumption
             ),
-            "ruteType" to rute.routeType.name,
-            "distance" to rute.distance,
-            "duration" to rute.duration,
-            "rute" to rute.rute,
-            "bbox" to rute.bbox
+            "ruteType" to route.routeType.name,
+            "distance" to route.distance,
+            "duration" to route.duration,
+            "rute" to route.rute,
+            "bbox" to route.bbox
 
         )
     }

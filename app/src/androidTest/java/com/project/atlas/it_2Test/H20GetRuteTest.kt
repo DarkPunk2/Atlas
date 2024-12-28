@@ -30,7 +30,7 @@ class H20GetRuteTest {
         }
         //Then
         assertTrue("Incorrect number of values on the list",result.size == 1)
-        assertTrue("Incorrect rute",result.get(0).id == "8860fca0-5df8-4739-b67d-a409ad29a6f7")
+        assertTrue("Incorrect route", result[0].id == "c4cd54b6-63f4-4344-a662-7e0e296a44cd")
     }
 
     @Test(expected = UserNotLoginException::class)
@@ -38,9 +38,8 @@ class H20GetRuteTest {
         //Given
         UserModel.setAuthState(AuthState.Unauthenticated)
         //When
-        val result: List<RouteModel>
         runBlocking {
-            result = routeService.getRoutes()
+            routeService.getRoutes()
         }
         //Then
 

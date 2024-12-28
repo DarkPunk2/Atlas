@@ -14,7 +14,6 @@ import com.project.atlas.services.RouteService
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
@@ -29,8 +28,8 @@ class H20GetRuteTest {
 
         val database = mock(RouteDatabaseService::class.java)
 
-        val start = Location(39.992573, -0.064749,"Castellon")
-        val end = Location(39.479126, -0.342623,"Valencia")
+        val start = Location(39.992573, -0.064749,"Castellon","Castellon")
+        val end = Location(39.479126, -0.342623,"Valencia","Valencia")
         val vehicle = VehicleModel("Coche", VehicleType.Car, Diesel(), 4.0)
         val route = RouteModel("id",start,end,vehicle,
             RouteType.SHORTER,2.2,2.2,"5305873gg", listOf(0.9,0.3))
@@ -53,9 +52,8 @@ class H20GetRuteTest {
         val database = mock(RouteDatabaseService::class.java)
         routeService = RouteService(database)
         //When
-        val result: List<RouteModel>
         runBlocking {
-            result = routeService.getRoutes()
+            routeService.getRoutes()
         }
         //Then
 

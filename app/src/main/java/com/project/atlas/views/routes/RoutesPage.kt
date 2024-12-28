@@ -1,5 +1,6 @@
 package com.project.atlas.views.routes
 
+import Calories
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -46,6 +47,7 @@ import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.NavigationMenu
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -256,18 +258,20 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
                         color = AtlasGreen
                     )
                     val formattedDistance = if (route.distance >= 1000) {
-                        String.format("%.1f km", route.distance / 1000.0)
+                        String.format(Locale("es","ES"),"%.1f km", route.distance / 1000.0)
                     } else {
                         "${route.distance.toInt()} m"
                     }
 
                     val formattedDuration = if (route.duration >= 3600) {
                         String.format(
+                            Locale("es","ES"),
                             "%.1f h",
                             route.duration / 3600.0
                         ) // Convertir segundos a horas
                     } else {
                         String.format(
+                            Locale("es","ES"),
                             "%d min",
                             (route.duration / 60).toInt()
                         ) // Convertir segundos a minutos
@@ -281,7 +285,11 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
                     )
 
                     Text(
-                        text = "Price: ${route.price?.let { String.format("$%.2f", it) } ?: "Calculating..."}",
+                        text = "Price: ${route.price?.let { if (route.vehicle.energyType is Calories){
+                            String.format(Locale("es","ES"),"%.2f cal", it)
+                        }else {
+                            String.format(Locale("es","ES"),"%.2f €", it)
+                        } } ?: "Calculating..."}",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
