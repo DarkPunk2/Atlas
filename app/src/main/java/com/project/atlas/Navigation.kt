@@ -6,7 +6,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.project.atlas.viewModels.FuelPriceViewModel
 import com.project.atlas.viewModels.MapViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.UserViewModel
@@ -27,7 +26,6 @@ import com.project.atlas.views.user.RecoverPasswordPage
 fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel, mapViewModel: MapViewModel){
     val navController = rememberNavController()
     val vehicleViewModel: VehicleViewModel = viewModel()
-    val fuelPriceViewModel: FuelPriceViewModel = viewModel()
     val routeViewModel: RouteViewModel = viewModel()
 
     NavHost(navController = navController, startDestination =  "login", builder = {

@@ -8,8 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -133,15 +133,15 @@ fun HomePage(
                         colorFilter = ColorFilter.tint(BackgroundBlack)
                     )
                     ExtendedFloatingActionButton(
-                        onClick = { navController.navigate("routes") },
+                        onClick = { navController.navigate("createRute") },
                         icon = {
                             Icon(
-                                Icons.Filled.LocationOn,
-                                "My Routes",
+                                Icons.Filled.Add,
+                                "Create Route",
                                 tint = BackgroundBlack
                             )
                         },
-                        text = { Text(text = "My Routes", color = BackgroundBlack) },
+                        text = { Text(text = "Create Route", color = BackgroundBlack) },
                         containerColor = AtlasGreen,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)

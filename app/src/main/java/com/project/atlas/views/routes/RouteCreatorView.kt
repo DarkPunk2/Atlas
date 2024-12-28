@@ -51,8 +51,11 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
 
     val context = LocalContext.current
 
-    LaunchedEffect(errorState.value) {
+    LaunchedEffect(Unit) {
         routeViewModel.defaultVehicle()
+    }
+
+    LaunchedEffect(errorState.value) {
         if (errorState.value != null)
         Toast.makeText(context,
             errorState.value!!.message, Toast.LENGTH_SHORT).show()
@@ -60,7 +63,7 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
 
     BackHandler {
         routeViewModel.resetValues()
-        navController.navigate("routes")
+        navController.popBackStack()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

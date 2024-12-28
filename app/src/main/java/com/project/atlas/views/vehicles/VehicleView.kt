@@ -600,7 +600,7 @@ fun <T> DropdownSelector(
             OutlinedButton(
                 onClick = { expanded = true }
                 ) {
-                Text(text = selectedItem?.toString() ?: "Select $label", color = Color.Black)
+                Text(text = selectedItem?.toString() ?: "Select $label")
             }
             DropdownMenu(
                 expanded = expanded,
