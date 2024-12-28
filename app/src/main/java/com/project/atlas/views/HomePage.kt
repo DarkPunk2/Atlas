@@ -1,17 +1,15 @@
 package com.project.atlas.views
 
-import ThemeViewModel
 import android.app.Application
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,7 +23,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.AuthState
@@ -37,12 +34,14 @@ import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.UserViewModel
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun HomePage(
     modifier: Modifier = Modifier,
     navController: NavController,
     userViewModel: UserViewModel,
-    routeViewModel: RouteViewModel
+    routeViewModel: RouteViewModel,
+    mapViewModel: MapViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -88,6 +87,13 @@ fun HomePage(
                         }) {
                             Text("Toggle Theme")
                         }
+                        RouteTypeSelector(
+                            items = RouteType.entries.toList(),
+                            selectedItem = selectedType,
+                            onItemSelected = { selectedType = it
+                                routeViewModel.changeDefaultRouteType(it)
+                            }
+                        )
                         Spacer(modifier = Modifier.weight(1f))
                         HorizontalDivider()
                         TextButton(
@@ -116,7 +122,7 @@ fun HomePage(
         ) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    OsmdroidMapView(MapViewModel())
+                    OsmdroidMapView(mapViewModel)
                     Image(
                         painter = painterResource(id = R.drawable.atlas_lettering_black),
                         contentDescription = "lettering",
@@ -127,15 +133,15 @@ fun HomePage(
                         colorFilter = ColorFilter.tint(BackgroundBlack)
                     )
                     ExtendedFloatingActionButton(
-                        onClick = { navController.navigate("routes") },
+                        onClick = { navController.navigate("createRute") },
                         icon = {
                             Icon(
-                                Icons.Filled.LocationOn,
-                                "My Routes",
+                                Icons.Filled.Add,
+                                "Create Route",
                                 tint = BackgroundBlack
                             )
                         },
-                        text = { Text(text = "My Routes", color = BackgroundBlack) },
+                        text = { Text(text = "Create Route", color = BackgroundBlack) },
                         containerColor = AtlasGreen,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
@@ -191,3 +197,4 @@ fun HomePage(
         )
     }
 }
+

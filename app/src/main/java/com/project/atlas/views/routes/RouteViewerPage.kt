@@ -116,7 +116,7 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
             showCard.value = false
         } else {
             routeViewModel.resetValues()
-            navController.navigate("routes")
+            navController.popBackStack()
         }
     }
 
