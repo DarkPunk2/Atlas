@@ -10,6 +10,7 @@ on:
       - "master"
       - "it-3"
       - "it-4"
+      - "it-5"
 
 jobs:
   build:
