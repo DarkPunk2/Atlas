@@ -7,13 +7,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.project.atlas.viewModels.FuelPriceViewModel
+import com.project.atlas.viewModels.MapViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.viewModels.VehicleViewModel
 import com.project.atlas.views.EnergyTypeTest
 import com.project.atlas.views.HomePage
 import com.project.atlas.views.user.LoginPage
-import com.project.atlas.views.MapPage
 import com.project.atlas.views.user.SignUpPage
 import com.project.atlas.views.vehicles.listVehicle
 import com.project.atlas.views.locations.LocationsListView
@@ -25,7 +25,7 @@ import com.project.atlas.views.user.ChangePasswordPage
 import com.project.atlas.views.user.RecoverPasswordPage
 
 @Composable
-fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel){
+fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel, mapViewModel: MapViewModel){
     val navController = rememberNavController()
     val vehicleViewModel: VehicleViewModel = viewModel()
     val fuelPriceViewModel: FuelPriceViewModel = viewModel()
@@ -36,10 +36,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel)
             LoginPage(modifier, navController, userViewModel)
         }
         composable("home"){
-            HomePage(modifier, navController, userViewModel, routeViewModel)
-        }
-        composable("map"){
-            MapPage(modifier, navController)
+            HomePage(modifier, navController, userViewModel, routeViewModel, mapViewModel)
         }
         composable("signup"){
             SignUpPage(modifier, navController, userViewModel)

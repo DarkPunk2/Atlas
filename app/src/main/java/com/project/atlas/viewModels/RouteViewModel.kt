@@ -84,8 +84,11 @@ class RouteViewModel: ViewModel() {
             viewModelScope.launch {
                 try {
                     if (vehicle == null) {
-                        _routeState.value = routeService.createRute(start, end,
-                            _vehicleDefaut.value!!, routeType)
+                        _routeState.value =
+                            _vehicleDefaut.value?.let {
+                                routeService.createRute(start, end,
+                                    it, routeType)
+                            } ?: throw Exception("Vehicle not selected")
                     } else{
                         _routeState.value = routeService.createRute(start, end, vehicle, routeType)
                     }

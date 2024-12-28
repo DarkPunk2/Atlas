@@ -270,15 +270,15 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
                             color = AtlasGreen
                         )
                         val formattedDistance = if (route.distance >= 1000) {
-                            String.format("%.1f km", route.distance / 1000.0)
+                            String.format(Locale("es", "ES"),"%.1f km", route.distance / 1000.0)
                         } else {
                             "${route.distance.toInt()} m"
                         }
 
                         val formattedDuration = if (route.duration >= 3600) {
-                            String.format("%.1f h", route.duration / 3600.0) // Convertir segundos a horas
+                            String.format(Locale("es", "ES"),"%.1f h", route.duration / 3600.0) // Convertir segundos a horas
                         } else {
-                            String.format("%d min", (route.duration / 60).toInt()) // Convertir segundos a minutos
+                            String.format(Locale("es", "ES"),"%d min", (route.duration / 60).toInt()) // Convertir segundos a minutos
                         }
 
                         Text(

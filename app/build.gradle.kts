@@ -86,11 +86,10 @@ dependencies {
     testImplementation(libs.kotlin.mockito.kotlin)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
-    implementation(platform(libs.firebase.bom.v3360))
     implementation(libs.material3)
     implementation(libs.ui)
     implementation(libs.play.services.maps.v1802)
     implementation(libs.android.maps.utils)
-    implementation("androidx.compose.material:material-icons-extended:1.4.3")
-
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.play.services.location)
 }
