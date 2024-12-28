@@ -1,6 +1,7 @@
 package com.project.atlas.views.routes
 
 import Calories
+import Electricity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +32,7 @@ import com.project.atlas.models.RouteModel
 import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.FuelPriceService
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.viewModels.ElectricityServiceViewModel
 import java.util.Locale
 
 
@@ -49,6 +51,7 @@ fun RouteDetailsCard(
     )
 
     val fuelPriceService = FuelPriceService(FuelPriceRepository())
+    val electricityServiceViewModel = ElectricityServiceViewModel()
     var showAdd by remember { mutableStateOf(activeAdd) }
     var showDelete by remember { mutableStateOf(activeDelete) }
     var cost by remember { mutableStateOf<Double?>(null) }
@@ -75,7 +78,12 @@ fun RouteDetailsCard(
         if (cost == null && !isLoading) {
             isLoading = true
             cost = try {
-                fuelPriceService.calculateRoutePrice(route) // Llamada al servicio
+                val vehicle = route.vehicle
+                when (vehicle.energyType){
+                    is Electricity -> electricityServiceViewModel.calculateCost(route)
+                    is Calories -> vehicle.energyType!!.calculateCost(route.distance/1000, vehicle.consumption!!, 0.0)
+                    else -> fuelPriceService.calculateRoutePrice(route) // Llamada al servicio
+                }
             } catch (e: Exception) {
                 null // En caso de error
             } finally {

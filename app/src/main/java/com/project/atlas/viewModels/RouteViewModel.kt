@@ -1,5 +1,7 @@
 package com.project.atlas.viewModels
 
+import Calories
+import Electricity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,8 +25,7 @@ class RouteViewModel: ViewModel() {
 
     private var pricesCalculated = false // Flag para evitar cálculos repetidos
     private val fuelPriceService = FuelPriceService(FuelPriceRepository())
-
-
+    private val electricityServiceViewModel = ElectricityServiceViewModel()
 
     private val _showAddButton = MutableLiveData(false)
     val showAddButton: LiveData<Boolean> = _showAddButton
@@ -95,7 +96,12 @@ class RouteViewModel: ViewModel() {
                 } else {
                     // Si el precio no está calculado, calcularlo y guardarlo en el mapa
                     try {
-                        val price = fuelPriceService.calculateRoutePrice(route)
+                        val vehicle = route.vehicle
+                        val price = when (vehicle.energyType){
+                            is Electricity -> electricityServiceViewModel.calculateCost(route)
+                            is Calories -> vehicle.energyType!!.calculateCost(route.distance/1000, vehicle.consumption!!, 0.0)
+                            else -> fuelPriceService.calculateRoutePrice(route) // Llamada al servicio
+                        }
                         calculatedPrices[route.id] = price // Guardar en el mapa
                         route.copy(price = price)
                     } catch (e: Exception) {
