@@ -238,67 +238,85 @@ fun VehicleSelectDetailsDialog(
     onDismiss: () -> Unit,
     onSelect: (VehicleModel) -> Unit // Función para manejar la selección del vehículo
 ) {
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    AtlasTheme(ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
+        dynamicColor = false) {
+        val bottomSheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        )
 
-    ModalBottomSheet(
-        onDismissRequest = { onDismiss() },
-        sheetState = bottomSheetState,
-        containerColor = MaterialTheme.colorScheme.surface
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        ModalBottomSheet(
+            onDismissRequest = { onDismiss() },
+            sheetState = bottomSheetState,
+            containerColor = MaterialTheme.colorScheme.surface
         ) {
-            // Título
-            Text(
-                text = "Vehicle Details",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Información del vehículo
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Alias", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.alias ?: "S/N", style = MaterialTheme.typography.bodyMedium)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Type", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.type.name, style = MaterialTheme.typography.bodyMedium)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Energy", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.energyType?.typeName ?: "N/A", style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+                // Título
+                Text(
+                    text = "Vehicle Details",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Consumo
-            Text(
-                text = "Consumption",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "${vehicle.consumption} ${vehicle.energyType?.magnitude ?: ""}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = Modifier.height(24.dp))
+                // Información del vehículo
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "Alias",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(vehicle.alias ?: "S/N", style = MaterialTheme.typography.bodyMedium)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "Type",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(vehicle.type.name, style = MaterialTheme.typography.bodyMedium)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "Energy",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            vehicle.energyType?.typeName ?: "N/A",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Botón de seleccionar
-            Button(
-                onClick = { onSelect(vehicle) },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text("Select", color = Color.White)
+                // Consumo
+                Text(
+                    text = "Consumption",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "${vehicle.consumption} ${vehicle.energyType?.magnitude ?: ""}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Botón de seleccionar
+                Button(
+                    onClick = { onSelect(vehicle) },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Select", color = Color.Black)
+                }
             }
         }
     }

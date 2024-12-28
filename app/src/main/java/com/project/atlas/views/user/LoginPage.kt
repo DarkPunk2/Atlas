@@ -146,7 +146,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
             },
             enabled = authState.value != AuthState.Loading,
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors( containerColor = AtlasGreen )
+            colors = ButtonDefaults.buttonColors( containerColor = AtlasDarker )
         ) {
             Text(
                 text = "Log-in",

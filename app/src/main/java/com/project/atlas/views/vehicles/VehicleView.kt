@@ -415,7 +415,9 @@ fun EditVehicleDialog(
         onDismissRequest = { onDismiss() },
         title = { Text("Edit Vehicle") },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp) // Espaciado entre componentes
+            ) {
                 // Alias
                 TextField(
                     value = alias!!,
@@ -444,7 +446,7 @@ fun EditVehicleDialog(
 
                 // Tipo de Energía
                 DropdownSelector(
-                    label =  "Energy type",
+                    label = "Energy type",
                     items = energyOptions,
                     selectedItem = selectedEnergyType,
                     onItemSelected = {
@@ -454,7 +456,7 @@ fun EditVehicleDialog(
                 )
                 if (energyError) {
                     Text(
-                        text ="Seleccione un tipo de energía válido",
+                        text = "Select a valid energy type",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -468,7 +470,10 @@ fun EditVehicleDialog(
                         consumptionError = it.toDoubleOrNull()?.let { it <= 0 } ?: true
                     },
                     label = { Text("Consumption ${selectedEnergyType?.magnitude ?: "not selected"}") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
                     isError = consumptionError
                 )
                 if (consumptionError) {
@@ -489,21 +494,22 @@ fun EditVehicleDialog(
                 },
                 enabled = isValid,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
+                    containerColor = if (isValid) AtlasGreen else Color.Gray
                 )
             ) {
-                Text("Save changes")
+                Text("Save changes", color = Color.Black)
             }
         },
         dismissButton = {
             Button(
                 onClick = { onDismiss() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("Cancel")
             }
         }
     )
+
 
     // Dialogo de confirmación para la actualización
     if (showConfirmationDialog) {
@@ -761,7 +767,7 @@ fun VehicleDetailsDialog(
                         onDelete()
                         showDeleteConfirmation = false
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
                     Text(text = "Delete")
                 }
