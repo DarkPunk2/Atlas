@@ -1,6 +1,7 @@
 package com.project.atlas.views.routes
 
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,21 +25,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.models.RouteType
 import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.viewModels.RouteViewModel
-import com.project.atlas.views.NavigationMenu
 import com.project.atlas.views.vehicles.DropdownSelector
 
 
 @Composable
 fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewModel) {
-    var selectedType by remember { mutableStateOf<RouteType?>(null) }
+    var selectedType by remember { mutableStateOf<RouteType?>(routeViewModel.routeTypeState.value) }
     val ruteState by routeViewModel.routeState.observeAsState()
     val navigateToRuteView by routeViewModel.navigateToRuteView.observeAsState()
+    val errorState = routeViewModel.errorState.observeAsState()
 
     LaunchedEffect(ruteState) {
         if (navigateToRuteView == true) {
@@ -47,9 +49,21 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
         }
     }
 
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        routeViewModel.defaultVehicle()
+    }
+
+    LaunchedEffect(errorState.value) {
+        if (errorState.value != null)
+        Toast.makeText(context,
+            errorState.value!!.message, Toast.LENGTH_SHORT).show()
+    }
+
     BackHandler {
         routeViewModel.resetValues()
-        navController.navigate("routes")
+        navController.popBackStack()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -100,7 +114,11 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = routeViewModel.vehicleState.value?.alias ?: "Select vehicle",
+                    text = if (routeViewModel.vehicleState.value == null && routeViewModel.vehicleDefault.value != null) {
+                        routeViewModel.vehicleDefault.value!!.alias!!
+                    }else{
+                        routeViewModel.vehicleState.value?.alias ?: "Select vehicle"
+                    },
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(vertical = 5.dp)
@@ -112,7 +130,7 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
                 label = "Type",
                 items = RouteType.entries.toList(),
                 selectedItem = selectedType,
-                onItemSelected = { selectedType = it }
+                onItemSelected = { selectedType = it },
             )
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -132,7 +150,8 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
                     text = "Create",
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = 5.dp)
+                    modifier = Modifier.padding(vertical = 5.dp),
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }

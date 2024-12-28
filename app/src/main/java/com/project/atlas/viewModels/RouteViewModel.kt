@@ -1,5 +1,7 @@
 package com.project.atlas.viewModels
 
+import Calories
+import Electricity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,26 +9,26 @@ import androidx.lifecycle.viewModelScope
 import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
+import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.FuelPriceService
 import com.project.atlas.services.RouteDatabaseService
 import com.project.atlas.services.RouteService
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.project.atlas.services.VehicleDatabaseService
+import com.project.atlas.services.VehicleService
 import kotlinx.coroutines.launch
 
 class RouteViewModel: ViewModel() {
     private val _navigateToRuteView = MutableLiveData(false)
     val navigateToRuteView: LiveData<Boolean> = _navigateToRuteView
 
+    private val _errorState = MutableLiveData<Exception>()
+    val errorState: LiveData<Exception> = _errorState
 
     private var pricesCalculated = false // Flag para evitar cálculos repetidos
-    val fuelPriceService = FuelPriceService(FuelPriceRepository())
-    private val _routePrice = MutableStateFlow<Double?>(null)
-
-    private val _fuelErrorMessage = MutableStateFlow("")
-    val fuelErrorMessage: StateFlow<String> get() = _fuelErrorMessage
+    private val fuelPriceService = FuelPriceService(FuelPriceRepository())
+    private val electricityServiceViewModel = ElectricityServiceViewModel()
 
     private val _showAddButton = MutableLiveData(false)
     val showAddButton: LiveData<Boolean> = _showAddButton
@@ -40,11 +42,17 @@ class RouteViewModel: ViewModel() {
     private var _vehicle = MutableLiveData<VehicleModel?>()
     val vehicleState: LiveData<VehicleModel?> = _vehicle
 
+    private var _vehicleDefaut = MutableLiveData<VehicleModel?>()
+    val vehicleDefault: LiveData<VehicleModel?> = _vehicleDefaut
+
     private var _start = MutableLiveData<Location?>()
     val start: LiveData<Location?> = _start
 
     private var _end = MutableLiveData<Location?>()
     val end: LiveData<Location?> = _end
+
+    private var _routeTypeState = MutableLiveData<RouteType?>()
+    val routeTypeState: LiveData<RouteType?> = _routeTypeState
 
     private val _ruteList = MutableLiveData<List<RouteModel>>()
     val ruteList: LiveData<List<RouteModel>> = _ruteList
@@ -57,13 +65,45 @@ class RouteViewModel: ViewModel() {
 
 
     private val routeService = RouteService(RouteDatabaseService())
+    private val vehicleService = VehicleService(VehicleDatabaseService())
+
+    init {
+        viewModelScope.launch {
+            try {
+                _routeTypeState.value = routeService.getDefaultRouteType()
+                defaultVehicle()
+            }catch (_: Exception){
+                _routeTypeState.value = null
+            }
+
+        }
+    }
 
     fun createRute(start: Location?, end: Location?, vehicle: VehicleModel?, routeType: RouteType?) {
-        if (start != null && end != null && vehicle != null && routeType != null) {
+        if (start != null && end != null && routeType != null) {
             viewModelScope.launch {
-                _routeState.value = routeService.createRute(start, end, vehicle, routeType)
-                _navigateToRuteView.value = true
+                try {
+                    if (vehicle == null) {
+                        _routeState.value =
+                            _vehicleDefaut.value?.let {
+                                routeService.createRute(start, end,
+                                    it, routeType)
+                            } ?: throw Exception("Vehicle not selected")
+                    } else{
+                        _routeState.value = routeService.createRute(start, end, vehicle, routeType)
+                    }
+                    _navigateToRuteView.value = true
+                } catch (e: Exception){
+                    _errorState.value = e
+                }
+
             }
+        }
+    }
+
+    fun defaultVehicle(){
+        viewModelScope.launch {
+            _vehicleDefaut.value = vehicleService.getDefaultVehicle(UserModel.eMail)
         }
     }
 
@@ -78,7 +118,12 @@ class RouteViewModel: ViewModel() {
                 } else {
                     // Si el precio no está calculado, calcularlo y guardarlo en el mapa
                     try {
-                        val price = fuelPriceService.calculateRoutePrice(route)
+                        val vehicle = route.vehicle
+                        val price = when (vehicle.energyType){
+                            is Electricity -> electricityServiceViewModel.calculateCost(route)
+                            is Calories -> vehicle.energyType!!.calculateCost(route.distance/1000, vehicle.consumption!!, 0.0)
+                            else -> fuelPriceService.calculateRoutePrice(route) // Llamada al servicio
+                        }
                         calculatedPrices[route.id] = price // Guardar en el mapa
                         route.copy(price = price)
                     } catch (e: Exception) {
@@ -94,7 +139,17 @@ class RouteViewModel: ViewModel() {
     }
 
 
+    fun changeDefaultRouteType(routeType: RouteType){
+        viewModelScope.launch {
+            try {
+                if (routeService.addDefaultRouteType(routeType)){
+                    _routeTypeState.value = routeType
+                }
+            }catch (_: Exception){
 
+            }
+        }
+    }
 
 
 
@@ -149,6 +204,7 @@ class RouteViewModel: ViewModel() {
     }
 
     fun resetValues(){
+        defaultVehicle()
         _vehicle.value = null
         _start.value = null
         _end.value = null

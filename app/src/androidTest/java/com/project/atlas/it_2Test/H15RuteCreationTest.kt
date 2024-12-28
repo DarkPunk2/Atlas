@@ -29,8 +29,8 @@ class H15RuteCreationTest {
     @Test
     fun h15P1Test(){
         //Given
-        val start = Location(39.992573, -0.064749,"Castellon")
-        val end = Location(39.479126, -0.342623,"Valencia")
+        val start = Location(39.992573, -0.064749, "Casa", "Castellon")
+        val end = Location(39.479126, -0.342623, "Trabajo", "Valencia")
         val vehicle = VehicleModel("Coche",VehicleType.Car, Diesel(), 4.0)
         val rute: RouteModel
         //When
@@ -45,8 +45,8 @@ class H15RuteCreationTest {
     @Test(expected = InvalidRouteException::class)
     fun h15P4Test(){
         //Given
-        val start = Location(39.992573, -0.064749, "Castellon")
-        val end = Location(40.724762, -73.994691, "New York")
+        val start = Location(39.992573, -0.064749, "Casa", "Castellon")
+        val end = Location(40.724762, -73.994691, "Hotel", "New York")
         val vehicle = VehicleModel("Coche", VehicleType.Car, Diesel(), 4.0)
         //When
         runBlocking {

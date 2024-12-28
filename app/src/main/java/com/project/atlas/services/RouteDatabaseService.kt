@@ -8,7 +8,6 @@ import Petrol98
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.project.atlas.exceptions.RouteNotFoundException
 import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.interfaces.RouteDatabase
@@ -33,7 +32,7 @@ class RouteDatabaseService: RouteDatabase {
     }
 
     override suspend fun add(route: RouteModel): Boolean {
-        val dbRute = ruteToMap(route)
+        val dbRute = routeToMap(route)
 
         return suspendCoroutine { continuation ->
             db.collection(usersCollection)
@@ -67,35 +66,37 @@ class RouteDatabaseService: RouteDatabase {
         }
     }
 
-    private fun ruteToMap(rute: RouteModel): Map<String, Any> {
+    private fun routeToMap(route: RouteModel): Map<String, Any> {
         return mapOf(
-            "id" to rute.id,
+            "id" to route.id,
             "start" to mapOf(
-                "lat" to rute.start.lat,
-                "lon" to rute.start.lon,
-                "alias" to rute.start.alias
+                "lat" to route.start.lat,
+                "lon" to route.start.lon,
+                "alias" to route.start.alias,
+                "toponym" to route.end.toponym
             ),
             "end" to mapOf(
-                "lat" to rute.end.lat,
-                "lon" to rute.end.lon,
-                "alias" to rute.end.alias
+                "lat" to route.end.lat,
+                "lon" to route.end.lon,
+                "alias" to route.end.alias,
+                "toponym" to route.end.toponym
             ),
             "vehicle" to mapOf(
-                "alias" to rute.vehicle.alias,
-                "type" to rute.vehicle.type.name,
-                "energyType" to rute.vehicle.energyType?.let { energyType ->
+                "alias" to route.vehicle.alias,
+                "type" to route.vehicle.type.name,
+                "energyType" to route.vehicle.energyType?.let { energyType ->
                     mapOf(
                         "typeName" to energyType.typeName,
                         "magnitude" to energyType.magnitude
                     )
                 },
-                "consumption" to rute.vehicle.consumption
+                "consumption" to route.vehicle.consumption
             ),
-            "ruteType" to rute.routeType.name,
-            "distance" to rute.distance,
-            "duration" to rute.duration,
-            "rute" to rute.rute,
-            "bbox" to rute.bbox
+            "ruteType" to route.routeType.name,
+            "distance" to route.distance,
+            "duration" to route.duration,
+            "rute" to route.rute,
+            "bbox" to route.bbox
 
         )
     }
@@ -122,12 +123,14 @@ class RouteDatabaseService: RouteDatabase {
             start = Location(
                 lat = start["lat"] as Double,
                 lon = start["lon"] as Double,
-                alias = start["alias"] as String
+                alias = start["alias"] as String,
+                toponym = start["toponym"] as String
             ),
             end = Location(
                 lat = end["lat"] as Double,
                 lon = end["lon"] as Double,
-                alias = end["alias"] as String
+                alias = end["alias"] as String,
+                toponym = start["toponym"] as String
             ),
             vehicle = VehicleModel(
                 alias = vehicle["alias"] as String?,
@@ -177,5 +180,49 @@ class RouteDatabaseService: RouteDatabase {
                 }
         }
     }
+
+    override suspend fun addDefaultRouteType(routeType: RouteType): Boolean {
+        val routeTypeDB = hashMapOf("routeType" to routeType)
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(UserModel.eMail)
+                .set(routeTypeDB)
+                .addOnSuccessListener {
+                    continuation.resume(true)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error adding rute: ${exception.message}")
+                    continuation.resumeWithException(ServiceNotAvailableException(exception.message ?: "Service not available"))
+                }
+        }
+    }
+
+    override suspend fun getDefaultRouteType(): RouteType {
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(UserModel.eMail)
+                .get()
+                .addOnSuccessListener { result ->
+                    val routeTypeString = result.getString("routeType")
+                    val routeType = routeTypeString?.let {
+                        try {
+                            RouteType.valueOf(it)
+                        }catch (e: IllegalArgumentException){
+                            null
+                        }
+                    }
+                    if (routeType != null) {
+                        continuation.resume(routeType)
+                    } else {
+                        continuation.resumeWithException(NoSuchElementException("No RouteType found"))
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error fetching route type: ${exception.message}")
+                    continuation.resumeWithException(ServiceNotAvailableException(exception.message ?: "Service not available"))
+                }
+        }
+    }
+
 
 }

@@ -19,7 +19,7 @@ class H4UserDeleteTest {
     private lateinit var user: UserInterface
 
     @Test
-    fun h2P1Test() = runBlocking{
+    fun h4P1Test() = runBlocking{
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
         `when`(firebaseAuth.deleteUser()).thenReturn(true)
@@ -36,7 +36,7 @@ class H4UserDeleteTest {
         assertEquals(AuthState.Unauthenticated,UserModel.getAuthState())
     }
     @Test(expected= SessionNotFoundException::class)
-    fun h2P2Test(): Unit = runBlocking{
+    fun h4P2Test(): Unit = runBlocking{
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
         `when`(firebaseAuth.deleteUser()).thenReturn(false)

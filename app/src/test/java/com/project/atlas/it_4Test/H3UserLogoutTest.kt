@@ -18,7 +18,7 @@ class H3UserLogoutTest {
     private lateinit var user: UserInterface
 
     @Test
-    fun h2P1Test() = runBlocking{
+    fun h3P1Test() = runBlocking{
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
         `when`(firebaseAuth.logout()).thenReturn(true)
@@ -33,7 +33,7 @@ class H3UserLogoutTest {
         assertEquals(AuthState.Unauthenticated,UserModel.getAuthState())
     }
     @Test(expected= SessionNotFoundException::class)
-    fun h2P2Test() {
+    fun h3P2Test() {
         //Given
         val firebaseAuth = mock(FireBaseAuthService::class.java)
         `when`(firebaseAuth.logout()).thenReturn(false)

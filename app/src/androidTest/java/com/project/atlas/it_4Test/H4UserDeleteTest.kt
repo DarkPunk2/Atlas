@@ -19,7 +19,7 @@ class H4UserDeleteTest {
     private var user: UserInterface = AuthService(FireBaseAuthService())
 
     @Test
-    fun h2P1Test() = runBlocking{
+    fun h4P1Test() = runBlocking{
         //Given
         val email = "deleteuser@test.test"
         val password = "contraseñaValida@13"
@@ -33,7 +33,7 @@ class H4UserDeleteTest {
         assertEquals(AuthState.Unauthenticated,UserModel.getAuthState())
     }
     @Test(expected= SessionNotFoundException::class)
-    fun h2P3Test() {
+    fun h4P3Test() {
         //Given
         UserModel.setMail("")
         UserModel.setAuthState(AuthState.Unauthenticated)

@@ -24,3 +24,11 @@ sealed class AuthState {
     object Loading : AuthState()
     data class Error(val message: String) : AuthState()
 }
+
+sealed class ChangeState {
+    data object Changed : ChangeState()
+    data object NotChange: ChangeState()
+    data class Error(val message: String) : ChangeState()
+}
+
+

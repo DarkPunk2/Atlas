@@ -18,7 +18,7 @@ class H3UserLogoutTest {
     private var user: UserInterface = AuthService(FireBaseAuthService())
 
     @Test
-    fun h2P1Test() = runBlocking{
+    fun h3P1Test() = runBlocking{
         //Given
         val email = "login@test.test"
         val password = "contraseñaValida@13"
@@ -30,7 +30,7 @@ class H3UserLogoutTest {
         assertEquals(AuthState.Unauthenticated,UserModel.getAuthState())
     }
     @Test(expected= SessionNotFoundException::class)
-    fun h2P2Test() {
+    fun h3P2Test() {
         //Given
         UserModel.setMail("")
         UserModel.setAuthState(AuthState.Unauthenticated)

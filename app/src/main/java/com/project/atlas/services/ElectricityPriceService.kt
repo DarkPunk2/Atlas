@@ -47,11 +47,9 @@ class ElectricityPriceService {
     }
 
     fun getPriceByHour(): Double {
-        var hour = LocalDateTime.now().hour.toString()
-        val price = pricesByHourMap.get(hour)
-        if (price==null)
-            return -1.0 //retornar valor inválido
-        return price
+        val hour = String.format("%02d", LocalDateTime.now().hour)
+        val price = pricesByHourMap[hour]
+        return price ?: -1.0
     }
     fun getPricesMap(): Map<String, Double>{
         return pricesByHourMap

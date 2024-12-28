@@ -31,17 +31,14 @@ class H16CalculateFuelCostTest {
     @Test
     fun h16pa1Test(){
         //Given
-        val start = Location(39.992573, -0.064749,"Castellon")
-        val end = Location(39.479126, -0.342623,"Valencia")
+        val start = Location(39.992573, -0.064749, "Casa", "Castellon")
+        val end = Location(39.479126, -0.342623, "Trabajo", "Valencia")
         val vehicle = VehicleModel("Coche", VehicleType.Car, Diesel(), 4.0)
         val rute: RouteModel
         val precioCombustible: Double?
         val precioRuta: Double?
         runBlocking {
             rute = routeService.createRute(start, end, vehicle, RouteType.FASTER)
-        }
-        runBlocking {
-            routeService.addRoute(rute)
         }
         runBlocking {
             precioCombustible = fuelPriceService.fetchFuelData(start.lat,start.lon, vehicle.energyType!!)
@@ -67,8 +64,8 @@ class H16CalculateFuelCostTest {
     @Test(expected = InvalidRouteException::class) //Datos eroneos en la primera ubicacion
     fun h16pa3Test(){
         //Given
-        val start = Location(2000.992573, -0.064749,"Castellon")
-        val end = Location(39.479126, -0.342623,"Valencia")
+        val start = Location(2000.992573, -0.064749, "Casa", "Castellon")
+        val end = Location(39.479126, -0.342623, "Trabajo", "Valencia")
         val vehicle = VehicleModel("Coche", VehicleType.Car, Diesel(), 4.0)
         val rute: RouteModel
         val precioCombustible: Double?
@@ -94,8 +91,8 @@ class H16CalculateFuelCostTest {
     @Test(expected = InvalidRouteException::class) //Datos erroneos en la segunda ubicacion
     fun h16pa4Test(){
         //Given
-        val start = Location(1.992573, -0.064749,"Castellon")
-        val end = Location(2000.479126, -0.342623,"Valencia")
+        val start = Location(1.992573, -0.064749, "Casa", "Castellon")
+        val end = Location(2000.479126, -0.342623, "Trabajo", "Valencia")
         val vehicle = VehicleModel("Coche", VehicleType.Car, Diesel(), 4.0)
         val rute: RouteModel
         val precioCombustible: Double?

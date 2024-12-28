@@ -1,5 +1,7 @@
 package com.project.atlas.views.routes
 
+import Calories
+import android.app.Application
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -35,17 +37,22 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.RouteModel
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.ui.theme.AtlasTheme
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.NavigationMenu
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -188,118 +195,128 @@ fun ListRoute(
 
 @Composable
 fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
-    var isFavorite by remember { mutableStateOf(false) }
-    val launched = remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        launched.value = true
-    }
-
-    AnimatedVisibility(
-        visible = launched.value,
-        enter = slideInVertically { it },
-        exit = slideOutVertically { it }
+    AtlasTheme(
+        dynamicColor = false,
+        isDarkTheme = ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .clickable { onClick() },
-            border = BorderStroke(2.dp, AtlasGreen),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+        var isFavorite by remember { mutableStateOf(false) }
+        val launched = remember { mutableStateOf(false) }
+
+        LaunchedEffect(Unit) {
+            launched.value = true
+        }
+
+        AnimatedVisibility(
+            visible = launched.value,
+            enter = slideInVertically { it / 2 },
+            exit = slideOutVertically { it / 2 }
         ) {
-            Row(
+            Card(
                 modifier = Modifier
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Icono representativo del vehículo asociado a la ruta
-                Image(
-                    painter = painterResource(
-                        id = when (route.vehicle.type.toString()) {
-                            "Car" -> R.drawable.car
-                            "Bike" -> R.drawable.bike
-                            "Cycle" -> R.drawable.cycle
-                            "Scooter" -> R.drawable.scooter
-                            "Walk" -> R.drawable.walk
-                            else -> android.R.drawable.stat_notify_sdcard_usb
-                        }
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .clickable { onClick() },
+                border = BorderStroke(1.dp, AtlasGreen),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
                 )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column(modifier = Modifier.weight(2f)) {
-                    // Información de la ruta (origen y destino)
-                    Text(
-                        text = "From: ${route.start.alias}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Black
-                    )
-                    Text(
-                        text = "To: ${route.end.alias}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Black
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Tipo de ruta y distancia/duración
-                    Text(
-                        text = "Type: ${route.routeType.getPreference()}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AtlasGreen
-                    )
-                    val formattedDistance = if (route.distance >= 1000) {
-                        String.format("%.1f km", route.distance / 1000.0)
-                    } else {
-                        "${route.distance.toInt()} m"
-                    }
-
-                    val formattedDuration = if (route.duration >= 3600) {
-                        String.format(
-                            "%.1f h",
-                            route.duration / 3600.0
-                        ) // Convertir segundos a horas
-                    } else {
-                        String.format(
-                            "%d min",
-                            (route.duration / 60).toInt()
-                        ) // Convertir segundos a minutos
-                    }
-
-
-                    Text(
-                        text = "Distance: $formattedDistance | Duration: $formattedDuration",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
-                    )
-
-                    Text(
-                        text = "Price: ${route.price?.let { String.format("$%.2f", it) } ?: "Calculating..."}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
-                    )
-                }
-
-                // Botón de favorito
-                IconButton(
-                    onClick = { isFavorite = !isFavorite }
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    // Icono representativo del vehículo asociado a la ruta
+                    Image(
+                        painter = painterResource(
+                            id = when (route.vehicle.type.toString()) {
+                                "Car" -> R.drawable.car
+                                "Bike" -> R.drawable.bike
+                                "Cycle" -> R.drawable.cycle
+                                "Scooter" -> R.drawable.scooter
+                                "Walk" -> R.drawable.walk
+                                else -> android.R.drawable.stat_notify_sdcard_usb
+                            }
+                        ),
                         contentDescription = null,
-                        tint = if (isFavorite) AtlasGreen else Color.Black,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(48.dp)
                     )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        // Información de la ruta (origen y destino)
+                        Text(
+                            text = "From: ${route.start.alias}",
+                            style = MaterialTheme.typography.titleMedium,
+                            overflow = TextOverflow.Ellipsis,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Text(
+                            text = "To: ${route.end.alias}",
+                            style = MaterialTheme.typography.titleMedium,
+                            overflow = TextOverflow.Ellipsis,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Tipo de ruta y distancia/duración
+                        Text(
+                            text = "Type: ${route.routeType.getPreference()}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AtlasGreen
+                        )
+                        val formattedDistance = if (route.distance >= 1000) {
+                            String.format(Locale("es", "ES"),"%.1f km", route.distance / 1000.0)
+                        } else {
+                            "${route.distance.toInt()} m"
+                        }
+
+                        val formattedDuration = if (route.duration >= 3600) {
+                            String.format(Locale("es", "ES"),"%.1f h", route.duration / 3600.0) // Convertir segundos a horas
+                        } else {
+                            String.format(Locale("es", "ES"),"%d min", (route.duration / 60).toInt()) // Convertir segundos a minutos
+                        }
+
+                        Text(
+                            text = "Distance: $formattedDistance | Duration: $formattedDuration",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondary
+                        )
+
+                        // Formateo de precio con Locale específico
+                        Text(
+                            text = "Price: ${route.price?.let {
+                                if (route.vehicle.energyType is Calories) {
+                                    String.format(Locale("es", "ES"), "%.2f cal", it)
+                                } else {
+                                    String.format(Locale("es", "ES"), "%.2f €", it)
+                                }
+                            } ?: "Calculating..."}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
+
+                    // Botón de favorito
+                    IconButton(
+                        onClick = { isFavorite = !isFavorite }
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = null,
+                            tint = if (isFavorite) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSecondary,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
             }
         }
     }
 }
+
 

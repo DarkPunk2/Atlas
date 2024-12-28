@@ -132,6 +132,13 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions( onNext = { focusManager.clearFocus() } )
         )
+        TextButton(onClick = {
+            navController.navigate("recover")
+        },
+            modifier = Modifier
+                .align(Alignment.End)) {
+            Text(text = "Have you forgotten your password?", color = AtlasDarker)
+        }
         Spacer(modifier = Modifier.height(15.dp))
         Button(
             onClick = {
@@ -139,7 +146,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
             },
             enabled = authState.value != AuthState.Loading,
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors( containerColor = AtlasGreen )
+            colors = ButtonDefaults.buttonColors( containerColor = AtlasDarker )
         ) {
             Text(
                 text = "Log-in",

@@ -1,11 +1,10 @@
 package com.project.atlas.views
 
+import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -15,11 +14,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideEffect
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.project.atlas.R
 import com.project.atlas.viewModels.LocationsViewModel
 import com.project.atlas.viewModels.MapViewModel
 import com.project.atlas.views.locations.AddLocationView
@@ -29,38 +27,31 @@ import com.utsman.osmandcompose.DefaultMapProperties
 import com.utsman.osmandcompose.Marker
 import com.utsman.osmandcompose.OpenStreetMap
 import com.utsman.osmandcompose.ZoomButtonVisibility
-import com.utsman.osmandcompose.rememberCameraState
 import com.utsman.osmandcompose.rememberMarkerState
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 
-@Composable
-fun MapPage(modifier: Modifier = Modifier, navController: NavController) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        OsmdroidMapView(MapViewModel())
-    }
-}
 
 @Composable
 fun OsmdroidMapView(mapViewModel: MapViewModel) {
-    val markerPosition by mapViewModel.markerPosition.observeAsState(GeoPoint(39.992573, -0.064749))
+    val markerPosition by mapViewModel.markerPosition.observeAsState()
+    val context = LocalContext.current
 
     val markerState = rememberMarkerState(
-        geoPoint = markerPosition
+        geoPoint = markerPosition!!
     )
+    val markerIcon: Drawable? by remember {
+        mutableStateOf(ContextCompat.getDrawable(context, R.drawable.start_icon))
+    }
 
     LaunchedEffect(markerPosition) {
-        markerState.geoPoint = markerPosition
+        markerState.geoPoint = markerPosition as GeoPoint
     }
 
     var cameraState by remember {
         mutableStateOf(
             CameraState(
                 CameraProperty(
-                    geoPoint = GeoPoint(39.993100, -0.067035),
+                    geoPoint = mapViewModel.markerPosition.value!!,
                     zoom = 16.0
                 )
             )
@@ -113,7 +104,8 @@ fun OsmdroidMapView(mapViewModel: MapViewModel) {
     ){
         Marker(
             state = markerState,
-            visible = mapViewModel.showMarker.value!!
+            visible = mapViewModel.showMarker.value!!,
+            icon = markerIcon
         )
     }
 

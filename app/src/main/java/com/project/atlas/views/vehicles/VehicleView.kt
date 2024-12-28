@@ -3,10 +3,14 @@ package com.project.atlas.views.vehicles
 import Diesel
 import Electricity
 import Petrol98
+import android.app.Application
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +24,8 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,11 +53,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -63,11 +71,12 @@ import com.project.atlas.models.VehicleType
 import com.project.atlas.R
 import com.project.atlas.ui.theme.AtlasGold
 import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.ui.theme.AtlasTheme
 import com.project.atlas.views.NavigationMenu
 import kotlinx.coroutines.delay
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun listVehicle(
     modifier: Modifier,
@@ -75,6 +84,7 @@ fun listVehicle(
     vehicleViewModel: VehicleViewModel
 ) {
     val vehicleList by vehicleViewModel.vehicleList.observeAsState(emptyList())
+    val defaultVehicle by vehicleViewModel.defaultVehicle.observeAsState(null)
     var isLoading by remember { mutableStateOf(true) }
     var showDetails by remember { mutableStateOf<VehicleModel?>(null) }
     var showAddForm by remember { mutableStateOf(false) }
@@ -88,11 +98,13 @@ fun listVehicle(
 
     LaunchedEffect(Unit) {
         vehicleViewModel.refreshVehicles()
+        vehicleViewModel.refreshDefaultVehicle()
     }
     isLoading = false
 
     if (showSnackbar) {
-        LaunchedEffect(snackbarHostState) {
+        LaunchedEffect(snackbarHostState, snackbarMessage) {
+            snackbarHostState.currentSnackbarData?.dismiss()
             snackbarHostState.showSnackbar(snackbarMessage)
             showSnackbar = false
         }
@@ -105,7 +117,9 @@ fun listVehicle(
                     snackbarData = data,
                     containerColor = snackbarColor,
                     contentColor = Color.Black,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    modifier =  Modifier
+                        .padding(bottom = 76.dp)
                 )
             }
         },
@@ -153,7 +167,7 @@ fun listVehicle(
                         top = paddingValues.calculateTopPadding(),
                         end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         bottom = 0.dp
-                    ) // Aplica el padding respectivo
+                    )
             ) {
                 if (showLoading) {
                     Box(
@@ -180,9 +194,18 @@ fun listVehicle(
                 } else {
                     LazyColumn {
                         items(vehicleList) { vehicle ->
-                            VehicleItem(vehicle = vehicle) {
-                                showDetails = vehicle
-                            }
+                            VehicleItem(
+                                vehicle = vehicle,
+                                onClick = {showDetails = vehicle},
+                                onFavourite = {
+                                    vehicleViewModel.update(vehicle.alias!!, vehicle)
+                                    snackbarMessage = if(vehicle.favourite) "Vehicle ${vehicle.alias} is now set as a favourite" else "Vehicle ${vehicle.alias} is now unset as a favourite"
+                                    snackbarColor = AtlasGreen
+                                    showSnackbar = true
+                                              },
+                                default = defaultVehicle?.alias?:"" == vehicle.alias,
+                                modifier = Modifier.animateContentSize()
+                            )
                         }
                     }
                 }
@@ -215,6 +238,32 @@ fun listVehicle(
                 snackbarColor = AtlasGold
                 showDetails = null
                 showSnackbar = true
+            },
+            default = defaultVehicle?.alias?:"" == vehicle.alias,
+            onDefaultAdd = {
+                vehicleViewModel.setDefaultVehicle(vehicle)
+                var message: String = if(defaultVehicle != null)
+                            "Vehicle ${vehicle.alias} now set as your default vehicle (previously set ${defaultVehicle?.alias})"
+                            else "Vehicle ${vehicle.alias} now set as your default vehicle"
+                snackbarMessage = message
+                snackbarColor = AtlasGold
+                showDetails = null
+                showSnackbar = true
+                           },
+            onDefaultDelete = {
+                vehicleViewModel.deleteDefaultVehicle()
+                snackbarMessage = "Vehicle ${vehicle.alias} is now unset as your default vehicle"
+                snackbarColor = AtlasGold
+                showDetails = null
+                showSnackbar = true
+                              },
+            onFavourite = {
+                vehicleViewModel.update(vehicle.alias!!, vehicle)
+                snackbarMessage = if(vehicle.favourite) "Vehicle ${vehicle.alias} is now set as a favourite" else "Vehicle ${vehicle.alias} is now unset as a favourite"
+                snackbarColor = AtlasGreen
+                showDetails = null
+                showSnackbar = true
+
             }
         )
     }
@@ -273,7 +322,9 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
         onDismissRequest = { onDismiss() },
         title = { Text(text = "Add Vehicle") },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp) // Espaciado entre componentes
+            ) {
                 // Alias
                 TextField(
                     value = alias,
@@ -285,10 +336,12 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     isError = aliasError,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done))
+                        imeAction = ImeAction.Done
+                    )
+                )
                 if (aliasError) {
                     Text(
-                        text = if (alias!!.isBlank()) "Alias cannot be blank" else "Alias already exists",
+                        text = if (alias.isBlank()) "Alias cannot be blank" else "Alias already exists",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -297,7 +350,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                 // Tipo de Vehículo
                 DropdownSelector(
                     label = "Type",
-                    items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter) /*VehicleType.entries*/,
+                    items = listOf(VehicleType.Car, VehicleType.Bike, VehicleType.Scooter),
                     selectedItem = selectedType,
                     onItemSelected = { selectedType = it }
                 )
@@ -326,13 +379,15 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                     label = { Text("Consumption ${selectedEnergyType?.magnitude ?: "not selected"}") },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done),
+                        imeAction = ImeAction.Done
+                    ),
                     isError = consumptionError
                 )
                 if (consumptionError) {
                     Text("Consumption must be greater than 0", color = Color.Red, style = MaterialTheme.typography.bodySmall)
                 }
             }
+
         },
         confirmButton = {
             Button(
@@ -343,7 +398,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
                 },
                 enabled = isValid,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
+                    containerColor = if (isValid) AtlasGreen else Color.Gray
                 )
             ) {
                 Text("Add", color = Color.Black)
@@ -352,7 +407,7 @@ fun AddVehicleDialog(vehicleList: List<VehicleModel>,
         dismissButton = {
             Button(
                 onClick = { onDismiss() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("Cancel")
             }
@@ -365,7 +420,7 @@ fun EditVehicleDialog(
     vehicle: VehicleModel,
     vehicleList: List<VehicleModel>,
     onDismiss: () -> Unit,
-    onConfirm: (alias: String, type: VehicleType, energyType: EnergyType, consumption: Double) -> Unit
+    onConfirm: (alias: String, type: VehicleType, energyType: EnergyType, consumption: Double, favourite:Boolean) -> Unit
 ) {
     var alias by remember { mutableStateOf(vehicle.alias) }
     var selectedType by remember { mutableStateOf(vehicle.type) }
@@ -401,7 +456,9 @@ fun EditVehicleDialog(
         onDismissRequest = { onDismiss() },
         title = { Text("Edit Vehicle") },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp) // Espaciado entre componentes
+            ) {
                 // Alias
                 TextField(
                     value = alias!!,
@@ -430,7 +487,7 @@ fun EditVehicleDialog(
 
                 // Tipo de Energía
                 DropdownSelector(
-                    label =  "Energy type",
+                    label = "Energy type",
                     items = energyOptions,
                     selectedItem = selectedEnergyType,
                     onItemSelected = {
@@ -440,7 +497,7 @@ fun EditVehicleDialog(
                 )
                 if (energyError) {
                     Text(
-                        text ="Seleccione un tipo de energía válido",
+                        text = "Select a valid energy type",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -454,7 +511,10 @@ fun EditVehicleDialog(
                         consumptionError = it.toDoubleOrNull()?.let { it <= 0 } ?: true
                     },
                     label = { Text("Consumption ${selectedEnergyType?.magnitude ?: "not selected"}") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
                     isError = consumptionError
                 )
                 if (consumptionError) {
@@ -475,16 +535,16 @@ fun EditVehicleDialog(
                 },
                 enabled = isValid,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isValid) MaterialTheme.colorScheme.primary else Color.Gray
+                    containerColor = if (isValid) AtlasGreen else Color.Gray
                 )
             ) {
-                Text("Save changes")
+                Text("Save changes", color = Color.Black)
             }
         },
         dismissButton = {
             Button(
                 onClick = { onDismiss() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("Cancel")
             }
@@ -500,7 +560,7 @@ fun EditVehicleDialog(
             confirmButton = {
                 Button(
                     onClick = {
-                        onConfirm(alias!!, selectedType!!, selectedEnergyType!!, consumption.toDouble())
+                        onConfirm(alias!!, selectedType!!, selectedEnergyType!!, consumption.toDouble(), vehicle.favourite)
                         showConfirmationDialog = false
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -540,7 +600,7 @@ fun <T> DropdownSelector(
             OutlinedButton(
                 onClick = { expanded = true }
                 ) {
-                Text(text = selectedItem?.toString() ?: "Select $label", color = Color.Black)
+                Text(text = selectedItem?.toString() ?: "Select $label")
             }
             DropdownMenu(
                 expanded = expanded,
@@ -561,73 +621,114 @@ fun <T> DropdownSelector(
 }
 
 @Composable
-fun VehicleItem(vehicle: VehicleModel, onClick: () -> Unit) {
-    var isFavorite = false
-    val launched = remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        launched.value = true
-    }
-    AnimatedVisibility(
-        visible = launched.value,
-        enter = slideInVertically { it },
-        exit = slideOutVertically { it }
-    ){
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .clickable { onClick() },
-            border = BorderStroke(2.dp, AtlasGreen),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+fun VehicleItem(
+    vehicle: VehicleModel,
+    onClick: () -> Unit,
+    onFavourite: () -> Unit,
+    default: Boolean,
+    modifier: Modifier = Modifier
+) {
+    AtlasTheme(ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
+        dynamicColor = false) {
+        val launched = remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            launched.value = true
+        }
+        AnimatedVisibility(
+            visible = launched.value,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it }
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(
-                        id = when (vehicle.type.name) {
-                            "Car" -> R.drawable.car
-                            "Bike" -> R.drawable.bike
-                            "Cycle" -> R.drawable.cycle
-                            "Scooter" -> R.drawable.scooter
-                            "Walk" -> R.drawable.walk
-                            else -> android.R.drawable.stat_notify_sdcard_usb
-                        }
+            Card(
+                modifier = modifier
+                    .then(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable { onClick() }
                     ),
-                    contentDescription = null,
+                border = BorderStroke(2.dp, AtlasGreen),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer // Cambiado al esquema de Material Theme
+                )
+            ) {
+                Row(
                     modifier = Modifier
-                        .size(48.dp)
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Text(
-                    text = vehicle.alias!!,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(2f),
-                    color = Color.Black
-                )
-
-
-                IconButton(
-                    onClick = { isFavorite = !isFavorite }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    // Imagen representativa del vehículo
+                    Image(
+                        painter = painterResource(
+                            id = when (vehicle.type.name) {
+                                "Car" -> R.drawable.car
+                                "Bike" -> R.drawable.bike
+                                "Cycle" -> R.drawable.cycle
+                                "Scooter" -> R.drawable.scooter
+                                "Walk" -> R.drawable.walk
+                                else -> android.R.drawable.stat_notify_sdcard_usb
+                            }
+                        ),
                         contentDescription = null,
-                        tint = if (isFavorite) AtlasGreen else Color.Black,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier
+                            .size(48.dp)
                     )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // Texto del alias del vehículo
+                    Text(
+                        text = vehicle.alias!!,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.weight(2f),
+                        overflow = TextOverflow.Ellipsis, // Ajustado para cortar texto largo con puntos suspensivos
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground // Color ajustado al esquema de Material Theme
+                    )
+
+                    // Ícono para marcar como predeterminado
+                    if (default) {
+                        IconButton(
+                            onClick = {}
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Star,
+                                contentDescription = "Default mark",
+                                tint = AtlasGold,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
+
+                    // Ícono para marcar como favorito (no aplicable a Walk o Cycle)
+                    if (vehicle.type.name != VehicleType.Walk.name && vehicle.type.name != VehicleType.Cycle.name) {
+                        IconButton(
+                            onClick = {
+                                vehicle.toggleFavourite()
+                                onFavourite()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (vehicle.favourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = null,
+                                tint = animateColorAsState(
+                                    if (vehicle.favourite) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSecondary
+                                ).value, // Usando colores dinámicos
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .animateContentSize() // Animación de tamaño para ícono favorito
+                            )
+                        }
+                    }
                 }
             }
+        }
     }
 }
-}
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -637,13 +738,18 @@ fun VehicleDetailsDialog(
     vehicleList: List<VehicleModel>,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
-    onUpdate: (String, VehicleModel) -> Unit
+    onUpdate: (String, VehicleModel) -> Unit,
+    onDefaultAdd: () -> Unit,
+    onDefaultDelete: () -> Unit,
+    onFavourite: () -> Unit,
+    default : Boolean
 ) {
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var showSetDefaultConfirmation by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
@@ -656,12 +762,48 @@ fun VehicleDetailsDialog(
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Título
-            Text(
-                text = "Vehicle Details",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
+            // Header con acciones de estrella y corazón
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { showSetDefaultConfirmation = true }) {
+                    Icon(
+                        imageVector = if (default) Icons.Filled.Star else Icons.Outlined.StarOutline,
+                        contentDescription = "Set as Default",
+                        tint = AtlasGold,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
+                Text(
+                    text = "Vehicle Details",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f), // Agregamos peso para centrar el texto
+                    textAlign = TextAlign.Center // Aseguramos alineación centrada
+                )
+
+                if (vehicle.type.name != VehicleType.Walk.name && vehicle.type.name != VehicleType.Cycle.name) {
+                    IconButton(
+                        onClick = {
+                            vehicle.toggleFavourite()
+                            onFavourite()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (vehicle.favourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = null,
+                            tint = if (vehicle.favourite) AtlasGreen else Color.Black,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                } else {
+                    Spacer(modifier = Modifier.size(48.dp)) // Reserva espacio para el ícono del corazón
+                }
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // Información del vehículo
@@ -669,31 +811,77 @@ fun VehicleDetailsDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Alias", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.alias ?: "S/N", style = MaterialTheme.typography.bodyMedium)
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Alias",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        vehicle.alias ?: "S/N",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center // Aseguramos el centrado del texto
+                    )
                 }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Type", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.type.name, style = MaterialTheme.typography.bodyMedium)
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Type",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        vehicle.type.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
                 }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Energy", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                    Text(vehicle.energyType?.typeName ?: "N/A", style = MaterialTheme.typography.bodyMedium)
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Energy",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        vehicle.energyType?.typeName ?: "N/A",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // Consumo
-            Text(
-                text = "Consumption",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "${vehicle.consumption} ${vehicle.energyType?.magnitude ?: ""}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Consumption",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        "${vehicle.consumption} ${vehicle.energyType?.magnitude ?: ""}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             // Botones
@@ -701,9 +889,7 @@ fun VehicleDetailsDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // Mostrar botones solo si el tipo de vehículo no es Walk ni Cycle
                 if (vehicle.type != VehicleType.Walk && vehicle.type != VehicleType.Cycle) {
-                    // Botón de actualizar
                     Button(
                         onClick = { showEditDialog = true },
                         colors = ButtonDefaults.buttonColors(containerColor = AtlasGreen)
@@ -711,15 +897,13 @@ fun VehicleDetailsDialog(
                         Text("Update", color = Color.Black)
                     }
 
-                    // Botón de eliminar
                     Button(
                         onClick = { showDeleteConfirmation = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Text("Delete", color = Color.White)
+                        Text("Delete")
                     }
                 } else {
-
                     Spacer(modifier = Modifier.width(120.dp))
                 }
             }
@@ -754,14 +938,45 @@ fun VehicleDetailsDialog(
         )
     }
 
+    // Confirmación de establecer como predeterminado
+    if (showSetDefaultConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showSetDefaultConfirmation = false },
+            title = {Text(if(!default) "Set as Default" else "Unset as Default")},
+            text = {Text(
+                    if(!default) "Are you sure you want to set this vehicle as default?"
+                    else "Are you sure you want to unset this vehicle as your default?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if(!default) onDefaultAdd() else onDefaultDelete()
+                        showSetDefaultConfirmation = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AtlasGold)
+                ) {
+                    Text(text = "Confirm")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showSetDefaultConfirmation = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                ) {
+                    Text(text = "Cancel", color = Color.Black)
+                }
+            }
+        )
+    }
+
     // Dialogo de edición de vehículo
     if (showEditDialog) {
         EditVehicleDialog(
             vehicle = vehicle,
             vehicleList = vehicleList,
             onDismiss = { showEditDialog = false },
-            onConfirm = { alias, type, energyType, consumption ->
+            onConfirm = { alias, type, energyType, consumption, favourite ->
                 val updatedVehicle = vehicle.copy(alias = alias, type = type, energyType = energyType, consumption = consumption)
+                updatedVehicle.favourite = vehicle.favourite
                 onUpdate(vehicle.alias!!, updatedVehicle)
                 showEditDialog = false
             }

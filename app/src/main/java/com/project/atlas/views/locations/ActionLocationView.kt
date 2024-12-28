@@ -19,9 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.components.CustomBottomSheet
@@ -106,6 +103,8 @@ fun ActionLocationView(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         ),
+                        modifier = Modifier
+                            .weight(1f)
                     ) {
                         Text("Edit")
                     }
@@ -120,41 +119,45 @@ fun ActionLocationView(
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error
-                        )
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
                     ) {
                         Text("Remove location")
                     }
-                    if (routeViewModel.showStartSelect.value!!) {
-                        FilledTonalButton(
-                            onClick = {
-                                routeViewModel.addStart(location)
-                                routeViewModel.seeSelectStart(false)
-                                onDismiss()
-                                navController.navigate("createRute")
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = AtlasDarker
-                            )
-                        ) {
-                            Text("Select location")
-                        }
-                    }
-                    if (routeViewModel.showEndSelect.value!!) {
-                        FilledTonalButton(
-                            onClick = {
-                                routeViewModel.addEnd(location)
-                                routeViewModel.seeSelectEnd(false)
-                                navController.navigate("createRute")
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = AtlasDarker
-                            )
-                        ) {
-                            Text("Select location")
-                        }
+                }
+                Spacer(modifier = Modifier.size(10.dp))
+                if (routeViewModel.showStartSelect.value!!) {
+                    FilledTonalButton(
+                        onClick = {
+                            routeViewModel.addStart(location)
+                            routeViewModel.seeSelectStart(false)
+                            onDismiss()
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AtlasDarker
+                        ),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text("Select location")
                     }
                 }
-
+                if (routeViewModel.showEndSelect.value!!) {
+                    FilledTonalButton(
+                        onClick = {
+                            routeViewModel.addEnd(location)
+                            routeViewModel.seeSelectEnd(false)
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AtlasDarker
+                        ),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text("Select location")
+                    }
+                }
                 Spacer(modifier = Modifier.size(200.dp))
             }
         }

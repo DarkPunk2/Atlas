@@ -4,6 +4,7 @@ import com.project.atlas.exceptions.IncorrectEmailException
 import com.project.atlas.exceptions.IncorrectPasswordException
 import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.exceptions.SessionNotFoundException
+import com.project.atlas.exceptions.UserNotFoundException
 import com.project.atlas.interfaces.UserInterface
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.UserModel
@@ -100,6 +101,32 @@ class AuthService(externalAuth: FireBaseAuthService) : UserInterface {
             return false
         }
     }
+
+    override suspend fun recoverPassword(email: String): Boolean {
+        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+        if (!email.matches(emailRegex)) {
+            throw IncorrectEmailException("Email is not valid")
+        }
+        if (!auth.checkUserExists(email)){
+            throw UserNotFoundException("User not register in DataBase")
+        }
+        return auth.restorePassword(email)
+    }
+
+    override suspend fun changePassword(oldPassword: String,newPassword: String, confirmPassword: String): Boolean {
+        val regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$".toRegex()
+        if (!oldPassword.matches(regex)) {
+            throw IncorrectPasswordException("New password is invalid")
+        }
+        if (!newPassword.matches(regex)) {
+            throw IncorrectPasswordException("New password is invalid")
+        }
+        if (newPassword != confirmPassword){
+            throw IncorrectPasswordException("Password don't match")
+        }
+        return auth.changePassword(oldPassword,newPassword)
+    }
+
 }
 
 
