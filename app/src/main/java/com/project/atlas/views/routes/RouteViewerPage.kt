@@ -83,7 +83,6 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
         }
     }
     val context = LocalContext.current
-
     val start = routeViewModel.routeState.value!!.start
     val starMarker = rememberMarkerState(
         geoPoint = GeoPoint(start.lat, start.lon)
@@ -96,6 +95,9 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
     val endMarker = rememberMarkerState(
         geoPoint = GeoPoint(end.lat, end.lon)
     )
+    val endIcon: Drawable? by remember {
+        mutableStateOf(ContextCompat.getDrawable(context, R.drawable.start_icon_red))
+    }
 
     var mapProperties by remember {
         mutableStateOf(DefaultMapProperties)
@@ -124,16 +126,17 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
             cameraState = cameraState,
             properties = mapProperties
         ) {
-            Marker(
-                state = starMarker,
-                icon = startIcon
-                )
-            Marker(
-                state = endMarker
-            )
             Polyline(
                 geoPoints = geoPoint,
                 color = AtlasDarker
+            )
+            Marker(
+                state = starMarker,
+                icon = startIcon
+            )
+            Marker(
+                state = endMarker,
+                icon = endIcon
             )
         }
         Image(

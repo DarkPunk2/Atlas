@@ -9,11 +9,14 @@ import androidx.lifecycle.viewModelScope
 import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
+import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.FuelPriceService
 import com.project.atlas.services.RouteDatabaseService
 import com.project.atlas.services.RouteService
+import com.project.atlas.services.VehicleDatabaseService
+import com.project.atlas.services.VehicleService
 import kotlinx.coroutines.launch
 
 class RouteViewModel: ViewModel() {
@@ -39,6 +42,9 @@ class RouteViewModel: ViewModel() {
     private var _vehicle = MutableLiveData<VehicleModel?>()
     val vehicleState: LiveData<VehicleModel?> = _vehicle
 
+    private var _vehicleDefaut = MutableLiveData<VehicleModel?>()
+    val vehicleDefault: LiveData<VehicleModel?> = _vehicleDefaut
+
     private var _start = MutableLiveData<Location?>()
     val start: LiveData<Location?> = _start
 
@@ -59,11 +65,13 @@ class RouteViewModel: ViewModel() {
 
 
     private val routeService = RouteService(RouteDatabaseService())
+    private val vehicleService = VehicleService(VehicleDatabaseService())
 
     init {
         viewModelScope.launch {
             try {
                 _routeTypeState.value = routeService.getDefaultRouteType()
+                defaultVehicle()
             }catch (_: Exception){
                 _routeTypeState.value = null
             }
@@ -72,16 +80,27 @@ class RouteViewModel: ViewModel() {
     }
 
     fun createRute(start: Location?, end: Location?, vehicle: VehicleModel?, routeType: RouteType?) {
-        if (start != null && end != null && vehicle != null && routeType != null) {
+        if (start != null && end != null && routeType != null) {
             viewModelScope.launch {
                 try {
-                    _routeState.value = routeService.createRute(start, end, vehicle, routeType)
+                    if (vehicle == null) {
+                        _routeState.value = routeService.createRute(start, end,
+                            _vehicleDefaut.value!!, routeType)
+                    } else{
+                        _routeState.value = routeService.createRute(start, end, vehicle, routeType)
+                    }
                     _navigateToRuteView.value = true
                 } catch (e: Exception){
                     _errorState.value = e
                 }
 
             }
+        }
+    }
+
+    fun defaultVehicle(){
+        viewModelScope.launch {
+            _vehicleDefaut.value = vehicleService.getDefaultVehicle(UserModel.eMail)
         }
     }
 
@@ -178,6 +197,7 @@ class RouteViewModel: ViewModel() {
     }
 
     fun resetValues(){
+        defaultVehicle()
         _vehicle.value = null
         _start.value = null
         _end.value = null
