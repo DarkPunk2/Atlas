@@ -121,12 +121,14 @@ class RouteDatabaseService: RouteDatabase {
             start = Location(
                 lat = start["lat"] as Double,
                 lon = start["lon"] as Double,
-                alias = start["alias"] as String
+                alias = start["alias"] as String,
+                toponym = start["toponym"] as String
             ),
             end = Location(
                 lat = end["lat"] as Double,
                 lon = end["lon"] as Double,
-                alias = end["alias"] as String
+                alias = end["alias"] as String,
+                toponym = start["toponym"] as String
             ),
             vehicle = VehicleModel(
                 alias = vehicle["alias"] as String?,
