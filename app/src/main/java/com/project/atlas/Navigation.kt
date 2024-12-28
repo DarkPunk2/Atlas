@@ -11,7 +11,6 @@ import com.project.atlas.viewModels.MapViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.viewModels.VehicleViewModel
-import com.project.atlas.views.EnergyTypeTest
 import com.project.atlas.views.HomePage
 import com.project.atlas.views.user.LoginPage
 import com.project.atlas.views.user.SignUpPage
@@ -58,11 +57,6 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel,
         }
         composable("viewRute"){
             RouteViewerPage(navController, routeViewModel)
-        }
-        composable("fuelTest"){
-            EnergyTypeTest(
-                viewModel = fuelPriceViewModel
-            )
         }
         composable("recover"){
             RecoverPasswordPage(modifier, navController, userViewModel)

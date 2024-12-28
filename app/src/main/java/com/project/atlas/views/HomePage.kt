@@ -87,6 +87,13 @@ fun HomePage(
                         }) {
                             Text("Toggle Theme")
                         }
+                        RouteTypeSelector(
+                            items = RouteType.entries.toList(),
+                            selectedItem = selectedType,
+                            onItemSelected = { selectedType = it
+                                routeViewModel.changeDefaultRouteType(it)
+                            }
+                        )
                         Spacer(modifier = Modifier.weight(1f))
                         HorizontalDivider()
                         TextButton(

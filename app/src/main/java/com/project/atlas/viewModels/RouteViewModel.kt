@@ -141,8 +141,12 @@ class RouteViewModel: ViewModel() {
 
     fun changeDefaultRouteType(routeType: RouteType){
         viewModelScope.launch {
-            if (routeService.addDefaultRouteType(routeType)){
-                _routeTypeState.value = routeType
+            try {
+                if (routeService.addDefaultRouteType(routeType)){
+                    _routeTypeState.value = routeType
+                }
+            }catch (_: Exception){
+
             }
         }
     }
