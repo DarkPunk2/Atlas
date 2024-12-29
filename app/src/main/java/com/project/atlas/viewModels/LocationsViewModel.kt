@@ -108,7 +108,11 @@ class LocationsViewModel : ViewModel() {
         location.alias = newAlias
     }
 
-    fun makeFavourite(location: Location) {
-
+    fun changeFavourite(location: Location) {
+        if(locationsList.contains(location)){
+            location.changeFavourite()
+            locationsList.sortWith(compareByDescending { it.isFavourite })
+        }
+        else throw IllegalArgumentException()
     }
 }

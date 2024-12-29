@@ -1,4 +1,4 @@
-package com.project.atlas.it_3Test
+package com.project.atlas.it_4Test
 
 import com.project.atlas.models.Location
 import com.project.atlas.models.UserModel
@@ -128,11 +128,11 @@ class LocationsTest {
         locationsViewModel.addLocation(location2)
 
         //When
-        locationsViewModel.makeFavourite(location2)
+        locationsViewModel.changeFavourite(location2)
 
         //Then
         assertEquals(locationsViewModel.getLocation(0), location2)
-        assertEquals(location2.favourite, true)
+        assertEquals(location2.isFavourite, true)
     }
 
     //Make a location that is not in list favourite
@@ -142,7 +142,7 @@ class LocationsTest {
         val location1 = Location(40.0, 0.0, "Parque", "Castellón")
 
         //When
-        locationsViewModel.makeFavourite(location1)
+        locationsViewModel.changeFavourite(location1)
 
         //Then
     }

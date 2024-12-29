@@ -19,9 +19,11 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,9 +42,8 @@ import com.project.atlas.views.NavigationMenu
 
 @Composable
 fun LocationCard(
-    alias: String,
-    coords: String,
-    favorite: Boolean,
+    location: Location,
+    onFavourite: () -> Unit,
     onClick: () -> Unit
 ) {
     AtlasTheme(
@@ -80,7 +81,7 @@ fun LocationCard(
                         modifier = Modifier.weight(2f)
                     ) {
                         Text(
-                            text = alias,
+                            text = location.alias,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleLarge,
@@ -88,7 +89,7 @@ fun LocationCard(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = coords,
+                            text = "(${location.lat}, ${location.lon})",
                             maxLines = 1,
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Normal,
@@ -97,13 +98,13 @@ fun LocationCard(
                     }
                     IconButton(
                         onClick = {
-                            /* TODO */
+                            onFavourite()
                         }
                     ) {
                         Icon(
-                            imageVector = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            imageVector = if (location.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Go Back",
-                            tint = if (favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary,
+                            tint = if (location.isFavourite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -125,7 +126,33 @@ fun LocationsListView(
     val showAddLocation = remember { mutableStateOf(false) }
     val showActionCard = remember { mutableStateOf(false) }
 
+    //Variables SnackBar
+    var showSnackbar by remember { mutableStateOf(false) }
+    var snackbarMessage by remember { mutableStateOf("") }
+    var snackbarColor by remember { mutableStateOf(AtlasGreen) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    if (showSnackbar) {
+        LaunchedEffect(snackbarHostState, snackbarMessage) {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(snackbarMessage)
+            showSnackbar = false
+        }
+    }
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = snackbarColor,
+                    contentColor = Color.Black,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier =  Modifier
+                        .padding(bottom = 76.dp)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -161,9 +188,13 @@ fun LocationsListView(
                     ) {
                         locations.value.forEach { location ->
                             LocationCard(
-                                alias = location.alias,
-                                coords = "(${location.lat}, ${location.lon})",
-                                favorite = false,
+                                location,
+                                onFavourite = {
+                                    viewModel.changeFavourite(location)
+                                    snackbarMessage = if(location.isFavourite) "Vehicle ${location.alias} is now set as a favourite" else "Vehicle ${location.alias} is now unset as a favourite"
+                                    snackbarColor = AtlasGreen
+                                    showSnackbar = true
+                                },
                                 onClick = {
                                     selectedLocation.value = location
                                     showActionCard.value = true
