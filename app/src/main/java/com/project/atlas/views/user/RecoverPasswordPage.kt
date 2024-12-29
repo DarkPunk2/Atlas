@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
 import com.project.atlas.models.ChangeState
+import com.project.atlas.ui.theme.AtlasDarker
 import com.project.atlas.viewModels.UserViewModel
 import com.project.atlas.ui.theme.AtlasGreen
 
@@ -68,11 +69,10 @@ fun RecoverPasswordPage(modifier: Modifier = Modifier,navController: NavControll
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.atlas_t),
+            painter = painterResource(id = R.drawable.atlas_lettering_black),
             contentDescription = "Logo",
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(180.dp)
         )
-        Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = "Recover password",
             style = MaterialTheme.typography.displaySmall,
@@ -97,7 +97,7 @@ fun RecoverPasswordPage(modifier: Modifier = Modifier,navController: NavControll
                 userViewModel.recoverPassword(email)
             },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors( containerColor = AtlasGreen )
+            colors = ButtonDefaults.buttonColors( containerColor = AtlasDarker )
         ) {
             Text(
                 text = "Send email",
@@ -106,6 +106,7 @@ fun RecoverPasswordPage(modifier: Modifier = Modifier,navController: NavControll
                 modifier = Modifier.padding(vertical = 5.dp)
             )
         }
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }
 

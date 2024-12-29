@@ -127,8 +127,8 @@ fun HomePage(
                         painter = painterResource(id = R.drawable.atlas_lettering_black),
                         contentDescription = "lettering",
                         modifier = Modifier
-                            .padding(start = 32.dp)
-                            .absolutePadding(2.dp, 1.dp, 3.dp, 3.dp)
+                            .padding(start = 20.dp)
+                            .absolutePadding(2.dp, 6.dp, 3.dp, 3.dp)
                             .size(100.dp),
                         colorFilter = ColorFilter.tint(BackgroundBlack)
                     )
@@ -145,7 +145,7 @@ fun HomePage(
                         containerColor = AtlasGreen,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(bottom = 180.dp, end = 16.dp)
+                            .padding(bottom = 120.dp, end = 16.dp)
                     )
                     IconButton(
                         onClick = {

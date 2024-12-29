@@ -89,9 +89,9 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.atlas_t),
+            painter = painterResource(id = R.drawable.atlas_lettering_black),
             contentDescription = "Logo",
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(180.dp)
         )
         Spacer(modifier = Modifier.height(20.dp))
         Text(
@@ -160,6 +160,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
         }) {
             Text(text = "Don't have an account, Sign-up", color = AtlasDarker)
         }
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }
 

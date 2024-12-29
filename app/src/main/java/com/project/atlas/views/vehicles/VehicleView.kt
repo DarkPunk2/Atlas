@@ -192,7 +192,10 @@ fun listVehicle(
                         textAlign = TextAlign.Center
                     )
                 } else {
-                    LazyColumn {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                    ){
                         items(vehicleList) { vehicle ->
                             VehicleItem(
                                 vehicle = vehicle,
