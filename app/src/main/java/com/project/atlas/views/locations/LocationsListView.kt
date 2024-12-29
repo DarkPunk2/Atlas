@@ -1,5 +1,6 @@
 package com.project.atlas.views.locations
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -40,6 +41,7 @@ import com.project.atlas.viewModels.LocationsViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.NavigationMenu
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun LocationCard(
     location: Location,
@@ -89,7 +91,7 @@ fun LocationCard(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = "(${location.lat}, ${location.lon})",
+                            text = "(${String.format("%.4f", location.lat)}, ${String.format("%.4f", location.lon)})",
                             maxLines = 1,
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Normal,
@@ -191,7 +193,7 @@ fun LocationsListView(
                                 location,
                                 onFavourite = {
                                     viewModel.changeFavourite(location)
-                                    snackbarMessage = if(location.isFavourite) "Vehicle ${location.alias} is now set as a favourite" else "Vehicle ${location.alias} is now unset as a favourite"
+                                    snackbarMessage = if(location.isFavourite) "${location.alias} is now set as a favourite" else "Vehicle ${location.alias} is now unset as a favourite"
                                     snackbarColor = AtlasGreen
                                     showSnackbar = true
                                 },
@@ -212,7 +214,14 @@ fun LocationsListView(
     )
 
     if (showAddLocation.value) {
-        SearchByToponymView(onDismiss = { showAddLocation.value = false }, viewModel)
+        SearchByToponymView(
+            onDismiss = { showAddLocation.value = false },
+            onAdd = {
+                snackbarMessage = "Location added"
+                snackbarColor = AtlasGreen
+                showSnackbar = true
+            },
+            viewModel)
     }
 
     selectedLocation.value?.let { location ->
@@ -220,6 +229,16 @@ fun LocationsListView(
             onDismiss = {
                 showActionCard.value = false
                 selectedLocation.value = null
+            },
+            onEdit = {
+                snackbarMessage = "Location updated"
+                snackbarColor = AtlasGreen
+                showSnackbar = true
+            },
+            onDelete = {
+                snackbarMessage = "${location.alias} has been removed"
+                snackbarColor = AtlasGreen
+                showSnackbar = true
             },
             viewModel,
             location,

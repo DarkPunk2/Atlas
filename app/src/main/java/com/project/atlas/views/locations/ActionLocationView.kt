@@ -1,6 +1,5 @@
 package com.project.atlas.views.locations
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.shrinkOut
@@ -30,6 +29,8 @@ import com.project.atlas.viewModels.RouteViewModel
 @Composable
 fun ActionLocationView(
     onDismiss: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
     viewModel: LocationsViewModel,
     location: Location,
     routeViewModel: RouteViewModel,
@@ -65,6 +66,9 @@ fun ActionLocationView(
             EditLocationView(
                 onDismiss = {
                     onDismiss()
+                },
+                onEdit = {
+                    onEdit()
                 },
                 viewModel,
                 location
@@ -114,7 +118,7 @@ fun ActionLocationView(
                             viewModel.removeLocation(
                                 location
                             )
-                            Log.d("locations", "Removed")
+                            onDelete()
                             onDismiss()
                         },
                         colors = ButtonDefaults.buttonColors(

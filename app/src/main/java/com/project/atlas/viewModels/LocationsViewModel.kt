@@ -24,9 +24,14 @@ class LocationsViewModel : ViewModel() {
     }
 
     fun addLocation(lat: Double, lon: Double, alias: String) {
+        //Comprobar latitud y longitud
+        if (abs(lat) > 90.0 || abs(lon) > 180.0) {
+            throw IllegalArgumentException()
+        }
+
         //Realizar corutina
-        viewModelScope.launch {
-            //Conseguir latitud y longitud de la API
+        viewModelScope.launch() {
+            //Conseguir topónimo de la API
             val toponym =
                 ApiClient.fetchToponymByLatLong(
                     "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
@@ -49,7 +54,6 @@ class LocationsViewModel : ViewModel() {
                 toponym
             ) { lat, lon, topo ->
                 addLocation(lat, lon, topo)
-                Log.d("location", "Nueva ubicación agregada: $topo")
             }
         } else {
             Log.e("location", "No se encontraron resultados en la geocodificación.")
