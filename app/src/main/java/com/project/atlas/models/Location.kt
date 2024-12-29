@@ -5,7 +5,7 @@ class Location() {
     var lon: Double = 0.0
     var alias: String = ""
     var toponym: String = ""
-    var favourite: Boolean = false
+    var isFavourite: Boolean = false
 
     constructor (lat: Double, lon: Double, alias: String, toponym: String) : this() {
         this.lat = lat
@@ -15,6 +15,6 @@ class Location() {
     }
 
     fun changeFavourite(){
-        favourite = !favourite
+        isFavourite = !isFavourite
     }
 }
