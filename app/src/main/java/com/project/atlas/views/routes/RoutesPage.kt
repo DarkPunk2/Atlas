@@ -129,7 +129,7 @@ fun ListRoute(
             )
         },
         content = { paddingValues ->
-            val loadingTimeoutMillis = 20000L // 20 segundos
+            val loadingTimeoutMillis = 5000L  // 5 segundos
             var showLoading by remember { mutableStateOf(true) }
 
             LaunchedEffect(key1 = routeList) {

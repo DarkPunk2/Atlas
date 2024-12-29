@@ -16,6 +16,7 @@ import com.project.atlas.models.UserModel
 import com.project.atlas.services.AuthService
 import com.project.atlas.services.FireBaseAuthService
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class UserViewModel : ViewModel() {
     private val _authState = MutableLiveData<AuthState>()
@@ -36,7 +37,7 @@ class UserViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                authService.createUser(email, password)
+                authService.createUser(email.lowercase(Locale.getDefault()), password)
                 _authState.value = UserModel.getAuthState()
             } catch (inPass: IncorrectPasswordException) {
                 _authState.value = AuthState.Error(inPass.message.toString())
@@ -55,7 +56,7 @@ class UserViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                authService.loginUser(email, password)
+                authService.loginUser(email.lowercase(Locale.getDefault()), password)
                 _authState.value = UserModel.getAuthState()
             } catch (inPass: IncorrectPasswordException) {
                 _authState.value = AuthState.Error(inPass.message.toString())
