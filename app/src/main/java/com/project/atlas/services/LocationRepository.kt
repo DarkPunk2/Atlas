@@ -1,6 +1,5 @@
 package com.project.atlas.services
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
@@ -16,13 +15,15 @@ class LocationRepository {
         val dbLocation = hashMapOf(
             "lat" to location.lat,
             "lon" to location.lon,
-            "alias" to location.alias
+            "alias" to location.alias,
+            "toponym" to location.toponym,
+            "favourite" to location.isFavourite
         )
 
         db.collection("users")
             .document(UserModel.eMail)
             .collection("locations")
-            .document(location.alias)
+            .document(location.toponym)
             .set(dbLocation)
             .addOnSuccessListener { documentReference ->
                 Log.d("Firestore", "DocumentSnapshot added with ID: ${location.alias}")
@@ -61,23 +62,25 @@ class LocationRepository {
         db.collection("users")
             .document(UserModel.eMail)
             .collection("locations")
-            .document(location.alias)
+            .document(location.toponym)
             .delete()
             .addOnSuccessListener { Log.d("Firestore", "DocumentSnapshot successfully deleted!") }
             .addOnFailureListener { e -> Log.w("Firestore", "Error deleting document", e) }
     }
 
-    fun updateLocation(location: Location, lat: Double, lon: Double, alias: String) {
+    fun updateLocation(location: Location, lat: Double, lon: Double, alias: String, toponym: String, favourite: Boolean) {
         val dbLocation = hashMapOf(
             "lat" to lat,
             "lon" to lon,
-            "alias" to alias
+            "alias" to alias,
+            "toponym" to toponym,
+            "favourite" to favourite
         )
 
         db.collection("users")
             .document(UserModel.eMail)
             .collection("locations")
-            .document(location.alias)
+            .document(location.toponym)
             .update(dbLocation as Map<String, Any>)
             .addOnSuccessListener {
                 Log.d("Firestore", "Ubicación actualizada correctamente")
@@ -85,5 +88,9 @@ class LocationRepository {
             .addOnFailureListener { e ->
                 Log.e("Firestore", "Error al actualizar la ubicación", e)
             }
+    }
+
+    fun setFavourite(location: Location, value: Boolean) {
+        updateLocation(location, location.lat, location.lon, location.alias, location.toponym, value)
     }
 }

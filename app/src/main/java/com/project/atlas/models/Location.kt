@@ -7,6 +7,14 @@ class Location() {
     var toponym: String = ""
     var isFavourite: Boolean = false
 
+    constructor (lat: Double, lon: Double, alias: String, toponym: String, favourite: Boolean) : this() {
+        this.lat = lat
+        this.lon = lon
+        this.alias = alias
+        this.toponym = toponym
+        this.isFavourite = favourite
+    }
+
     constructor (lat: Double, lon: Double, alias: String, toponym: String) : this() {
         this.lat = lat
         this.lon = lon

@@ -106,7 +106,7 @@ class LocationsViewModel : ViewModel() {
         if (alias != location.alias) {
             newAlias = alias
         }
-        locationRepository.updateLocation(location, lat, lon, newAlias)
+        locationRepository.updateLocation(location, lat, lon, newAlias, location.toponym, location.isFavourite)
         location.lat = lat
         location.lon = lon
         location.alias = newAlias
@@ -116,6 +116,8 @@ class LocationsViewModel : ViewModel() {
         if(locationsList.contains(location)){
             location.changeFavourite()
             locationsList.sortWith(compareByDescending { it.isFavourite })
+
+            locationRepository.setFavourite(location, location.isFavourite)
         }
         else throw IllegalArgumentException()
     }
