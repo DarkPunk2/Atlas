@@ -18,10 +18,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.project.atlas.models.Location
@@ -30,12 +28,13 @@ import com.project.atlas.viewModels.LocationsViewModel
 @Composable
 fun EditLocationView(
     onDismiss: () -> Unit,
+    onEdit: () -> Unit,
     viewModel: LocationsViewModel,
     location: Location
 ) {
     val lats = remember { mutableStateOf(location.lat.toString()) }
     val lons = remember { mutableStateOf(location.lon.toString()) }
-    val alias = remember { mutableStateOf(location.alias.toString()) }
+    val alias = remember { mutableStateOf(location.alias) }
     val focusRequester = FocusRequester()
 
     LaunchedEffect(Unit) {
@@ -93,6 +92,7 @@ fun EditLocationView(
                         lons.value.toDouble(),
                         alias.value
                     )
+                    onEdit()
                     onDismiss()
                 }) {
                 Text("Save location")
