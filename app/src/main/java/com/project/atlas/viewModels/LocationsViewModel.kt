@@ -107,4 +107,8 @@ class LocationsViewModel : ViewModel() {
         location.lon = lon
         location.alias = newAlias
     }
+
+    fun makeFavourite(location: Location) {
+
+    }
 }

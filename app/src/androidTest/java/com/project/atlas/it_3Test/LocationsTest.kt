@@ -117,4 +117,33 @@ class LocationsTest {
 
         //Then
     }
+
+    @Test //Make location favourite correctly
+    fun H23_1P1Test(){
+        //Given
+        val location1 = Location(40.0, 0.0, "Parque", "Castellón")
+        locationsViewModel.addLocation(location1)
+
+        val location2 = Location(41.0, 1.0, "Museo", "Castellón")
+        locationsViewModel.addLocation(location2)
+
+        //When
+        locationsViewModel.makeFavourite(location2)
+
+        //Then
+        assertEquals(locationsViewModel.getLocation(0), location2)
+        assertEquals(location2.favourite, true)
+    }
+
+    //Make a location that is not in list favourite
+    @Test(expected = IllegalArgumentException::class)
+    fun H23_1P3Test(){
+        //Given
+        val location1 = Location(40.0, 0.0, "Parque", "Castellón")
+
+        //When
+        locationsViewModel.makeFavourite(location1)
+
+        //Then
+    }
 }
