@@ -5,15 +5,22 @@ import Diesel
 import Electricity
 import Petrol98
 import android.annotation.SuppressLint
+import android.content.Context
+import androidx.core.content.ContentProviderCompat.requireContext
+import com.project.atlas.MainActivity
 import com.project.atlas.exceptions.VehicleWrongBusinessRulesException
 import com.project.atlas.interfaces.EnergyType
 import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.interfaces.VehicleInterface
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.models.VehicleType
+import kotlinx.coroutines.flow.Flow
 
 
 class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInterface {
+
+    private val localDefaultVehicleService = LocalDefaultVehicleService
+
     override suspend fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
         checkBusinessRules(vehicle)
         return dbService.addVehicle(user, vehicle)
@@ -42,6 +49,10 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
         return dbService.checkForDuplicates(user, vehicleAlias)
     }
 
+    fun checkForDuplicatesOffline(vehicleList: List<VehicleModel>, vehicleAlias: String): Boolean {
+        return vehicleList.any { vehicle -> vehicle.alias == vehicleAlias }
+    }
+
     override suspend fun deleteAll(user: String): Boolean {
         return dbService.deleteAll(user)
     }
@@ -51,19 +62,32 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
     }
 
     override suspend fun checkForVehicles(user:String): Boolean {
-    return dbService.checkForVehicles(user)
-}
+        return dbService.checkForVehicles(user)
+    }
 
     override suspend fun setDefaultVehicle(user: String, vehicle: VehicleModel): Boolean {
-        return dbService.setDefaultVehicle(user, vehicle)
+        if (dbService.setDefaultVehicle(user, vehicle)){
+            return true
+        }
+        localDefaultVehicleService.saveDefaultVehicle(vehicle)
+        return false
     }
 
     override suspend fun getDefaultVehicle(user: String): VehicleModel? {
-        return dbService.getDefaultVehicle(user)
+        val vehicle = dbService.getDefaultVehicle(user)
+        if (vehicle == null) {
+            return localDefaultVehicleService.getDefaultVehicle()
+        }
+        return vehicle
     }
 
     override suspend fun deleteDefaultVehicle(user: String): Boolean {
+        localDefaultVehicleService.removeDefaultVehicle()
         return dbService.deleteDefaultVehicle(user)
+    }
+
+    override fun observeVehicles(user: String): Flow<List<VehicleModel>> {
+        return dbService.observeVehicles(user)
     }
 
     @SuppressLint("SuspiciousIndentation")
