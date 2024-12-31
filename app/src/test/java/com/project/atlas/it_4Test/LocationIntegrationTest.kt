@@ -1,7 +1,10 @@
 package com.project.atlas.it_4Test
 
+import android.util.Log
+import com.project.atlas.interfaces.LocationRepositoryInterface
 import com.project.atlas.models.Location
-import com.project.atlas.models.UserModel
+import com.project.atlas.repositories.LocationRepository
+import com.project.atlas.services.ApiClient
 import com.project.atlas.viewModels.LocationsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -10,24 +13,31 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
 
-class LocationsTest {
-
+class LocationIntegrationTest {
+    private lateinit var mockRepository: LocationRepositoryInterface
     private lateinit var locationsViewModel: LocationsViewModel
+    private lateinit var mockApiClient: ApiClient
 
-    val coroutineTestWaitTime: Long = 2000
+
+    val coroutineTestWaitTime: Long = 100
 
     @Before
     fun startup() {
-        UserModel.setMail("locations@test.test")
-        locationsViewModel = LocationsViewModel()
-        UserModel.setMail("locations@test.com")
+        mockApiClient = mock(ApiClient::class.java)
+        mockRepository = mock(LocationRepositoryInterface::class.java)
 
+        locationsViewModel = LocationsViewModel(mockRepository)
+        locationsViewModel.locationsApi = mockApiClient
     }
 
     @Test
     fun H7P1Test() = runBlocking {
         //Given
+        `when`(mockApiClient.fetchToponymByLatLong(any(), any(), any())).thenReturn("Castellon")
 
         //When
         locationsViewModel.addLocation(45.0, 25.0, "Parque")
@@ -44,7 +54,8 @@ class LocationsTest {
         //Given
 
         //When
-        locationsViewModel.addLocation(100.0, 100.0, "Marte")
+        val location = Location(100.0, 100.0, "Parque", "Castellón")
+        locationsViewModel.addLocation(location)
 
         //Then
     }
@@ -52,9 +63,13 @@ class LocationsTest {
     @Test
     fun H8P1Test() = runBlocking {
         //Given
+        `when`(mockApiClient.fetchToponymByLatLong(any(), any(), any())).thenReturn("Castellon")
 
         //When
-        locationsViewModel.addLocation(40.0, 0.0, "Parque")
+        locationsViewModel.addLocation(45.0, 25.0, "Parque")
+
+        `when`(mockApiClient.fetchToponymByLatLong(any(), any(), any())).thenReturn("Barcelona")
+
         locationsViewModel.addLocation(41.0, 1.0, "Museo")
 
         delay(coroutineTestWaitTime)
@@ -78,11 +93,14 @@ class LocationsTest {
     @Test
     fun H9P1Test() = runBlocking {
         //Given
-        locationsViewModel.addLocation(40.0, 0.0, "Parque")
+        `when`(mockApiClient.fetchToponymByLatLong(any(), any(), any())).thenReturn("Castellon")
+
+        //When
+        locationsViewModel.addLocation(45.0, 25.0, "Parque")
+
         delay(coroutineTestWaitTime)
 
         val location = locationsViewModel.getLocation(0)
-        //When
         locationsViewModel.updateLocation(location, "Parque Actualizado")
 
         //Then
@@ -92,11 +110,14 @@ class LocationsTest {
     @Test(expected = IllegalArgumentException::class)
     fun H9P2Test() = runBlocking {
         //Given
-        locationsViewModel.addLocation(40.0, 0.0, "Parque")
+        `when`(mockApiClient.fetchToponymByLatLong(any(), any(), any())).thenReturn("Castellon")
+
+        //When
+        locationsViewModel.addLocation(45.0, 25.0, "Parque")
+
         delay(coroutineTestWaitTime)
 
         val location = locationsViewModel.getLocation(0)
-        //When
         locationsViewModel.updateLocation(location, 100.0, 100.0)
 
         //Then
@@ -105,10 +126,13 @@ class LocationsTest {
     @Test
     fun H10P1Test() = runBlocking {
         //Given
-        locationsViewModel.addLocation(40.0, 0.0, "Parque")
+        `when`(mockApiClient.fetchToponymByLatLong(any(), any(), any())).thenReturn("Castellon")
+        locationsViewModel.addLocation(45.0, 25.0, "Parque")
+
         delay(coroutineTestWaitTime)
 
         val location = locationsViewModel.getLocation(0)
+
         //When
         locationsViewModel.removeLocation(location)
 
@@ -119,10 +143,10 @@ class LocationsTest {
     @Test(expected = IllegalStateException::class)
     fun H10P2Test() {
         //Given
-        val location1 = Location(40.0, 0.0, "Parque", "Castellón")
+        val location = Location(40.0, 0.0, "Parque", "Castellón")
 
         //When
-        locationsViewModel.removeLocation(location1)
+        locationsViewModel.removeLocation(location)
 
         //Then
     }
@@ -130,7 +154,10 @@ class LocationsTest {
     @Test //Make location favourite correctly
     fun H23_1P1Test() = runBlocking {
         //Given
+        `when`(mockApiClient.fetchToponymByLatLong(any(), any(), any())).thenReturn("Castellon")
         locationsViewModel.addLocation(45.0, 25.0, "Parque")
+
+        `when`(mockApiClient.fetchToponymByLatLong(any(), any(), any())).thenReturn("Barcelona")
         locationsViewModel.addLocation(41.0, 1.0, "Museo")
 
         delay(coroutineTestWaitTime)

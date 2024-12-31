@@ -5,16 +5,19 @@ import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.atlas.interfaces.LocationRepositoryInterface
 import com.project.atlas.models.Location
 import com.project.atlas.services.ApiClient
-import com.project.atlas.services.LocationRepository
+import com.project.atlas.repositories.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-class LocationsViewModel : ViewModel() {
+class LocationsViewModel(
+    private val locationRepository: LocationRepositoryInterface = LocationRepository()
+) : ViewModel() {
     private val locationsList = SnapshotStateList<Location>()
-    private val locationRepository = LocationRepository()
+    var locationsApi = ApiClient
 
     fun addLocation(location: Location) {
         if (abs(location.lat) > 90.0 || abs(location.lon) > 180.0) {
@@ -30,10 +33,10 @@ class LocationsViewModel : ViewModel() {
         }
 
         //Realizar corutina
-        viewModelScope.launch() {
+        viewModelScope.launch(Dispatchers.IO) {
             //Conseguir topónimo de la API
             val toponym =
-                ApiClient.fetchToponymByLatLong(
+                locationsApi.fetchToponymByLatLong(
                     "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                     lat.toString(),
                     lon.toString()
@@ -49,7 +52,7 @@ class LocationsViewModel : ViewModel() {
 
     fun addLocation(toponym: String) {
         if (toponym.isNotEmpty()) {
-            ApiClient.fetchGeocode(
+            locationsApi.fetchGeocode(
                 "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                 toponym
             ) { lat, lon, topo ->

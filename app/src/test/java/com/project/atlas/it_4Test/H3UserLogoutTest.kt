@@ -32,6 +32,7 @@ class H3UserLogoutTest {
         assertEquals("", UserModel.eMail)
         assertEquals(AuthState.Unauthenticated,UserModel.getAuthState())
     }
+
     @Test(expected= SessionNotFoundException::class)
     fun h3P2Test() {
         //Given

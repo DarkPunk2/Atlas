@@ -1,17 +1,18 @@
-package com.project.atlas.services
+package com.project.atlas.repositories
 
 import android.util.Log
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.project.atlas.interfaces.LocationRepositoryInterface
 import com.project.atlas.models.Location
 import com.project.atlas.models.UserModel
 import kotlinx.coroutines.tasks.await
 
-class LocationRepository {
+class LocationRepository : LocationRepositoryInterface {
     val db = Firebase.firestore
 
-    fun addLocation(location: Location){
+    override fun addLocation(location: Location){
         val dbLocation = hashMapOf(
             "lat" to location.lat,
             "lon" to location.lon,
@@ -33,7 +34,7 @@ class LocationRepository {
             }
     }
 
-    suspend fun getAllLocations(): List<Location> {
+    override suspend fun getAllLocations(): List<Location> {
         val locationsList = mutableListOf<Location>()
         try {
             val result: QuerySnapshot = db.collection("users")
@@ -58,7 +59,7 @@ class LocationRepository {
         return locationsList
     }
 
-    fun deleteLocation(location: Location){
+    override fun deleteLocation(location: Location){
         db.collection("users")
             .document(UserModel.eMail)
             .collection("locations")
@@ -68,7 +69,7 @@ class LocationRepository {
             .addOnFailureListener { e -> Log.w("Firestore", "Error deleting document", e) }
     }
 
-    fun updateLocation(location: Location, lat: Double, lon: Double, alias: String, toponym: String, favourite: Boolean) {
+    override fun updateLocation(location: Location, lat: Double, lon: Double, alias: String, toponym: String, favourite: Boolean) {
         val dbLocation = hashMapOf(
             "lat" to lat,
             "lon" to lon,
@@ -90,7 +91,7 @@ class LocationRepository {
             }
     }
 
-    fun setFavourite(location: Location, value: Boolean) {
+    override fun setFavourite(location: Location, value: Boolean) {
         updateLocation(location, location.lat, location.lon, location.alias, location.toponym, value)
     }
 }
