@@ -125,19 +125,6 @@ fun listVehicle(
         },
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.popBackStack()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go Back",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
                 title = { Text("Vehicle List") },
                 actions = {
                     IconButton(onClick = { showAddForm = true }) {
@@ -207,6 +194,14 @@ fun listVehicle(
                                     showSnackbar = true
                                               },
                                 default = defaultVehicle?.alias?:"" == vehicle.alias,
+                                onDefaultDelete = {
+                                    vehicleViewModel.deleteDefaultVehicle()
+                                    vehicleViewModel.refreshDefaultVehicle()
+                                    snackbarMessage = "Vehicle ${vehicle.alias} is now unset as your default vehicle"
+                                    snackbarColor = AtlasGold
+                                    showDetails = null
+                                    showSnackbar = true
+                                },
                                 modifier = Modifier.animateContentSize()
                             )
                         }
@@ -631,8 +626,10 @@ fun VehicleItem(
     onClick: () -> Unit,
     onFavourite: () -> Unit,
     default: Boolean,
+    onDefaultDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showSetDefaultConfirmation by remember { mutableStateOf(false) }
     AtlasTheme(ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
         dynamicColor = false) {
         val launched = remember { mutableStateOf(false) }
@@ -695,7 +692,7 @@ fun VehicleItem(
                     // Ícono para marcar como predeterminado
                     if (default) {
                         IconButton(
-                            onClick = {}
+                            onClick = {showSetDefaultConfirmation = true}
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Star,
@@ -730,6 +727,32 @@ fun VehicleItem(
                 }
             }
         }
+    }
+    if (showSetDefaultConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showSetDefaultConfirmation = false },
+            title = {Text("Unset as Default")},
+            text = {Text("Are you sure you want to unset this vehicle as your default?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDefaultDelete()
+                        showSetDefaultConfirmation = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AtlasGold)
+                ) {
+                    Text(text = "Confirm")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showSetDefaultConfirmation = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                ) {
+                    Text(text = "Cancel", color = Color.Black)
+                }
+            }
+        )
     }
 }
 
