@@ -1,6 +1,7 @@
 package com.project.atlas
 
 import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -25,9 +26,14 @@ class MainActivity : ComponentActivity() {
     private lateinit var mapService: MapService
     private lateinit var mapViewModel: MapViewModel
 
+    companion object {
+        lateinit var appContext: Context
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
+        appContext = applicationContext
+
         enableEdgeToEdge()
         val userViewModel: UserViewModel by viewModels()
 
