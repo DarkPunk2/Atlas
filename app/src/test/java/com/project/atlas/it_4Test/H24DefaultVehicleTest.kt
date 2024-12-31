@@ -7,12 +7,14 @@ import com.project.atlas.models.VehicleModel
 import com.project.atlas.models.VehicleType
 import com.project.atlas.services.VehicleDatabaseService
 import com.project.atlas.services.VehicleService
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
@@ -29,38 +31,40 @@ class H24DefaultVehicleTest {
     }
 
     @Test
-    fun integrationTest1(){
-        // Given - vehículo en lista y sin vehículo por defecto definido (se pasa Walk por defecto)
+    fun integrationTest1() = runBlocking {
+        // Given - vehículo en lista y sin vehículo por defecto definido
         val vehicle = VehicleModel("Mi buga", VehicleType.Car, Petrol95(), 7.9)
-        var vehicleList: List<VehicleModel> = emptyList()
+        val vehicleList = mutableListOf<VehicleModel>()
 
-        runBlocking {
-            `when`(mockDbService.addVehicle(user, vehicle)).thenReturn(true)
-            `when`(mockDbService.checkForVehicles(user)).thenReturn(true)
-            `when`(mockDbService.listVehicle(user)).thenReturn(listOf(vehicle))
+        `when`(mockDbService.addVehicle(user, vehicle)).thenReturn(true)
+        `when`(mockDbService.checkForVehicles(user)).thenReturn(true)
+        `when`(mockDbService.listVehicle(user)).thenReturn(listOf(vehicle))
 
-            service.addVehicle(user, vehicle)
-            vehicleList = service.listVehicle(user)!!
-        }
+        service.addVehicle(user, vehicle)
+        vehicleList.addAll(service.listVehicle(user)!!)
+
         assertFalse(vehicleList.isEmpty())
-        var default : VehicleModel? = null
-        runBlocking {
-            `when`(mockDbService.getDefaultVehicle(user)).thenReturn(null)
-            default = service.getDefaultVehicle(user)
-        }
+
+        // When - no hay vehículo por defecto definido
+        `when`(mockDbService.getDefaultVehicle(user)).thenReturn(null)
+
+        var default = service.getDefaultVehicle(user)
         assertNull(default)
+
         // When - se marca por defecto el vehículo "Mi buga"
-        runBlocking {
-            `when`(mockDbService.setDefaultVehicle(user, vehicle)).thenReturn(true)
-            `when`(mockDbService.getDefaultVehicle(user)).thenReturn(vehicle)
-            assertTrue(service.setDefaultVehicle(user, vehicle))
-            default = service.getDefaultVehicle(user)
-        }
-        //Then - el vehículo "Mi buga" es el vehículo por defecto
-        assertTrue(default!!.alias.equals(vehicle.alias))
-        assertTrue(default!!.type.equals((vehicle.type)))
-        assertTrue(default!!.energyType!!.typeName.equals(vehicle.energyType!!.typeName))
-        assertTrue(default!!.consumption == vehicle.consumption)
+        doReturn(null).`when`(mockDbService).getDefaultVehicle(user)
+        `when`(mockDbService.setDefaultVehicle(user, vehicle)).thenReturn(true)
+
+        val success = service.setDefaultVehicle(user, vehicle)
+        assertTrue(success)
+
+        doReturn(vehicle).`when`(mockDbService).getDefaultVehicle(user)
+        // Then - el vehículo "Mi buga" es el vehículo por defecto
+        default = service.getDefaultVehicle(user)
+        assertEquals(vehicle.alias, default?.alias)
+        assertEquals(vehicle.type, default?.type)
+        assertEquals(vehicle.energyType?.typeName, default?.energyType?.typeName)
+        assertEquals(vehicle.consumption, default?.consumption)
     }
 
     @Test
@@ -79,12 +83,14 @@ class H24DefaultVehicleTest {
         assertFalse(vehicleList.isEmpty())
         var default : VehicleModel? = null
         runBlocking {
+            doReturn(null).`when`(mockDbService).getDefaultVehicle(user)
             `when`(mockDbService.setDefaultVehicle(user, vehicle)).thenReturn(true)
-            `when`(mockDbService.getDefaultVehicle(user)).thenReturn(vehicle)
-
             assertTrue(service.setDefaultVehicle(user, vehicle))
+
+            doReturn(vehicle).`when`(mockDbService).getDefaultVehicle(user)
             default = service.getDefaultVehicle(user)
         }
+
         assertTrue(default!!.alias.equals(vehicle.alias))
         assertTrue(default!!.type.equals((vehicle.type)))
         assertTrue(default!!.energyType!!.typeName.equals(vehicle.energyType!!.typeName))
@@ -114,10 +120,11 @@ class H24DefaultVehicleTest {
         assertFalse(vehicleList.isEmpty())
         var default : VehicleModel? = null
         runBlocking {
+            doReturn(null).`when`(mockDbService).getDefaultVehicle(user)
             `when`(mockDbService.setDefaultVehicle(user, vehicle)).thenReturn(true)
-            `when`(mockDbService.getDefaultVehicle(user)).thenReturn(vehicle)
-
             assertTrue(service.setDefaultVehicle(user, vehicle))
+
+            doReturn(vehicle).`when`(mockDbService).getDefaultVehicle(user)
             default = service.getDefaultVehicle(user)
         }
         vehicle.alias = newAlias

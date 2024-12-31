@@ -66,23 +66,20 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
     }
 
     override suspend fun setDefaultVehicle(user: String, vehicle: VehicleModel): Boolean {
+        var vehicleDefault : VehicleModel? = getDefaultVehicle(user)
+        if( vehicleDefault != null && vehicleDefault!!.alias == vehicle.alias) return false
         if (dbService.setDefaultVehicle(user, vehicle)){
             return true
         }
-        localDefaultVehicleService.saveDefaultVehicle(vehicle)
         return false
     }
 
     override suspend fun getDefaultVehicle(user: String): VehicleModel? {
         val vehicle = dbService.getDefaultVehicle(user)
-        if (vehicle == null) {
-            return localDefaultVehicleService.getDefaultVehicle()
-        }
         return vehicle
     }
 
     override suspend fun deleteDefaultVehicle(user: String): Boolean {
-        localDefaultVehicleService.removeDefaultVehicle()
         return dbService.deleteDefaultVehicle(user)
     }
 
