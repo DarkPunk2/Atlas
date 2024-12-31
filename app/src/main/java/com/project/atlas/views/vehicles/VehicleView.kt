@@ -245,6 +245,7 @@ fun listVehicle(
             default = defaultVehicle?.alias?:"" == vehicle.alias,
             onDefaultAdd = {
                 vehicleViewModel.setDefaultVehicle(vehicle)
+                vehicleViewModel.refreshDefaultVehicle()
                 var message: String = if(defaultVehicle != null)
                             "Vehicle ${vehicle.alias} now set as your default vehicle (previously set ${defaultVehicle?.alias})"
                             else "Vehicle ${vehicle.alias} now set as your default vehicle"
@@ -255,6 +256,7 @@ fun listVehicle(
                            },
             onDefaultDelete = {
                 vehicleViewModel.deleteDefaultVehicle()
+                vehicleViewModel.refreshDefaultVehicle()
                 snackbarMessage = "Vehicle ${vehicle.alias} is now unset as your default vehicle"
                 snackbarColor = AtlasGold
                 showDetails = null
