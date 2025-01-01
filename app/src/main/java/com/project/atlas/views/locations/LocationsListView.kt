@@ -176,6 +176,11 @@ fun LocationsListView(
                 }
             )
         },
+        bottomBar = {
+            BottomAppBar {
+                NavigationMenu(navController, 1)
+            }
+        },
         content = { paddingValues ->
             Box {
                 Column(
@@ -205,9 +210,6 @@ fun LocationsListView(
                             )
                         }
                     }
-                }
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    NavigationMenu(navController, 1)
                 }
             }
         },

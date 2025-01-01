@@ -20,13 +20,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -60,7 +60,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.interfaces.EnergyType
@@ -133,6 +132,11 @@ fun listVehicle(
                 }
             )
         },
+        bottomBar = {
+            BottomAppBar {
+                NavigationMenu(navController, 2)
+            }
+        },
         content = { paddingValues ->
             val loadingTimeoutMillis = 20000L // 20 segundos
             var showLoading by remember { mutableStateOf(true) }
@@ -150,10 +154,7 @@ fun listVehicle(
                 modifier = Modifier
                     .fillMaxSize() // Ocupa todo el espacio disponible en la pantalla
                     .padding(
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        top = paddingValues.calculateTopPadding(),
-                        end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        bottom = 0.dp
+                        paddingValues
                     )
             ) {
                 if (showLoading) {
@@ -193,7 +194,7 @@ fun listVehicle(
                                     snackbarColor = AtlasGreen
                                     showSnackbar = true
                                               },
-                                default = defaultVehicle?.alias?:"" == vehicle.alias,
+                                default = (defaultVehicle?.alias ?: "") == vehicle.alias,
                                 onDefaultDelete = {
                                     vehicleViewModel.deleteDefaultVehicle()
                                     vehicleViewModel.refreshDefaultVehicle()
@@ -206,12 +207,6 @@ fun listVehicle(
                             )
                         }
                     }
-                }
-                Box(modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                ) {
-                    NavigationMenu(navController, 2)
                 }
             }
         }
@@ -237,11 +232,11 @@ fun listVehicle(
                 showDetails = null
                 showSnackbar = true
             },
-            default = defaultVehicle?.alias?:"" == vehicle.alias,
+            default = (defaultVehicle?.alias ?: "") == vehicle.alias,
             onDefaultAdd = {
                 vehicleViewModel.setDefaultVehicle(vehicle)
                 vehicleViewModel.refreshDefaultVehicle()
-                var message: String = if(defaultVehicle != null)
+                val message: String = if(defaultVehicle != null)
                             "Vehicle ${vehicle.alias} now set as your default vehicle (previously set ${defaultVehicle?.alias})"
                             else "Vehicle ${vehicle.alias} now set as your default vehicle"
                 snackbarMessage = message
@@ -427,7 +422,7 @@ fun EditVehicleDialog(
     var selectedEnergyType by remember { mutableStateOf(vehicle.energyType) }
     var consumption by remember { mutableStateOf(vehicle.consumption.toString()) }
 
-    val energyOptions = when (selectedType?.name) {
+    val energyOptions = when (selectedType.name) {
         "Car", "Bike" -> listOf(Petrol95(), Petrol98(), Diesel(), Electricity())
         "Scooter" -> listOf(Electricity())
         else -> emptyList()
@@ -445,12 +440,8 @@ fun EditVehicleDialog(
         }
     }
 
-    val isValid = alias!!.isNotBlank() &&
-            selectedType != null &&
-            selectedEnergyType != null &&
-            consumption.toDoubleOrNull()?.let { it > 0 } == true &&
-            (alias == vehicle.alias || vehicleList.none { it.alias == alias })
-            && !vehicle.equals(VehicleModel(alias, selectedType,selectedEnergyType, consumption.toDouble()))
+    val isValid =
+        alias!!.isNotBlank() && selectedEnergyType != null && consumption.toDoubleOrNull()?.let { it > 0 } == true && (alias == vehicle.alias || vehicleList.none { it.alias == alias }) && !vehicle.equals(VehicleModel(alias, selectedType,selectedEnergyType, consumption.toDouble()))
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -560,7 +551,8 @@ fun EditVehicleDialog(
             confirmButton = {
                 Button(
                     onClick = {
-                        onConfirm(alias!!, selectedType!!, selectedEnergyType!!, consumption.toDouble(), vehicle.favourite)
+                        onConfirm(alias!!,
+                            selectedType, selectedEnergyType!!, consumption.toDouble(), vehicle.favourite)
                         showConfirmationDialog = false
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)

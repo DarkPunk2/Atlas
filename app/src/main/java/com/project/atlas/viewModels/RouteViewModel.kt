@@ -67,17 +67,6 @@ class RouteViewModel: ViewModel() {
     private val routeService = RouteService(RouteDatabaseService())
     private val vehicleService = VehicleService(VehicleDatabaseService())
 
-    init {
-        viewModelScope.launch {
-            try {
-                _routeTypeState.value = routeService.getDefaultRouteType()
-                defaultVehicle()
-            }catch (_: Exception){
-                _routeTypeState.value = null
-            }
-
-        }
-    }
 
     fun createRute(start: Location?, end: Location?, vehicle: VehicleModel?, routeType: RouteType?) {
         if (start != null && end != null && routeType != null) {
@@ -103,7 +92,21 @@ class RouteViewModel: ViewModel() {
 
     fun defaultVehicle(){
         viewModelScope.launch {
-            _vehicleDefaut.value = vehicleService.getDefaultVehicle(UserModel.eMail)
+            try {
+                _vehicleDefaut.value = vehicleService.getDefaultVehicle(UserModel.eMail)
+            }catch (_: Exception){
+                _vehicleDefaut.value = null
+            }
+        }
+    }
+
+    fun defaultRouteType(){
+        viewModelScope.launch {
+            try {
+                _routeTypeState.value = routeService.getDefaultRouteType()
+            }catch (_: Exception){
+                _routeTypeState.value = null
+            }
         }
     }
 

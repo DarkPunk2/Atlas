@@ -53,6 +53,7 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
 
     LaunchedEffect(Unit) {
         routeViewModel.defaultVehicle()
+        routeViewModel.defaultRouteType()
     }
 
     LaunchedEffect(errorState.value) {

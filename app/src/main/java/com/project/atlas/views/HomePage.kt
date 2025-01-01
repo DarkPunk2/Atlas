@@ -59,6 +59,10 @@ fun HomePage(
         }
     }
 
+    LaunchedEffect(Unit) {
+        routeViewModel.defaultRouteType()
+    }
+
     BackHandler(enabled = drawerState.isOpen) {
         scope.launch { drawerState.close() }
     }
