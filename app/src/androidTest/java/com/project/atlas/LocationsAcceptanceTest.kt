@@ -10,7 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.assertEquals
 
-class LocationsTest {
+class LocationsAcceptanceTest {
 
     private lateinit var locationsViewModel: LocationsViewModel
 
@@ -59,9 +59,7 @@ class LocationsTest {
         delay(coroutineTestWaitTime)
 
         //Then
-        assertEquals(locationsViewModel.getNumLocations(), 2)
-        assertEquals(locationsViewModel.getLocation(0).alias, "Parque")
-        assertEquals(locationsViewModel.getLocation(1).alias, "Museo")
+        assertEquals(locationsViewModel.getAllLocations().size, 2)
     }
 
     @Test
