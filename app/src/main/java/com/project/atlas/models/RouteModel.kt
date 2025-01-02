@@ -12,8 +12,13 @@ data class RouteModel(val id: String = UUID.randomUUID().toString(),
                       val rute: String,
                       val bbox: List<Double>,
                       var price: Double? = null,
-                      val isFavorite: Boolean = false
-)
+                      var isFavorite: Boolean = false
+) {
+    fun changeFavourite() {
+        isFavorite = !isFavorite
+    }
+}
+
 enum class RouteType {
     FASTER,
     CHEAPER,

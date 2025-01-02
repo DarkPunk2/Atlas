@@ -19,6 +19,8 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,7 +44,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
@@ -107,19 +108,6 @@ fun ListRoute(
         },
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.navigate("home")
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go Back",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
                 title = { Text("Route List") },
                 actions = {
                     IconButton(onClick = { navController.navigate("createRute") }) {
@@ -127,6 +115,11 @@ fun ListRoute(
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomAppBar {
+                NavigationMenu(navController, 3)
+            }
         },
         content = { paddingValues ->
             val loadingTimeoutMillis = 5000L  // 5 segundos
@@ -145,10 +138,7 @@ fun ListRoute(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        top = paddingValues.calculateTopPadding(),
-                        end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        bottom = 0.dp
+                        paddingValues = paddingValues
                     )
             ) {
                 if (showLoading) {
@@ -185,15 +175,12 @@ fun ListRoute(
                                 },
                                 function = { showDetails = route },
                                 onFavoriteChanged = { isFavorite ->
-                                    routeViewModel.updateRouteFavorite(route.copy(isFavorite = isFavorite))  // Actualizamos el estado del favorito en el ViewModel
+                                    routeViewModel.updateRouteFavorite(route)  // Actualizamos el estado del favorito en el ViewModel
                                 }
                             )
                         }
                     }
 
-                }
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    NavigationMenu(navController, 3 )
                 }
             }
         }
@@ -316,10 +303,9 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit, onFa
                         }
                     ) {
                         Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = null,
-                            tint = if (isFavorite) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSecondary,
+                            imageVector = if (route.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Go Back",
+                            tint = if (route.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier.size(32.dp)
                         )
                     }

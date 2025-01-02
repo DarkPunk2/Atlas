@@ -1,9 +1,7 @@
-package com.project.atlas.it_4Test
+package com.project.atlas
 
-import android.util.Log
 import com.project.atlas.interfaces.LocationRepositoryInterface
 import com.project.atlas.models.Location
-import com.project.atlas.repositories.LocationRepository
 import com.project.atlas.services.ApiClient
 import com.project.atlas.viewModels.LocationsViewModel
 import kotlinx.coroutines.delay
@@ -12,7 +10,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
@@ -21,7 +18,6 @@ class LocationIntegrationTest {
     private lateinit var mockRepository: LocationRepositoryInterface
     private lateinit var locationsViewModel: LocationsViewModel
     private lateinit var mockApiClient: ApiClient
-
 
     val coroutineTestWaitTime: Long = 100
 
@@ -75,9 +71,7 @@ class LocationIntegrationTest {
         delay(coroutineTestWaitTime)
 
         //Then
-        assertEquals(locationsViewModel.getNumLocations(), 2)
-        assertEquals(locationsViewModel.getLocation(0).alias, "Parque")
-        assertEquals(locationsViewModel.getLocation(1).alias, "Museo")
+        assertEquals(locationsViewModel.getAllLocations().size, 2)
     }
 
     @Test

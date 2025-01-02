@@ -40,7 +40,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel,
             SignUpPage(modifier, navController, userViewModel)
         }
         composable("locations"){
-            LocationsListView(navController, routeViewModel)
+            LocationsListView(navController, routeViewModel, mapViewModel)
         }
         composable("vehicles"){
             listVehicle(modifier, navController, vehicleViewModel)
