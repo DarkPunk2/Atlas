@@ -5,7 +5,7 @@ import com.project.atlas.services.ElectricityPriceService
 import kotlinx.coroutines.runBlocking
 
 class ElectricityServiceViewModel {
-    private val electricityPriceService = ElectricityPriceService()
+    private val electricityPriceService = ElectricityPriceService
     private fun getPriceByHour(): Double {
         updatePrices()
         return electricityPriceService.getPriceByHour()
