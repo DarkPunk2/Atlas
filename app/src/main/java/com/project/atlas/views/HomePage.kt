@@ -6,8 +6,12 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
@@ -21,6 +25,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.navigation.NavController
@@ -32,6 +37,8 @@ import com.project.atlas.ui.theme.BackgroundBlack
 import com.project.atlas.viewModels.MapViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.viewModels.UserViewModel
+import com.project.atlas.views.routes.RouteItem
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -134,51 +141,58 @@ fun HomePage(
             }
         ) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    OsmdroidMapView(mapViewModel)
-                    Image(
-                        painter = painterResource(id = R.drawable.atlas_lettering_black),
-                        contentDescription = "lettering",
-                        modifier = Modifier
-                            .padding(start = 20.dp)
-                            .absolutePadding(2.dp, 6.dp, 3.dp, 3.dp)
-                            .size(100.dp),
-                        colorFilter = ColorFilter.tint(BackgroundBlack)
-                    )
-                    ExtendedFloatingActionButton(
-                        onClick = { navController.navigate("createRute") },
-                        icon = {
-                            Icon(
-                                Icons.Filled.Add,
-                                "Create Route",
-                                tint = BackgroundBlack
+                Scaffold(
+                    bottomBar = {
+                        BottomAppBar {
+                            NavigationMenu(navController, 0)
+                        }
+                    },
+                    content = { paddingValues ->
+                        Box(modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)) {
+                            OsmdroidMapView(mapViewModel)
+                            Image(
+                                painter = painterResource(id = R.drawable.atlas_lettering_black),
+                                contentDescription = "lettering",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .offset(y = (-27).dp)
+                                    .padding(start = 16.dp),
+                                colorFilter = ColorFilter.tint(BackgroundBlack)
                             )
-                        },
-                        text = { Text(text = "Create Route", color = BackgroundBlack) },
-                        containerColor = AtlasGreen,
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(bottom = 140.dp, end = 16.dp)
-                    )
-                    IconButton(
-                        onClick = {
-                            scope.launch { drawerState.open() }
-                        },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 32.dp, end = 16.dp)
-                    ) {
-                        Icon(
-                            Icons.Filled.Settings,
-                            contentDescription = "Menu",
-                            tint = BackgroundBlack
-                        )
+                            ExtendedFloatingActionButton(
+                                onClick = { navController.navigate("createRute") },
+                                icon = {
+                                    Icon(
+                                        Icons.Filled.Add,
+                                        "Create Route",
+                                        tint = BackgroundBlack
+                                    )
+                                },
+                                text = { Text(text = "Create Route", color = BackgroundBlack) },
+                                containerColor = AtlasGreen,
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(bottom = 60.dp, end = 16.dp)
+                            )
+                            IconButton(
+                                onClick = {
+                                    scope.launch { drawerState.open() }
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(end = 16.dp)
+                            ) {
+                                Icon(
+                                    Icons.Filled.Settings,
+                                    contentDescription = "Menu",
+                                    tint = BackgroundBlack
+                                )
+                            }
+                        }
                     }
-
-                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                        NavigationMenu(navController, 0)
-                    }
-                }
+                )
             }
         }
     }

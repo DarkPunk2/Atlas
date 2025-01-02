@@ -57,6 +57,17 @@ class MapViewModel(private val mapService: MapService) : ViewModel() {
         }
     }
 
+    fun goToUser(){
+        viewModelScope.launch {
+            try {
+                val user = mapService.getUserLocation()
+                if (user != null) {
+                    _markerPosition.value = GeoPoint(user.lat, user.lon)
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
     fun resetUserLocation(){
         _userLocation.value = null
     }
