@@ -47,8 +47,8 @@ class MapService(private val activity: Activity) {
                                 val myLocation = Location(
                                     lat = location.latitude,
                                     lon = location.longitude,
-                                    alias = "You",
-                                    toponym = "You"
+                                    alias = "Your location",
+                                    toponym = "Your location"
                                 )
                                 continuation.resume(myLocation)
                             } else {

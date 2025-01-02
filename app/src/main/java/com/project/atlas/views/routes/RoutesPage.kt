@@ -107,19 +107,6 @@ fun ListRoute(
         },
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.navigate("home")
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go Back",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
                 title = { Text("Route List") },
                 actions = {
                     IconButton(onClick = { navController.navigate("createRute") }) {
