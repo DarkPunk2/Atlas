@@ -5,8 +5,8 @@ import com.project.atlas.exceptions.UserNotLoginException
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.UserModel
-import com.project.atlas.services.RouteDatabaseService
-import com.project.atlas.services.RouteService
+import com.project.atlas.services.routeServicies.RouteDatabaseService
+import com.project.atlas.services.routeServicies.RouteService
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test

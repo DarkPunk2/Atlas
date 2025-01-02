@@ -14,8 +14,8 @@ import com.project.atlas.models.VehicleModel
 import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.ApiClient
 import com.project.atlas.services.FuelPriceService
-import com.project.atlas.services.RouteDatabaseService
-import com.project.atlas.services.RouteService
+import com.project.atlas.services.routeServicies.RouteDatabaseService
+import com.project.atlas.services.routeServicies.RouteService
 import com.project.atlas.services.VehicleDatabaseService
 import com.project.atlas.services.VehicleService
 import kotlinx.coroutines.launch
