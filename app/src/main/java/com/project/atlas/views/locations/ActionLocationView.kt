@@ -3,9 +3,11 @@ package com.project.atlas.views.locations
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.shrinkOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ButtonDefaults
@@ -23,6 +25,9 @@ import androidx.navigation.NavController
 import com.project.atlas.components.CustomBottomSheet
 import com.project.atlas.models.Location
 import com.project.atlas.ui.theme.AtlasDarker
+import com.project.atlas.ui.theme.AtlasGreen
+import com.project.atlas.ui.theme.AtlasRed
+import com.project.atlas.ui.theme.SnowWhite
 import com.project.atlas.viewModels.LocationsViewModel
 import com.project.atlas.viewModels.RouteViewModel
 
@@ -48,6 +53,7 @@ fun ActionLocationView(
             onDismiss()
         }
     }
+
 
     CustomBottomSheet(
         title = "Location",
@@ -90,7 +96,7 @@ fun ActionLocationView(
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Text(
-                    text = "(" + location.lat + ", " + location.lon + ")",
+                    text = location.toponym,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -98,39 +104,49 @@ fun ActionLocationView(
                     modifier = Modifier
                         .padding(8.dp)
                 )
+                Text(
+                    text = "( ${String.format("%.7f", location.lat)} , ${String.format("%.7f", location.lon)} )",
+                    style = MaterialTheme.typography.labelMedium,
+                )
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(8.dp)
+                )
 
-                Row() {
-                    FilledTonalButton(
-                        onClick = {
-                            showEditCard.value = true
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        modifier = Modifier
-                            .weight(1f)
+                if (!(routeViewModel.showStartSelect.value!! || routeViewModel.showEndSelect.value!!)) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Edit")
-                    }
-                    Spacer(modifier = Modifier.size(8.dp))
-                    FilledTonalButton(
-                        onClick = {
-                            viewModel.removeLocation(
-                                location
-                            )
-                            onDelete()
-                            onDismiss()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
-                        ),
-                        modifier = Modifier
-                            .weight(1f)
-                    ) {
-                        Text("Remove location")
+                        FilledTonalButton(
+                            onClick = {
+                                showEditCard.value = true
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AtlasDarker,
+                                contentColor = SnowWhite
+                            ),
+                        ) {
+                            Text("Edit")
+                        }
+                        FilledTonalButton(
+                            onClick = {
+                                viewModel.removeLocation(
+                                    location
+                                )
+                                onDelete()
+                                onDismiss()
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AtlasRed,
+                                contentColor = SnowWhite
+                            ),
+                        ) {
+                            Text("Remove location")
+                        }
                     }
                 }
-                Spacer(modifier = Modifier.size(10.dp))
+
                 if (routeViewModel.showStartSelect.value!!) {
                     FilledTonalButton(
                         onClick = {
@@ -140,7 +156,8 @@ fun ActionLocationView(
                             navController.popBackStack()
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AtlasDarker
+                            containerColor = AtlasGreen,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         ),
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
@@ -155,7 +172,8 @@ fun ActionLocationView(
                             navController.popBackStack()
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = AtlasDarker
+                            containerColor = AtlasGreen,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         ),
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
@@ -166,5 +184,4 @@ fun ActionLocationView(
             }
         }
     }
-
 }
