@@ -135,7 +135,6 @@ fun ActionLocationView(
                     FilledTonalButton(
                         onClick = {
                             routeViewModel.addStart(location)
-                            routeViewModel.seeSelectStart(false)
                             onDismiss()
                             navController.popBackStack()
                         },
@@ -151,7 +150,6 @@ fun ActionLocationView(
                     FilledTonalButton(
                         onClick = {
                             routeViewModel.addEnd(location)
-                            routeViewModel.seeSelectEnd(false)
                             navController.popBackStack()
                         },
                         colors = ButtonDefaults.buttonColors(

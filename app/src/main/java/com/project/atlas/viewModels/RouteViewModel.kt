@@ -178,11 +178,11 @@ class RouteViewModel: ViewModel() {
         _vehicle.value = vehicle
     }
 
-    fun addStart(start: Location){
+    fun addStart(start: Location?){
         _start.value = start
     }
 
-    fun addEnd(end: Location){
+    fun addEnd(end: Location?){
         _end.value = end
     }
 

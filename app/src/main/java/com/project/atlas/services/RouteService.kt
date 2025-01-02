@@ -1,5 +1,6 @@
 package com.project.atlas.services
 
+import com.project.atlas.exceptions.InvalidRouteException
 import com.project.atlas.exceptions.RouteAlreadyInDataBaseException
 import com.project.atlas.exceptions.RouteNotFoundException
 import com.project.atlas.exceptions.RouteTypeAlreadyAssignedException
@@ -20,6 +21,9 @@ class RouteService(private val db: RouteDatabase) {
     var consumtionService = FuelPriceService(FuelPriceRepository())
 
     suspend fun createRute(start: Location, end: Location, vehicle: VehicleModel, routeType: RouteType): RouteModel {
+        if (start.lon == end.lon && start.lat == end.lat){
+            throw InvalidRouteException("The start and end of a route cannot be the same")
+        }
         val coordinates = listOf(listOf(start.lon,start.lat), listOf(end.lon,end.lat))
         if (routeType.getPreference() == "cheaper"){
             val shorter = createRute(start,end,vehicle,RouteType.SHORTER)
@@ -77,7 +81,7 @@ class RouteService(private val db: RouteDatabase) {
             if (getDefaultRouteType() == routeType){
                 throw RouteTypeAlreadyAssignedException("This RouteType is already assigned")
             }
-        }catch (e: NoSuchElementException){}
+        }catch (_: NoSuchElementException){}
         return db.addDefaultRouteType(routeType)
     }
 
