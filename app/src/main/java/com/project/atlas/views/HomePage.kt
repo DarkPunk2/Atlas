@@ -48,7 +48,8 @@ fun HomePage(
     val authState = userViewModel.authState.observeAsState()
     val context = LocalContext.current
     val themeViewModel = ThemeViewModel.getInstance(context.applicationContext as Application)
-    var selectedType by remember { mutableStateOf<RouteType?>(routeViewModel.routeTypeState.value) }
+    val routeTypeState by routeViewModel.routeTypeState.observeAsState()
+    var selectedType by remember { mutableStateOf(routeTypeState) }
     var showConfirmationDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState.value) {
@@ -57,6 +58,10 @@ fun HomePage(
             is AuthState.Error -> Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> Unit
         }
+    }
+
+    LaunchedEffect(routeTypeState) {
+        selectedType = routeTypeState
     }
 
     LaunchedEffect(Unit) {
