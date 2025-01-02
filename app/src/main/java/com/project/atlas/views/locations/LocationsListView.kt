@@ -41,7 +41,6 @@ import com.project.atlas.viewModels.LocationsViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.NavigationMenu
 
-@SuppressLint("DefaultLocale")
 @Composable
 fun LocationCard(
     location: Location,
@@ -91,7 +90,7 @@ fun LocationCard(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = "(${String.format("%.4f", location.lat)}, ${String.format("%.4f", location.lon)})",
+                            text = location.toponym,
                             maxLines = 1,
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Normal,
