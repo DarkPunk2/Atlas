@@ -63,6 +63,9 @@ class RouteViewModel: ViewModel() {
     private val _showEndSelect = MutableLiveData(false)
     val showEndSelect = _showEndSelect
 
+    private val _isFavoriteUpdated = MutableLiveData<Boolean>()
+    val isFavoriteUpdated: LiveData<Boolean> get() = _isFavoriteUpdated
+
 
     private val routeService = RouteService(RouteDatabaseService())
     private val vehicleService = VehicleService(VehicleDatabaseService())
@@ -210,4 +213,16 @@ class RouteViewModel: ViewModel() {
         _end.value = null
         _navigateToRuteView.value = false
     }
+
+    fun updateRouteFavorite(route: RouteModel) {
+        viewModelScope.launch {
+            try {
+                routeService.updateRoute(route) // Actualiza la ruta en la base de datos
+                getRutes()
+            } catch (e: Exception) {
+                _isFavoriteUpdated.postValue(false)
+            }
+        }
+    }
+
 }

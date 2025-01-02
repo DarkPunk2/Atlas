@@ -11,7 +11,8 @@ data class RouteModel(val id: String = UUID.randomUUID().toString(),
                       val duration: Double,
                       val rute: String,
                       val bbox: List<Double>,
-                      var price: Double? = null
+                      var price: Double? = null,
+                      val isFavorite: Boolean = false
 )
 enum class RouteType {
     FASTER,

@@ -174,16 +174,23 @@ fun ListRoute(
                     )
                 } else {
                     LazyColumn {
-                        items(routeList) { route ->
-                            RouteItem(route = route, onClick = {
-                                routeViewModel.addRouteState(route)
-                                routeViewModel.seeRemove(true)
-                                navController.navigate("viewRute")
-                            }) {
-                                showDetails = route
-                            }
+                        val sortedRouteList = routeList.sortedByDescending { it.isFavorite }
+                        items(sortedRouteList) { route ->
+                            RouteItem(
+                                route = route,
+                                onClick = {
+                                    routeViewModel.addRouteState(route)
+                                    routeViewModel.seeRemove(true)
+                                    navController.navigate("viewRute")
+                                },
+                                function = { showDetails = route },
+                                onFavoriteChanged = { isFavorite ->
+                                    routeViewModel.updateRouteFavorite(route.copy(isFavorite = isFavorite))  // Actualizamos el estado del favorito en el ViewModel
+                                }
+                            )
                         }
                     }
+
                 }
                 Box(modifier = Modifier.align(Alignment.BottomCenter)) {
                     NavigationMenu(navController, 3 )
@@ -194,12 +201,12 @@ fun ListRoute(
 }
 
 @Composable
-fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
+fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit, onFavoriteChanged: (Boolean) -> Unit) {
     AtlasTheme(
         dynamicColor = false,
         isDarkTheme = ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
     ) {
-        var isFavorite by remember { mutableStateOf(false) }
+        var isFavorite by remember { mutableStateOf(route.isFavorite) }  // Usamos el valor de `isFavorite` de la ruta
         val launched = remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
@@ -303,7 +310,10 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
 
                     // Botón de favorito
                     IconButton(
-                        onClick = { isFavorite = !isFavorite }
+                        onClick = {
+                            isFavorite = !isFavorite
+                            onFavoriteChanged(isFavorite)  // Llamamos al callback para actualizar el favorito
+                        }
                     ) {
                         Icon(
                             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
@@ -318,5 +328,6 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
         }
     }
 }
+
 
 

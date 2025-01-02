@@ -84,4 +84,8 @@ class RouteService(private val db: RouteDatabase) {
     suspend fun getDefaultRouteType(): RouteType{
         return db.getDefaultRouteType()
     }
+
+    suspend fun updateRoute(route: RouteModel): Boolean {
+        return db.update(route)  // Método para actualizar la ruta en la base de datos
+    }
 }
