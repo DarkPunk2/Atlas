@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -42,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import com.project.atlas.components.CustomBottomSheet
 import com.project.atlas.viewModels.LocationsViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddLocationView(
     onDismiss: () -> Unit,
@@ -54,8 +54,11 @@ fun AddLocationView(
     val focusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
 
+    val toponym = remember { mutableStateOf<String>("") }
+
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+        toponym.value = lvm.getToponym(lat, lon)
     }
 
     CustomBottomSheet(
@@ -63,14 +66,24 @@ fun AddLocationView(
         onDismiss = onDismiss,
         title = "Add location"
     ) {
-        Row {
+        Column(
+        ){
             Text(
-                text = "(" + lat + ", " + lon + ")",
+                text = toponym.value,
                 style = MaterialTheme.typography.labelLarge,
+            )
+            HorizontalDivider(
                 modifier = Modifier
                     .padding(8.dp)
             )
+            Text(
+                text = "(" + String.format("%.7f", lat) + ", " + String.format("%.7f", lon) + ")",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
+
+        Spacer(Modifier.padding(8.dp))
 
         OutlinedTextField(
             value = alias.value,

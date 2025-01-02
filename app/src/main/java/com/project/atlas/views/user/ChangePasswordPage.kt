@@ -82,7 +82,7 @@ fun ChangePasswordPage(modifier: Modifier = Modifier,navController: NavControlle
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.atlas_t),
+            painter = painterResource(id = R.drawable.atlas_lettering_green),
             contentDescription = "Logo",
             modifier = Modifier.size(200.dp)
         )
@@ -125,7 +125,6 @@ fun ChangePasswordPage(modifier: Modifier = Modifier,navController: NavControlle
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions( onNext = { confPasswordFocusRequester.requestFocus() } )
         )
-        Spacer(modifier = Modifier.height(15.dp))
         OutlinedTextField(
             value = confPassword,
             onValueChange = { newValue ->

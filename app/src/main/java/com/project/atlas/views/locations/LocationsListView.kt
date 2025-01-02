@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
@@ -94,12 +95,7 @@ fun LocationCard(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = "(${String.format("%.4f", location.lat)}, ${
-                                String.format(
-                                    "%.4f",
-                                    location.lon
-                                )
-                            })",
+                            text = location.toponym,
                             maxLines = 1,
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Normal,
@@ -281,8 +277,7 @@ fun LocationsListView(
                 snackbarColor = AtlasGreen
                 showSnackbar = true
             },
-            viewModel
-        )
+            viewModel)
     }
 
     selectedLocation.value?.let { location ->

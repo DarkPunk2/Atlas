@@ -175,7 +175,7 @@ fun ListRoute(
                         textAlign = TextAlign.Center
                     )
                 } else {
-                    LazyColumn {
+                    LazyColumn(modifier=Modifier.fillMaxHeight()) {
                         items(routeList) { route ->
                             RouteItem(route = route, onClick = {
                                 routeViewModel.addRouteState(route)
