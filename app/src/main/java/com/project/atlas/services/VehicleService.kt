@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.Flow
 
 class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInterface {
 
-    private val localDefaultVehicleService = LocalDefaultVehicleService
 
     override suspend fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
         checkBusinessRules(vehicle)

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -162,17 +163,24 @@ fun ListRoute(
                         textAlign = TextAlign.Center
                     )
                 } else {
-                    LazyColumn(modifier=Modifier.fillMaxHeight()) {
-                        items(routeList) { route ->
-                            RouteItem(route = route, onClick = {
-                                routeViewModel.addRouteState(route)
-                                routeViewModel.seeRemove(true)
-                                navController.navigate("viewRute")
-                            }) {
-                                showDetails = route
-                            }
+                    LazyColumn {
+                        val sortedRouteList = routeList.sortedByDescending { it.isFavorite }
+                        items(sortedRouteList) { route ->
+                            RouteItem(
+                                route = route,
+                                onClick = {
+                                    routeViewModel.addRouteState(route)
+                                    routeViewModel.seeRemove(true)
+                                    navController.navigate("viewRute")
+                                },
+                                function = { showDetails = route },
+                                onFavoriteChanged = { isFavorite ->
+                                    routeViewModel.updateRouteFavorite(route)  // Actualizamos el estado del favorito en el ViewModel
+                                }
+                            )
                         }
                     }
+
                 }
             }
         }
@@ -180,12 +188,12 @@ fun ListRoute(
 }
 
 @Composable
-fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
+fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit, onFavoriteChanged: (Boolean) -> Unit) {
     AtlasTheme(
         dynamicColor = false,
         isDarkTheme = ThemeViewModel.getInstance(LocalContext.current.applicationContext as Application).isDarkTheme.observeAsState(false).value,
     ) {
-        var isFavorite by remember { mutableStateOf(false) }
+        var isFavorite by remember { mutableStateOf(route.isFavorite) }  // Usamos el valor de `isFavorite` de la ruta
         val launched = remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
@@ -289,13 +297,15 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
 
                     // Botón de favorito
                     IconButton(
-                        onClick = { isFavorite = !isFavorite }
+                        onClick = {
+                            isFavorite = !isFavorite
+                            onFavoriteChanged(isFavorite)  // Llamamos al callback para actualizar el favorito
+                        }
                     ) {
                         Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = null,
-                            tint = if (isFavorite) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSecondary,
+                            imageVector = if (route.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Go Back",
+                            tint = if (route.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -304,5 +314,6 @@ fun RouteItem(route: RouteModel, onClick: () -> Unit, function: () -> Unit) {
         }
     }
 }
+
 
 

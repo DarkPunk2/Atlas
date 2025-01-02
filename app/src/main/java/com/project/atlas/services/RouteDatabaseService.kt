@@ -96,7 +96,8 @@ class RouteDatabaseService: RouteDatabase {
             "distance" to route.distance,
             "duration" to route.duration,
             "rute" to route.rute,
-            "bbox" to route.bbox
+            "bbox" to route.bbox,
+            "isFavorite" to route.isFavorite
 
         )
     }
@@ -142,7 +143,8 @@ class RouteDatabaseService: RouteDatabase {
             distance = getDouble("distance")!!,
             duration = getDouble("duration")!!,
             rute = getString("rute")!!,
-            bbox = get("bbox") as List<Double>
+            bbox = get("bbox") as List<Double>,
+            isFavorite = getBoolean("isFavorite") ?: false
         )
     }
 
@@ -224,5 +226,23 @@ class RouteDatabaseService: RouteDatabase {
         }
     }
 
+    override suspend fun update(route: RouteModel): Boolean {
+        val dbRute = routeToMap(route)
+
+        return suspendCoroutine { continuation ->
+            db.collection(usersCollection)
+                .document(UserModel.eMail)
+                .collection(collectionId)
+                .document(route.id)
+                .set(dbRute)
+                .addOnSuccessListener {
+                    continuation.resume(true)
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firebase", "Error updating route: ${exception.message}")
+                    continuation.resumeWithException(ServiceNotAvailableException(exception.message ?: "Service not available"))
+                }
+        }
+    }
 
 }
