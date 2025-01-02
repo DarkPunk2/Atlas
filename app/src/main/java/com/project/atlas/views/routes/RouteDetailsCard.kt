@@ -1,7 +1,6 @@
 package com.project.atlas.views.routes
 
 import Calories
-import Electricity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +19,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,11 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
 import com.project.atlas.models.RouteModel
-import com.project.atlas.repository.FuelPriceRepository
-import com.project.atlas.services.FuelPriceService
 import com.project.atlas.ui.theme.AtlasGreen
-import com.project.atlas.viewModels.ElectricityServiceViewModel
 import java.util.Locale
 
 
@@ -44,17 +42,18 @@ fun RouteDetailsCard(
     activeDelete: Boolean,
     onDismiss: () -> Unit,
     onAdd: (RouteModel) -> Unit,
-    onDelete: (RouteModel) -> Unit
+    onDelete: (RouteModel) -> Unit,
+    onCalculateCost: () -> Unit,
+    calculatedCost: LiveData<Double>
 ) {
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
 
-    val fuelPriceService = FuelPriceService(FuelPriceRepository())
-    val electricityServiceViewModel = ElectricityServiceViewModel()
+
     var showAdd by remember { mutableStateOf(activeAdd) }
     var showDelete by remember { mutableStateOf(activeDelete) }
-    var cost by remember { mutableStateOf<Double?>(null) }
+    val cost by calculatedCost.observeAsState(initial = null)
     var isLoading by remember { mutableStateOf(false) }
 
     val formattedDistance = if (route.distance >= 1000) {
@@ -77,13 +76,8 @@ fun RouteDetailsCard(
     LaunchedEffect(route.id) {
         if (cost == null && !isLoading) {
             isLoading = true
-            cost = try {
-                val vehicle = route.vehicle
-                when (vehicle.energyType){
-                    is Electricity -> electricityServiceViewModel.calculateCost(route)
-                    is Calories -> vehicle.energyType!!.calculateCost(route.distance/1000, vehicle.consumption!!, 0.0)
-                    else -> fuelPriceService.calculateRoutePrice(route) // Llamada al servicio
-                }
+            try {
+                onCalculateCost()
             } catch (e: Exception) {
                 null // En caso de error
             } finally {

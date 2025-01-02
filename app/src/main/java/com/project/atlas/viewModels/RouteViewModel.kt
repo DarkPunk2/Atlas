@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.atlas.facades.EnergyCostCalculatorFacade
+import com.project.atlas.interfaces.EnergyCostCalculatorInterface
 import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
@@ -18,7 +20,9 @@ import com.project.atlas.services.RouteDatabaseService
 import com.project.atlas.services.RouteService
 import com.project.atlas.services.VehicleDatabaseService
 import com.project.atlas.services.VehicleService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RouteViewModel: ViewModel() {
     private val _navigateToRuteView = MutableLiveData(false)
@@ -28,8 +32,11 @@ class RouteViewModel: ViewModel() {
     val errorState: LiveData<Exception> = _errorState
 
     private var pricesCalculated = false // Flag para evitar cálculos repetidos
-    private val fuelPriceService = FuelPriceService(FuelPriceRepository())
-    private val electricityServiceViewModel = ElectricityServiceViewModel()
+    //private val fuelPriceService = FuelPriceService(FuelPriceRepository())
+    //private val electricityServiceViewModel = ElectricityServiceViewModel()
+    private val energyCostCalculator: EnergyCostCalculatorInterface = EnergyCostCalculatorFacade()
+    private val _calculatedPrice = MutableLiveData<Double>()
+    val calculatedPrice: LiveData<Double> get() = _calculatedPrice
 
     private val _showAddButton = MutableLiveData(false)
     val showAddButton: LiveData<Boolean> = _showAddButton
@@ -125,11 +132,8 @@ class RouteViewModel: ViewModel() {
                 } else {
                     // Si el precio no está calculado, calcularlo y guardarlo en el mapa
                     try {
-                        val vehicle = route.vehicle
-                        val price = when (vehicle.energyType){
-                            is Electricity -> electricityServiceViewModel.calculateCost(route)
-                            is Calories -> vehicle.energyType!!.calculateCost(route.distance/1000, vehicle.consumption!!, 0.0)
-                            else -> fuelPriceService.calculateRoutePrice(route) // Llamada al servicio
+                        val price = withContext(Dispatchers.IO) {
+                            energyCostCalculator.calculateCost(route)
                         }
                         calculatedPrices[route.id] = price // Guardar en el mapa
                         route.copy(price = price)
@@ -142,6 +146,13 @@ class RouteViewModel: ViewModel() {
 
             _ruteList.postValue(updatedRoutes)
             pricesCalculated = true // Marca los precios como calculados
+        }
+    }
+
+    fun calculatePrice(route: RouteModel) {
+        viewModelScope.launch {
+            val price = energyCostCalculator.calculateCost(route)
+            _calculatedPrice.postValue(price) // Actualiza el valor en LiveData
         }
     }
 
