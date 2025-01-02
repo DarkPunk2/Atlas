@@ -89,7 +89,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController ,userVi
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.atlas_lettering_black),
+            painter = painterResource(id = R.drawable.atlas_lettering_green),
             contentDescription = "Logo",
             modifier = Modifier.size(180.dp)
         )
