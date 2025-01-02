@@ -1,5 +1,6 @@
 package com.project.atlas.viewModels
 
+import android.content.Context
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +18,7 @@ import com.project.atlas.services.VehicleService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-open class VehicleViewModel : ViewModel() {
+open class VehicleViewModel(context: Context? = null) : ViewModel() {
     private val service: VehicleInterface = VehicleService(VehicleDatabaseService())
 
     // LiveData que se observa desde la UI
@@ -29,22 +30,22 @@ open class VehicleViewModel : ViewModel() {
 
     fun refreshVehicles() {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = service.listVehicle(UserModel.eMail) ?: emptyList()
-
-            // Ordenar la lista
-            val sortedList = result.sortedWith(compareBy {
-                when (it.type) { // Aquí se establece el orden personalizado
-                    VehicleType.Walk -> 0  // Walk va primero
-                    VehicleType.Cycle -> 1 // Cycle va segundo
-                    else -> when(it.favourite){ // El resto de vehículos va después
-                        true ->2
-                        else ->3
+            service.observeVehicles(UserModel.eMail).collect { result ->
+                val sortedList = result.sortedWith(compareBy {
+                    when (it.type) { // Aquí se establece el orden personalizado
+                        VehicleType.Walk -> 0  // Walk va primero
+                        VehicleType.Cycle -> 1 // Cycle va segundo
+                        else -> when(it.favourite){ // El resto de vehículos va después
+                            true -> 2
+                            else -> 3
+                        }
                     }
-                }
-            })
-            _vehicleList.postValue(sortedList)
+                })
+                _vehicleList.postValue(sortedList)
+            }
         }
     }
+
 
     fun refreshDefaultVehicle(){
         var default: VehicleModel? = null

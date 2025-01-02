@@ -1,5 +1,6 @@
 package com.project.atlas.views.locations
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -12,16 +13,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,14 +40,16 @@ import com.project.atlas.models.Location
 import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.ui.theme.AtlasTheme
 import com.project.atlas.viewModels.LocationsViewModel
+import com.project.atlas.viewModels.MapViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.NavigationMenu
+import com.project.atlas.views.routes.MapSelection
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun LocationCard(
-    alias: String,
-    coords: String,
-    favorite: Boolean,
+    location: Location,
+    onFavourite: () -> Unit,
     onClick: () -> Unit
 ) {
     AtlasTheme(
@@ -80,7 +87,7 @@ fun LocationCard(
                         modifier = Modifier.weight(2f)
                     ) {
                         Text(
-                            text = alias,
+                            text = location.alias,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleLarge,
@@ -88,7 +95,7 @@ fun LocationCard(
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = coords,
+                            text = location.toponym,
                             maxLines = 1,
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Normal,
@@ -97,13 +104,13 @@ fun LocationCard(
                     }
                     IconButton(
                         onClick = {
-                            /* TODO */
+                            onFavourite()
                         }
                     ) {
                         Icon(
-                            imageVector = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            imageVector = if (location.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = "Go Back",
-                            tint = if (favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary,
+                            tint = if (location.isFavourite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -118,27 +125,66 @@ fun LocationCard(
 fun LocationsListView(
     navController: NavController,
     routeViewModel: RouteViewModel,
+    mapViewModel: MapViewModel
 ) {
     val viewModel: LocationsViewModel = viewModel()
     val locations = remember { mutableStateOf(viewModel.getAllLocations()) }
     val selectedLocation = remember { mutableStateOf<Location?>(null) }
     val showAddLocation = remember { mutableStateOf(false) }
+    val showMap = remember { mutableStateOf(false) }
     val showActionCard = remember { mutableStateOf(false) }
+    val userLocation by mapViewModel.userLocation.observeAsState()
+
+    //Variables SnackBar
+    var showSnackbar by remember { mutableStateOf(false) }
+    var snackbarMessage by remember { mutableStateOf("") }
+    var snackbarColor by remember { mutableStateOf(AtlasGreen) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    if (showSnackbar) {
+        LaunchedEffect(snackbarHostState, snackbarMessage) {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(snackbarMessage)
+            showSnackbar = false
+        }
+    }
+
+    LaunchedEffect(userLocation) {
+        if (userLocation != null){
+            if (routeViewModel.showStartSelect.value == true){
+                routeViewModel.addStart(mapViewModel.userLocation.value)
+                navController.popBackStack()
+            }
+            else{
+                routeViewModel.addEnd(mapViewModel.userLocation.value)
+                navController.popBackStack()
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mapViewModel.resetUserLocation()
+            routeViewModel.seeSelectStart(false)
+            routeViewModel.seeSelectEnd(false)
+        }
+    }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = snackbarColor,
+                    contentColor = Color.Black,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .padding(bottom = 76.dp)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go Back",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
                 title = { Text("Saved Locations") },
                 actions = {
                     IconButton(onClick = { showAddLocation.value = true }) {
@@ -147,6 +193,11 @@ fun LocationsListView(
                 }
             )
         },
+        bottomBar = {
+            BottomAppBar {
+                NavigationMenu(navController, 1)
+            }
+        },
         content = { paddingValues ->
             Box {
                 Column(
@@ -154,6 +205,43 @@ fun LocationsListView(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
+                    if (routeViewModel.showStartSelect.value == true || routeViewModel.showEndSelect.value == true) {
+                        if (mapViewModel.hasPermission()) {
+                            TextButton(
+                                onClick = {
+                                    mapViewModel.getUserLocation()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Icon(
+                                    Icons.Filled.MyLocation,
+                                    contentDescription = "YourLocation"
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Your location")
+                            }
+
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 22.dp)
+                            )
+                        }
+
+                        TextButton(onClick = {
+                            showMap.value = true
+                        },
+                            modifier = Modifier
+                                .fillMaxWidth()) {
+                            Icon(
+                                Icons.Filled.LocationOn,
+                                contentDescription = "SelectMap"
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Select on map")
+                        }
+                    }
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -161,9 +249,14 @@ fun LocationsListView(
                     ) {
                         locations.value.forEach { location ->
                             LocationCard(
-                                alias = location.alias,
-                                coords = "(${location.lat}, ${location.lon})",
-                                favorite = false,
+                                location,
+                                onFavourite = {
+                                    viewModel.changeFavourite(location)
+                                    snackbarMessage =
+                                        if (location.isFavourite) "${location.alias} is now set as a favourite" else "Vehicle ${location.alias} is now unset as a favourite"
+                                    snackbarColor = AtlasGreen
+                                    showSnackbar = true
+                                },
                                 onClick = {
                                     selectedLocation.value = location
                                     showActionCard.value = true
@@ -173,15 +266,19 @@ fun LocationsListView(
                         }
                     }
                 }
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    NavigationMenu(navController, 1)
-                }
             }
         },
     )
 
     if (showAddLocation.value) {
-        SearchByToponymView(onDismiss = { showAddLocation.value = false }, viewModel)
+        SearchByToponymView(
+            onDismiss = { showAddLocation.value = false },
+            onAdd = {
+                snackbarMessage = "Location added"
+                snackbarColor = AtlasGreen
+                showSnackbar = true
+            },
+            viewModel)
     }
 
     selectedLocation.value?.let { location ->
@@ -190,10 +287,26 @@ fun LocationsListView(
                 showActionCard.value = false
                 selectedLocation.value = null
             },
+            onEdit = {
+                snackbarMessage = "Location updated"
+                snackbarColor = AtlasGreen
+                showSnackbar = true
+            },
+            onDelete = {
+                snackbarMessage = "${location.alias} has been removed"
+                snackbarColor = AtlasGreen
+                showSnackbar = true
+            },
             viewModel,
             location,
             routeViewModel,
             navController
         )
+    }
+
+    if (showMap.value){
+        MapSelection(routeViewModel,
+            mapViewModel,
+            onDismiss = {navController.popBackStack()})
     }
 }

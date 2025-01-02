@@ -27,6 +27,7 @@ import com.project.atlas.viewModels.LocationsViewModel
 @Composable
 fun SearchByToponymView(
     onDismiss: () -> Unit,
+    onAdd: () -> Unit,
     lvm: LocationsViewModel,
 ) {
     var toponym = remember { mutableStateOf("") }
@@ -66,6 +67,7 @@ fun SearchByToponymView(
                     toponym = mutableStateOf("")
                     focusManager.clearFocus()
                     Log.d("locations", "Añadido")
+                    onAdd()
                     onDismiss()
                 }) {
                 Text("Save location")

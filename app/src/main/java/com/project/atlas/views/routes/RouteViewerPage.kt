@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -32,6 +33,7 @@ import androidx.navigation.NavController
 import com.google.maps.android.PolyUtil
 import com.project.atlas.R
 import com.project.atlas.ui.theme.AtlasDarker
+import com.project.atlas.ui.theme.BackgroundBlack
 import com.project.atlas.viewModels.RouteViewModel
 import com.utsman.osmandcompose.CameraProperty
 import com.utsman.osmandcompose.CameraState
@@ -141,8 +143,12 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
         }
         Image(
             painter = painterResource(id = R.drawable.atlas_lettering_black),
-            contentDescription = "letterning",
-            modifier = Modifier.absolutePadding(2.dp, 1.dp,3.dp,3.dp).size(100.dp)
+            contentDescription = "lettering",
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .absolutePadding(2.dp, 6.dp, 3.dp, 3.dp)
+                .size(100.dp),
+            colorFilter = ColorFilter.tint(BackgroundBlack)
         )
         AnimatedVisibility(
             visible = showCard.value,

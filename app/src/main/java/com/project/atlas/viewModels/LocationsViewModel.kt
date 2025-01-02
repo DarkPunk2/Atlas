@@ -5,16 +5,20 @@ import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.atlas.interfaces.LocationRepositoryInterface
 import com.project.atlas.models.Location
 import com.project.atlas.services.ApiClient
-import com.project.atlas.services.LocationRepository
+import com.project.atlas.repositories.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
-class LocationsViewModel : ViewModel() {
+class LocationsViewModel(
+    private val locationRepository: LocationRepositoryInterface = LocationRepository()
+) : ViewModel() {
     private val locationsList = SnapshotStateList<Location>()
-    private val locationRepository = LocationRepository()
+    var locationsApi = ApiClient
 
     fun addLocation(location: Location) {
         if (abs(location.lat) > 90.0 || abs(location.lon) > 180.0) {
@@ -24,11 +28,17 @@ class LocationsViewModel : ViewModel() {
     }
 
     fun addLocation(lat: Double, lon: Double, alias: String) {
+        //Comprobar latitud y longitud
+        if (abs(lat) > 90.0 || abs(lon) > 180.0) {
+            throw IllegalArgumentException()
+        }
+
         //Realizar corutina
-        viewModelScope.launch {
-            //Conseguir latitud y longitud de la API
+        viewModelScope.launch(Dispatchers.IO) {
+            var newAlias = alias
+            //Conseguir topónimo de la API
             val toponym =
-                ApiClient.fetchToponymByLatLong(
+                locationsApi.fetchToponymByLatLong(
                     "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                     lat.toString(),
                     lon.toString()
@@ -36,7 +46,12 @@ class LocationsViewModel : ViewModel() {
 
             //Sanitizar topónimo para eliminar cualquier carácter después de una '/' hasta una ',' .
             val sanitizedToponym = toponym.replace(Regex("/[^,]*,"), ",")
-            val newLocation = Location(lat, lon, alias, sanitizedToponym)
+
+            if (alias.isBlank()) {
+                newAlias = toponym
+            }
+
+            val newLocation = Location(lat, lon, newAlias, sanitizedToponym)
             locationRepository.addLocation(newLocation)
             addLocation(newLocation)
         }
@@ -44,12 +59,11 @@ class LocationsViewModel : ViewModel() {
 
     fun addLocation(toponym: String) {
         if (toponym.isNotEmpty()) {
-            ApiClient.fetchGeocode(
+            locationsApi.fetchGeocode(
                 "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                 toponym
             ) { lat, lon, topo ->
                 addLocation(lat, lon, topo)
-                Log.d("location", "Nueva ubicación agregada: $topo")
             }
         } else {
             Log.e("location", "No se encontraron resultados en la geocodificación.")
@@ -72,7 +86,7 @@ class LocationsViewModel : ViewModel() {
             val dbLocationsList = locationRepository.getAllLocations()
             locationsList.clear()
             locationsList.addAll(dbLocationsList)
-            Log.d(TAG, "Locations size viewModel: ${dbLocationsList.size}")
+            locationsList.sortWith(compareByDescending { it.isFavourite })
         }
         return locationsList
     }
@@ -102,9 +116,40 @@ class LocationsViewModel : ViewModel() {
         if (alias != location.alias) {
             newAlias = alias
         }
-        locationRepository.updateLocation(location, lat, lon, newAlias)
+        if (alias.isBlank()) {
+            newAlias = location.toponym
+        }
+        locationRepository.updateLocation(
+            location,
+            lat,
+            lon,
+            newAlias,
+            location.toponym,
+            location.isFavourite
+        )
         location.lat = lat
         location.lon = lon
         location.alias = newAlias
     }
+
+    fun changeFavourite(location: Location) {
+        if (locationsList.contains(location)) {
+            location.changeFavourite()
+            locationsList.sortWith(compareByDescending { it.isFavourite })
+
+            locationRepository.setFavourite(location, location.isFavourite)
+        } else throw IllegalArgumentException()
+    }
+
+    suspend fun getToponym(lat: Double, lon: Double): String {
+        return withContext(Dispatchers.IO) {
+            // Conseguir topónimo de la API
+            locationsApi.fetchToponymByLatLong(
+                "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
+                lat.toString(),
+                lon.toString()
+            )
+        }
+    }
+
 }

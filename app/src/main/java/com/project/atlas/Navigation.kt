@@ -2,6 +2,7 @@ package com.project.atlas
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,7 +40,7 @@ fun MyAppNavigation(modifier: Modifier = Modifier, userViewModel: UserViewModel,
             SignUpPage(modifier, navController, userViewModel)
         }
         composable("locations"){
-            LocationsListView(navController, routeViewModel)
+            LocationsListView(navController, routeViewModel, mapViewModel)
         }
         composable("vehicles"){
             listVehicle(modifier, navController, vehicleViewModel)

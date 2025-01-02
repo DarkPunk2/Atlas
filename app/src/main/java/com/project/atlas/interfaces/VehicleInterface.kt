@@ -1,6 +1,7 @@
 package com.project.atlas.interfaces
 
 import com.project.atlas.models.VehicleModel
+import kotlinx.coroutines.flow.Flow
 
 interface VehicleInterface {
 
@@ -16,4 +17,5 @@ interface VehicleInterface {
     suspend fun setDefaultVehicle(user: String, vehicle: VehicleModel) : Boolean
     suspend fun getDefaultVehicle(user: String) : VehicleModel?
     suspend fun deleteDefaultVehicle(user: String) : Boolean
+    fun observeVehicles(user: String): Flow<List<VehicleModel>>
 }

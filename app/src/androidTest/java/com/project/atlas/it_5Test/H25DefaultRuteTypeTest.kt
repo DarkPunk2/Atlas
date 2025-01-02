@@ -5,8 +5,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.project.atlas.exceptions.RouteTypeAlreadyAssignedException
 import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
-import com.project.atlas.services.RouteDatabaseService
-import com.project.atlas.services.RouteService
+import com.project.atlas.services.routeServicies.RouteDatabaseService
+import com.project.atlas.services.routeServicies.RouteService
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals

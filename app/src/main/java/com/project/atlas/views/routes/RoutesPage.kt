@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,7 +43,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
@@ -107,19 +107,6 @@ fun ListRoute(
         },
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.navigate("home")
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go Back",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
                 title = { Text("Route List") },
                 actions = {
                     IconButton(onClick = { navController.navigate("createRute") }) {
@@ -128,8 +115,13 @@ fun ListRoute(
                 }
             )
         },
+        bottomBar = {
+            BottomAppBar {
+                NavigationMenu(navController, 3)
+            }
+        },
         content = { paddingValues ->
-            val loadingTimeoutMillis = 20000L // 20 segundos
+            val loadingTimeoutMillis = 5000L  // 5 segundos
             var showLoading by remember { mutableStateOf(true) }
 
             LaunchedEffect(key1 = routeList) {
@@ -145,10 +137,7 @@ fun ListRoute(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        top = paddingValues.calculateTopPadding(),
-                        end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        bottom = 0.dp
+                        paddingValues = paddingValues
                     )
             ) {
                 if (showLoading) {
@@ -173,7 +162,7 @@ fun ListRoute(
                         textAlign = TextAlign.Center
                     )
                 } else {
-                    LazyColumn {
+                    LazyColumn(modifier=Modifier.fillMaxHeight()) {
                         items(routeList) { route ->
                             RouteItem(route = route, onClick = {
                                 routeViewModel.addRouteState(route)
@@ -184,9 +173,6 @@ fun ListRoute(
                             }
                         }
                     }
-                }
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    NavigationMenu(navController, 3 )
                 }
             }
         }

@@ -12,9 +12,10 @@ import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.repository.FuelPriceRepository
+import com.project.atlas.services.ApiClient
 import com.project.atlas.services.FuelPriceService
-import com.project.atlas.services.RouteDatabaseService
-import com.project.atlas.services.RouteService
+import com.project.atlas.services.routeServicies.RouteDatabaseService
+import com.project.atlas.services.routeServicies.RouteService
 import com.project.atlas.services.VehicleDatabaseService
 import com.project.atlas.services.VehicleService
 import kotlinx.coroutines.launch
@@ -67,17 +68,6 @@ class RouteViewModel: ViewModel() {
     private val routeService = RouteService(RouteDatabaseService())
     private val vehicleService = VehicleService(VehicleDatabaseService())
 
-    init {
-        viewModelScope.launch {
-            try {
-                _routeTypeState.value = routeService.getDefaultRouteType()
-                defaultVehicle()
-            }catch (_: Exception){
-                _routeTypeState.value = null
-            }
-
-        }
-    }
 
     fun createRute(start: Location?, end: Location?, vehicle: VehicleModel?, routeType: RouteType?) {
         if (start != null && end != null && routeType != null) {
@@ -103,7 +93,21 @@ class RouteViewModel: ViewModel() {
 
     fun defaultVehicle(){
         viewModelScope.launch {
-            _vehicleDefaut.value = vehicleService.getDefaultVehicle(UserModel.eMail)
+            try {
+                _vehicleDefaut.value = vehicleService.getDefaultVehicle(UserModel.eMail)
+            }catch (_: Exception){
+                _vehicleDefaut.value = null
+            }
+        }
+    }
+
+    fun defaultRouteType(){
+        viewModelScope.launch {
+            try {
+                _routeTypeState.value = routeService.getDefaultRouteType()
+            }catch (_: Exception){
+                _routeTypeState.value = null
+            }
         }
     }
 
@@ -175,12 +179,42 @@ class RouteViewModel: ViewModel() {
         _vehicle.value = vehicle
     }
 
-    fun addStart(start: Location){
+    fun addStart(start: Location?){
         _start.value = start
     }
 
-    fun addEnd(end: Location){
+    fun addStartByCoord(lat: Double, lon:Double){
+        viewModelScope.launch {
+            try {
+                val toponym = ApiClient.fetchToponymByLatLong(
+                    "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
+                    lat.toString(),
+                    lon.toString()
+                )
+                _start.value = Location(lon = lon, lat = lat, alias = toponym, toponym = toponym)
+            }catch (_: Exception){
+                _start.value = null
+            }
+        }
+    }
+
+    fun addEnd(end: Location?){
         _end.value = end
+    }
+
+    fun addEndByCoord(lat: Double, lon:Double){
+        viewModelScope.launch {
+            try {
+                val toponym = ApiClient.fetchToponymByLatLong(
+                    "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
+                    lat.toString(),
+                    lon.toString()
+                )
+                _end.value = Location(lon = lon, lat = lat, alias = toponym, toponym = toponym)
+            }catch (_: Exception){
+                _end.value = null
+            }
+        }
     }
 
     suspend fun getRutes(){

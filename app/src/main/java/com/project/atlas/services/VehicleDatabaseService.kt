@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.project.atlas.exceptions.VehicleNotExistsException
 
 import com.project.atlas.interfaces.EnergyType
@@ -17,6 +18,9 @@ import com.project.atlas.interfaces.VehicleInterface
 
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.models.VehicleType
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import java.io.Serializable
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -24,6 +28,7 @@ import kotlin.coroutines.suspendCoroutine
 class VehicleDatabaseService : VehicleInterface {
 
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    val a = db.enableNetwork()
     private var usersCollection:String = "users"
 
     fun vehicleToHashMap (vehicle: VehicleModel): HashMap<String, Serializable> {
@@ -36,6 +41,28 @@ class VehicleDatabaseService : VehicleInterface {
         )
         return dbVehicle
     }
+
+    override fun observeVehicles(user: String): Flow<List<VehicleModel>> = callbackFlow {
+        val listener = db.collection(usersCollection)
+            .document(user)
+            .collection("vehicles")
+            .addSnapshotListener { snapshots, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val vehicles = snapshots?.documents?.mapNotNull { document ->
+                    document.toVehicle()
+                }.orEmpty()
+
+                trySend(vehicles).isSuccess
+            }
+
+        awaitClose{ listener.remove() }
+    }
+
+
     override suspend fun createDefaults(user: String) : Boolean {
         val vWalk = VehicleModel(VehicleType.Walk.toString(), VehicleType.Walk, Calories(), 3.8)
         val vCycle = VehicleModel(VehicleType.Cycle.toString(), VehicleType.Cycle, Calories(), 7.0)
@@ -71,22 +98,29 @@ class VehicleDatabaseService : VehicleInterface {
     }
 
     override suspend fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
-        if (!vehicle.alias.isNullOrBlank() and checkForDuplicates(user, vehicle.alias!!)) {
+        if (vehicle.alias.isNullOrBlank()) {
             return false
         }
         val dbVehicle = vehicleToHashMap(vehicle)
+
+        // Usar suspendCoroutine para que la función sea suspensiva
         return suspendCoroutine { continuation ->
+            // Establecer el alias como el ID del documento
             db.collection(usersCollection)
                 .document(user)
                 .collection("vehicles")
-                .document(vehicle.alias!!)
+                .document(vehicle.alias!!)  // Alias como ID del documento
                 .set(dbVehicle)
                 .addOnSuccessListener {
+                    // Si se ejecuta correctamente, continuar con true
                     continuation.resume(true)
                 }
                 .addOnFailureListener { exception ->
+                    // Si falla la operación, no fallar inmediatamente
+                    // Dejar que Firestore maneje la cola en caso de no conexión
                     Log.e("Firebase", "Error adding vehicle: ${exception.message}")
-                    continuation.resume(false)
+                    // Aquí no se llama a continuation.resume(false) inmediatamente,
+                    // ya que Firestore intentará realizar la operación cuando haya conexión
                 }
         }
     }
@@ -159,7 +193,7 @@ class VehicleDatabaseService : VehicleInterface {
                 }
                 .addOnFailureListener { exception ->
                     Log.e("Firebase", "Error fetching vehicles: ${exception.message}")
-                    continuation.resume(false)
+                    //continuation.resume(false)
                 }
         }
     }
@@ -235,82 +269,79 @@ class VehicleDatabaseService : VehicleInterface {
     }
 
     override suspend fun setDefaultVehicle(user: String, vehicle: VehicleModel): Boolean {
-        return suspendCoroutine { continuation ->
-            // Obtén una referencia al documento del vehículo
-            val vehicleRef = db.collection(usersCollection)
-                .document(user)
-                .collection("vehicles")
-                .document(vehicle.alias!!)
+        val vehicleRef = db.collection("users")
+            .document(user)
+            .collection("vehicles")
+            .document(vehicle.alias!!)
 
-            // Verifica si el vehículo ya está establecido como predeterminado
-            val defaultVehicleDoc = db.collection(usersCollection)
-                .document(user)
-                .collection("defaultVehicle")
-                .document("current")
+        val defaultVehicleDoc = db.collection("users")
+            .document(user)
+            .collection("defaultVehicle")
+            .document("current")
 
-            defaultVehicleDoc.get()
-                .addOnSuccessListener { documentSnapshot ->
-                    if (documentSnapshot.exists() && documentSnapshot.getDocumentReference("vehicleRef") == vehicleRef) {
-                        // El vehículo ya es el predeterminado, devolver false
-                        continuation.resume(false)
-                    } else {
-                        // Crea o actualiza el documento en la colección "defaultVehicle" con la referencia al vehículo
-                        defaultVehicleDoc.set(mapOf("vehicleRef" to vehicleRef))
-                            .addOnSuccessListener {
-                                continuation.resume(true)
-                            }
-                            .addOnFailureListener { exception ->
-                                Log.e("Firebase", "Error setting default vehicle: ${exception.message}")
-                                continuation.resume(false)
-                            }
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("Firebase", "Error checking default vehicle: ${exception.message}")
-                    continuation.resume(false)
-                }
-        }
+        defaultVehicleDoc.set(mapOf("vehicleRef" to vehicleRef))
+            .addOnSuccessListener {
+                Log.d("VehicleService", "Vehicle successfully set as default")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("VehicleService", "Error setting default vehicle: ${exception.message}")
+            }
+        return true
     }
 
 
-    override suspend fun getDefaultVehicle(user: String): VehicleModel? {
-        val vWalk = VehicleModel(VehicleType.Walk.toString(), VehicleType.Walk, Calories(), 3.8)
 
+    override suspend fun getDefaultVehicle(user: String): VehicleModel? {
         return suspendCoroutine { continuation ->
-            db.collection(usersCollection)
+            val defaultVehicleDocRef = db.collection(usersCollection)
                 .document(user)
                 .collection("defaultVehicle")
                 .document("current")
-                .get()
+
+            // Intentar obtener el documento de "defaultVehicle"
+            defaultVehicleDocRef.get()
                 .addOnSuccessListener { document ->
-                    val vehicleRef = document.getDocumentReference("vehicleRef")
-                    if (vehicleRef != null) {
-                        vehicleRef.get()
-                            .addOnSuccessListener { vehicleDoc ->
-                                if (vehicleDoc.exists()) {
-                                    // Convertir documento a VehicleModel
-                                    val vehicle = vehicleDoc.toVehicle()
-                                    continuation.resume(vehicle)
-                                } else {
-                                    // Si el documento no existe, devolver vWalk
+                    if (document.exists()) {
+                        // El documento existe, intentar obtener la referencia al vehículo
+                        val vehicleRef = document.getDocumentReference("vehicleRef")
+                        if (vehicleRef != null) {
+                            // Si la referencia existe, obtener el vehículo asociado
+                            vehicleRef.get()
+                                .addOnSuccessListener { vehicleDoc ->
+                                    if (vehicleDoc.exists()) {
+                                        // Convertir el documento a un modelo de vehículo
+                                        val vehicle = vehicleDoc.toVehicle()  // Asumiendo que toVehicle convierte correctamente
+                                        continuation.resume(vehicle)
+                                    } else {
+                                        // Si el documento del vehículo no existe, retornar null
+                                        Log.d("Firestore", "Vehicle document does not exist.")
+                                        continuation.resume(null)
+                                    }
+                                }
+                                .addOnFailureListener { exception ->
+                                    // En caso de error al recuperar el vehículo
+                                    Log.e("Firestore", "Error fetching vehicle data: ${exception.message}")
                                     continuation.resume(null)
                                 }
-                            }
-                            .addOnFailureListener { exception ->
-                                Log.e("Firebase", "Error fetching vehicle data: ${exception.message}")
-                                continuation.resume(null)
-                            }
+                        } else {
+                            // Si no hay referencia al vehículo, retornar null
+                            Log.d("Firestore", "No vehicle reference found in defaultVehicle document.")
+                            continuation.resume(null)
+                        }
                     } else {
-                        // Si no hay una referencia válida, devolvemos vWalk
+                        // Si el documento de defaultVehicle no existe, retornar null
+                        Log.d("Firestore", "Default vehicle document does not exist.")
                         continuation.resume(null)
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.e("Firebase", "Error fetching default vehicle document: ${exception.message}")
+                    // En caso de error al obtener el documento de defaultVehicle
+                    Log.e("Firestore", "Error fetching default vehicle document: ${exception.message}")
                     continuation.resume(null)
                 }
         }
     }
+
     override suspend fun deleteDefaultVehicle(user: String): Boolean {
         return suspendCoroutine { continuation ->
             val collectionRef = db.collection(usersCollection)
@@ -365,6 +396,4 @@ class VehicleDatabaseService : VehicleInterface {
     private fun energyTypeToString(energyType: EnergyType?): String? {
         return energyType?.typeName
     }
-
-
 }
