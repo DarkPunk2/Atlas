@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
@@ -44,6 +43,7 @@ import com.project.atlas.viewModels.LocationsViewModel
 import com.project.atlas.viewModels.MapViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.NavigationMenu
+import com.project.atlas.views.routes.MapSelection
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -131,6 +131,7 @@ fun LocationsListView(
     val locations = remember { mutableStateOf(viewModel.getAllLocations()) }
     val selectedLocation = remember { mutableStateOf<Location?>(null) }
     val showAddLocation = remember { mutableStateOf(false) }
+    val showMap = remember { mutableStateOf(false) }
     val showActionCard = remember { mutableStateOf(false) }
     val userLocation by mapViewModel.userLocation.observeAsState()
 
@@ -229,7 +230,7 @@ fun LocationsListView(
                         }
 
                         TextButton(onClick = {
-
+                            showMap.value = true
                         },
                             modifier = Modifier
                                 .fillMaxWidth()) {
@@ -301,5 +302,11 @@ fun LocationsListView(
             routeViewModel,
             navController
         )
+    }
+
+    if (showMap.value){
+        MapSelection(routeViewModel,
+            mapViewModel,
+            onDismiss = {navController.popBackStack()})
     }
 }
