@@ -12,7 +12,7 @@ import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.repository.FuelPriceRepository
-import com.project.atlas.services.ApiClient
+import com.project.atlas.services.OpenRouteServiceAPI
 import com.project.atlas.services.FuelPriceService
 import com.project.atlas.services.routeServicies.RouteDatabaseService
 import com.project.atlas.services.routeServicies.RouteService
@@ -186,7 +186,7 @@ class RouteViewModel: ViewModel() {
     fun addStartByCoord(lat: Double, lon:Double){
         viewModelScope.launch {
             try {
-                val toponym = ApiClient.fetchToponymByLatLong(
+                val toponym = OpenRouteServiceAPI.fetchToponymByLatLong(
                     "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                     lat.toString(),
                     lon.toString()
@@ -205,7 +205,7 @@ class RouteViewModel: ViewModel() {
     fun addEndByCoord(lat: Double, lon:Double){
         viewModelScope.launch {
             try {
-                val toponym = ApiClient.fetchToponymByLatLong(
+                val toponym = OpenRouteServiceAPI.fetchToponymByLatLong(
                     "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                     lat.toString(),
                     lon.toString()

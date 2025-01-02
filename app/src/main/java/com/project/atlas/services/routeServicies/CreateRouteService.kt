@@ -1,44 +1,42 @@
 package com.project.atlas.services.routeServicies
 
 import com.project.atlas.exceptions.ServiceNotAvailableException
+import com.project.atlas.interfaces.CalculateRoute
 import com.project.atlas.interfaces.CreateRouteStrategy
 import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
 import com.project.atlas.models.VehicleModel
-import com.project.atlas.services.ApiClient
 import com.project.atlas.services.FuelPriceService
 
 
-class ShorterRouteStrategy(private val routeApi: ApiClient): CreateRouteStrategy {
+class ShorterRouteStrategy(private val routeApi: CalculateRoute): CreateRouteStrategy {
     override suspend fun createRoute(start: Location, end: Location, vehicle: VehicleModel, routeType: RouteType): RouteModel {
-        val coordinates = listOf(listOf(start.lon, start.lat), listOf(end.lon, end.lat))
-        val response = routeApi.fetchRoute(coordinates, "shortest", vehicle.type.toRoute())
+        val response = routeApi.fetchRoute(start,end,vehicle,RouteType.SHORTER)
         return RouteModel(
             start = start,
             end = end,
             vehicle = vehicle,
             routeType = routeType,
-            distance = response.getDistance(),
-            duration = response.getDuration(),
-            rute = response.getRute(),
+            distance = response.distance,
+            duration = response.duration,
+            rute = response.route,
             bbox = response.bbox
         )
     }
 }
 
-class FasterRouteStrategy(private val routeApi: ApiClient): CreateRouteStrategy {
+class FasterRouteStrategy(private val routeApi: CalculateRoute): CreateRouteStrategy {
     override suspend fun createRoute(start: Location, end: Location, vehicle: VehicleModel, routeType: RouteType): RouteModel {
-        val coordinates = listOf(listOf(start.lon, start.lat), listOf(end.lon, end.lat))
-        val response = routeApi.fetchRoute(coordinates, "fastest", vehicle.type.toRoute())
+        val response = routeApi.fetchRoute(start,end,vehicle,RouteType.FASTER)
         return RouteModel(
             start = start,
             end = end,
             vehicle = vehicle,
             routeType = routeType,
-            distance = response.getDistance(),
-            duration = response.getDuration(),
-            rute = response.getRute(),
+            distance = response.distance,
+            duration = response.duration,
+            rute = response.route,
             bbox = response.bbox
         )
     }
