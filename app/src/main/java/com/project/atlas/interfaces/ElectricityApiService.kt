@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 
-interface ApiService {
+interface ElectricityApiService {
     @GET("datos/mercados/precios-mercados-tiempo-real")
     suspend fun getElectricityPrices(
         @Query("start_date") startDate: String,

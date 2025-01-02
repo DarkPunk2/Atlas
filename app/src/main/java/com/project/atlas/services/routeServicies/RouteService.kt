@@ -51,7 +51,9 @@ class RouteService(private val db: RouteDatabase) {
         if (UserModel.getAuthState() == AuthState.Unauthenticated){
             throw UserNotLoginException("User is not login")
         }
-        return db.getAll()
+        val routeList = db.getAll()
+        val sortedRouteList = routeList.sortedByDescending { it.isFavorite }
+        return sortedRouteList
     }
 
     suspend fun removeRoute(routeID: String): Boolean{
@@ -72,5 +74,9 @@ class RouteService(private val db: RouteDatabase) {
 
     suspend fun getDefaultRouteType(): RouteType{
         return db.getDefaultRouteType()
+    }
+
+    suspend fun updateRoute(route: RouteModel): Boolean {
+        return db.update(route)  // Método para actualizar la ruta en la base de datos
     }
 }
