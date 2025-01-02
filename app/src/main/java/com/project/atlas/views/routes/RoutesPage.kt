@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,7 +43,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.atlas.R
@@ -128,6 +128,11 @@ fun ListRoute(
                 }
             )
         },
+        bottomBar = {
+            BottomAppBar {
+                NavigationMenu(navController, 3)
+            }
+        },
         content = { paddingValues ->
             val loadingTimeoutMillis = 5000L  // 5 segundos
             var showLoading by remember { mutableStateOf(true) }
@@ -145,10 +150,7 @@ fun ListRoute(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        top = paddingValues.calculateTopPadding(),
-                        end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        bottom = 0.dp
+                        paddingValues = paddingValues
                     )
             ) {
                 if (showLoading) {
@@ -184,9 +186,6 @@ fun ListRoute(
                             }
                         }
                     }
-                }
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    NavigationMenu(navController, 3 )
                 }
             }
         }

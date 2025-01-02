@@ -44,11 +44,13 @@ fun HomePage(
     mapViewModel: MapViewModel
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    var gesturesEnabled by remember { mutableStateOf(false)}
     val scope = rememberCoroutineScope()
     val authState = userViewModel.authState.observeAsState()
     val context = LocalContext.current
     val themeViewModel = ThemeViewModel.getInstance(context.applicationContext as Application)
-    var selectedType by remember { mutableStateOf<RouteType?>(routeViewModel.routeTypeState.value) }
+    val routeTypeState by routeViewModel.routeTypeState.observeAsState()
+    var selectedType by remember { mutableStateOf(routeTypeState) }
     var showConfirmationDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(authState.value) {
@@ -59,6 +61,16 @@ fun HomePage(
         }
     }
 
+    LaunchedEffect(drawerState.currentValue) { gesturesEnabled = drawerState.isOpen }
+
+    LaunchedEffect(routeTypeState) {
+        selectedType = routeTypeState
+    }
+
+    LaunchedEffect(Unit) {
+        routeViewModel.defaultRouteType()
+    }
+
     BackHandler(enabled = drawerState.isOpen) {
         scope.launch { drawerState.close() }
     }
@@ -66,7 +78,7 @@ fun HomePage(
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         ModalNavigationDrawer(
             drawerState = drawerState,
-            gesturesEnabled = false,
+            gesturesEnabled = gesturesEnabled,
             drawerContent = {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Column(

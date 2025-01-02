@@ -16,9 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -38,9 +41,11 @@ import com.project.atlas.models.Location
 import com.project.atlas.ui.theme.AtlasGreen
 import com.project.atlas.ui.theme.AtlasTheme
 import com.project.atlas.viewModels.LocationsViewModel
+import com.project.atlas.viewModels.MapViewModel
 import com.project.atlas.viewModels.RouteViewModel
 import com.project.atlas.views.NavigationMenu
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun LocationCard(
     location: Location,
@@ -120,12 +125,14 @@ fun LocationCard(
 fun LocationsListView(
     navController: NavController,
     routeViewModel: RouteViewModel,
+    mapViewModel: MapViewModel
 ) {
     val viewModel: LocationsViewModel = viewModel()
     val locations = remember { mutableStateOf(viewModel.getAllLocations()) }
     val selectedLocation = remember { mutableStateOf<Location?>(null) }
     val showAddLocation = remember { mutableStateOf(false) }
     val showActionCard = remember { mutableStateOf(false) }
+    val userLocation by mapViewModel.userLocation.observeAsState()
 
     //Variables SnackBar
     var showSnackbar by remember { mutableStateOf(false) }
@@ -141,6 +148,27 @@ fun LocationsListView(
         }
     }
 
+    LaunchedEffect(userLocation) {
+        if (userLocation != null){
+            if (routeViewModel.showStartSelect.value == true){
+                routeViewModel.addStart(mapViewModel.userLocation.value)
+                navController.popBackStack()
+            }
+            else{
+                routeViewModel.addEnd(mapViewModel.userLocation.value)
+                navController.popBackStack()
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mapViewModel.resetUserLocation()
+            routeViewModel.seeSelectStart(false)
+            routeViewModel.seeSelectEnd(false)
+        }
+    }
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(snackbarHostState) { data ->
@@ -149,24 +177,13 @@ fun LocationsListView(
                     containerColor = snackbarColor,
                     contentColor = Color.Black,
                     shape = RoundedCornerShape(16.dp),
-                    modifier =  Modifier
+                    modifier = Modifier
                         .padding(bottom = 76.dp)
                 )
             }
         },
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go Back",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
                 title = { Text("Saved Locations") },
                 actions = {
                     IconButton(onClick = { showAddLocation.value = true }) {
@@ -175,6 +192,11 @@ fun LocationsListView(
                 }
             )
         },
+        bottomBar = {
+            BottomAppBar {
+                NavigationMenu(navController, 1)
+            }
+        },
         content = { paddingValues ->
             Box {
                 Column(
@@ -182,6 +204,43 @@ fun LocationsListView(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
+                    if (routeViewModel.showStartSelect.value == true || routeViewModel.showEndSelect.value == true) {
+                        if (mapViewModel.hasPermission()) {
+                            TextButton(
+                                onClick = {
+                                    mapViewModel.getUserLocation()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Icon(
+                                    Icons.Filled.MyLocation,
+                                    contentDescription = "YourLocation"
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Your location")
+                            }
+
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 22.dp)
+                            )
+                        }
+
+                        TextButton(onClick = {
+
+                        },
+                            modifier = Modifier
+                                .fillMaxWidth()) {
+                            Icon(
+                                Icons.Filled.LocationOn,
+                                contentDescription = "SelectMap"
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Select on map")
+                        }
+                    }
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -192,7 +251,8 @@ fun LocationsListView(
                                 location,
                                 onFavourite = {
                                     viewModel.changeFavourite(location)
-                                    snackbarMessage = if(location.isFavourite) "${location.alias} is now set as a favourite" else "Vehicle ${location.alias} is now unset as a favourite"
+                                    snackbarMessage =
+                                        if (location.isFavourite) "${location.alias} is now set as a favourite" else "Vehicle ${location.alias} is now unset as a favourite"
                                     snackbarColor = AtlasGreen
                                     showSnackbar = true
                                 },
@@ -203,11 +263,7 @@ fun LocationsListView(
                                 }
                             )
                         }
-                        Spacer(modifier=Modifier.padding(40.dp))
                     }
-                }
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    NavigationMenu(navController, 1)
                 }
             }
         },

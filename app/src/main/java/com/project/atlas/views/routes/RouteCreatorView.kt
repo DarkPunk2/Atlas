@@ -54,6 +54,7 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
 
     LaunchedEffect(Unit) {
         routeViewModel.defaultVehicle()
+        routeViewModel.defaultRouteType()
     }
 
     LaunchedEffect(errorState.value) {
@@ -76,7 +77,7 @@ fun RouteCreatorView(navController: NavController, routeViewModel: RouteViewMode
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Create Rute",
+                text = "Create Route",
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold
             )
