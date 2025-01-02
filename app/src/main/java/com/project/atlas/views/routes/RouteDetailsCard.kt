@@ -44,7 +44,7 @@ fun RouteDetailsCard(
     onAdd: (RouteModel) -> Unit,
     onDelete: (RouteModel) -> Unit,
     onCalculateCost: () -> Unit,
-    calculatedCost: LiveData<Double>
+    calculatedCost: LiveData<Double?>
 ) {
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true

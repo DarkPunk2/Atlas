@@ -3,6 +3,7 @@ package com.project.atlas.it_3Test
 import Diesel
 import com.project.atlas.apisRequest.RouteData
 import com.project.atlas.exceptions.InvalidRouteException
+import com.project.atlas.facades.EnergyCostCalculatorFacade
 import com.project.atlas.interfaces.CalculateRoute
 import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
@@ -10,7 +11,6 @@ import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.models.VehicleType
-import com.project.atlas.services.FuelPriceService
 import com.project.atlas.services.routeServicies.RouteDatabaseService
 import com.project.atlas.services.routeServicies.RouteService
 import junit.framework.TestCase.assertTrue
@@ -27,14 +27,14 @@ import org.mockito.kotlin.any
 class  H18RouteCheaperTest {
     private lateinit var routeService: RouteService
     private val mockCalculateRoute = mock(CalculateRoute::class.java)
-    private val mockConsumption = mock(FuelPriceService::class.java)
+    private val mockCalculatePrice = mock(EnergyCostCalculatorFacade::class.java)
 
     @Before
     fun setup(){
         UserModel.setMail("testRute@test.test")
         routeService = RouteService(mock(RouteDatabaseService::class.java))
         routeService.routeApi = mockCalculateRoute
-        routeService.consumptionService = mockConsumption
+        routeService.costCalculator = mockCalculatePrice
     }
     @Test
     fun h18P1Test() = runBlocking{
@@ -46,7 +46,7 @@ class  H18RouteCheaperTest {
 
         val response = RouteData(75000.0,3000.0,"Mocked Route", listOf(0.0))
 
-        `when`(mockConsumption.calculateRoutePrice(any())).thenReturn(40.0)
+        `when`(mockCalculatePrice.calculateCost(any())).thenReturn(40.0)
         `when`(mockCalculateRoute.fetchRoute(start, end,vehicle, RouteType.FASTER)).thenReturn(response)
         `when`(mockCalculateRoute.fetchRoute(start, end,vehicle, RouteType.SHORTER)).thenReturn(response)
 

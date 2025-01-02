@@ -1,13 +1,12 @@
 package com.project.atlas.services.routeServicies
 
-import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.interfaces.CalculateRoute
 import com.project.atlas.interfaces.CreateRouteStrategy
+import com.project.atlas.interfaces.EnergyCostCalculatorInterface
 import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
 import com.project.atlas.models.VehicleModel
-import com.project.atlas.services.FuelPriceService
 
 
 class ShorterRouteStrategy(private val routeApi: CalculateRoute): CreateRouteStrategy {
@@ -45,22 +44,18 @@ class FasterRouteStrategy(private val routeApi: CalculateRoute): CreateRouteStra
 class CheaperRouteStrategy(
     private val shorterRouteStrategy: CreateRouteStrategy,
     private val fasterRouteStrategy: CreateRouteStrategy,
-    private val consumtionService: FuelPriceService
+    private val costCalculator: EnergyCostCalculatorInterface
 ): CreateRouteStrategy {
     override suspend fun createRoute(start: Location, end: Location, vehicle: VehicleModel, routeType: RouteType): RouteModel {
         val shorter = shorterRouteStrategy.createRoute(start, end, vehicle,routeType)
         val faster = fasterRouteStrategy.createRoute(start, end, vehicle,routeType)
-        val shortCost = consumtionService.calculateRoutePrice(shorter)
-        val fastCost = consumtionService.calculateRoutePrice(faster)
+        val shortCost = costCalculator.calculateCost(shorter)
+        val fastCost = costCalculator.calculateCost(faster)
 
-        return if (shortCost != null && fastCost != null) {
-            if (shortCost < fastCost) {
-                shorter
-            } else {
-                faster
-            }
+        return if (shortCost < fastCost) {
+            shorter
         } else {
-            throw ServiceNotAvailableException("Route cost cannot be calculated")
+            faster
         }
     }
 }

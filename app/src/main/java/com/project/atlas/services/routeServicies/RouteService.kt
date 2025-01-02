@@ -5,8 +5,10 @@ import com.project.atlas.exceptions.RouteAlreadyInDataBaseException
 import com.project.atlas.exceptions.RouteNotFoundException
 import com.project.atlas.exceptions.RouteTypeAlreadyAssignedException
 import com.project.atlas.exceptions.UserNotLoginException
+import com.project.atlas.facades.EnergyCostCalculatorFacade
 import com.project.atlas.interfaces.CalculateRoute
 import com.project.atlas.interfaces.CreateRouteStrategy
+import com.project.atlas.interfaces.EnergyCostCalculatorInterface
 import com.project.atlas.interfaces.RouteDatabase
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.Location
@@ -14,13 +16,12 @@ import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
-import com.project.atlas.repository.FuelPriceRepository
-import com.project.atlas.services.FuelPriceService
+
 
 
 class RouteService(private val db: RouteDatabase) {
     var routeApi: CalculateRoute = CalculateRouteAdapter()
-    var consumptionService = FuelPriceService(FuelPriceRepository())
+    var costCalculator: EnergyCostCalculatorInterface = EnergyCostCalculatorFacade()
 
     suspend fun createRute(start: Location, end: Location, vehicle: VehicleModel, routeType: RouteType): RouteModel {
         if (start.lon == end.lon && start.lat == end.lat){
@@ -33,7 +34,7 @@ class RouteService(private val db: RouteDatabase) {
             RouteType.CHEAPER -> CheaperRouteStrategy(
                 ShorterRouteStrategy(routeApi),
                 FasterRouteStrategy(routeApi),
-                consumptionService
+                costCalculator
             )
         }
 
