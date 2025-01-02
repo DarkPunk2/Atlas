@@ -203,6 +203,7 @@ fun LocationsListView(
                                 }
                             )
                         }
+                        Spacer(modifier=Modifier.padding(40.dp))
                     }
                 }
                 Box(modifier = Modifier.align(Alignment.BottomCenter)) {
