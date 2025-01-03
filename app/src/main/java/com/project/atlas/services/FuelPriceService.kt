@@ -19,7 +19,7 @@ import kotlin.math.sqrt
 
 object FuelPriceService {
     private val geocodeApiKey = "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f"
-    private val repository = FuelPriceRepository()
+    var repository = FuelPriceRepository()
     suspend fun calculateRoutePrice(route: RouteModel): Double? {
         val energyType = route.vehicle.energyType
         val distance = route.distance

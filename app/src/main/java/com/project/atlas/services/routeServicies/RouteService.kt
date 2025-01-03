@@ -24,6 +24,14 @@ class RouteService(private val db: RouteDatabase) {
     var costCalculator: EnergyCostCalculatorInterface = EnergyCostCalculatorFacade()
 
     suspend fun createRute(start: Location, end: Location, vehicle: VehicleModel, routeType: RouteType): RouteModel {
+        if (!isValidCoordinate(start.lon, start.lat)) {
+            throw InvalidRouteException("Invalid coordinates for start location")
+        }
+
+        if (!isValidCoordinate(end.lon, end.lat)) {
+            throw InvalidRouteException("Invalid coordinates for end location")
+        }
+
         if (start.lon == end.lon && start.lat == end.lat){
             throw InvalidRouteException("The start and end of a route cannot be the same")
         }
@@ -40,6 +48,11 @@ class RouteService(private val db: RouteDatabase) {
 
         return createRouteStrategy.createRoute(start, end, vehicle, routeType)
     }
+
+    private fun isValidCoordinate(lon: Double, lat: Double): Boolean {
+        return lon in -180.0..180.0 && lat in -90.0..90.0
+    }
+
 
     suspend fun addRoute(route: RouteModel): Boolean{
         if (db.checkForDuplicates(UserModel.eMail, route.id)) {
