@@ -48,14 +48,16 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
 
 1. Clonar el repositorio en tu máquina local:
    ```bash
-   git clone <URL-DEL-REPOSITORIO>```
+   git clone <URL-DEL-REPOSITORIO> 
+   ```
+   
    
 2. Abrir el proyecto en Android Studio LadyBug 2024.2.1.
 
 3. Compilar y ejecutar el proyecto en un emulador o dispositivo físico.
 
 ##Equipo de desarrollo
-
+- **Miembros**:
 	- Alejandro Beltrán Salas (https://github.com/DarkPunk2)
 	- Gillermo Gragera Cerrillos (https://github.com/G11-GC)
 	- Oscar Boix Ripollés (https://github.com/OscarBoix)
