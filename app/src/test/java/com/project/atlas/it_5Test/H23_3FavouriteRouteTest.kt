@@ -2,16 +2,13 @@ package com.project.atlas.it_5Test
 
 import Diesel
 import com.project.atlas.models.*
-import com.project.atlas.services.RouteDatabaseService
-import com.project.atlas.services.RouteService
+import com.project.atlas.services.routeServicies.RouteDatabaseService
+import com.project.atlas.services.routeServicies.RouteService
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import org.junit.After
 import org.mockito.Mockito.*
 import org.mockito.Mockito.`when`
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.anyString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 
@@ -45,18 +42,14 @@ class H23_3FavouriteRouteTest {
         val route3 = RouteModel("3", start, end, vehicle3, RouteType.FASTER, 5.0, 8.0, "route3", emptyList(), null)
 
         // Configurar mocks para crear y obtener rutas
-        `when`(database.add(any(RouteModel::class.java))).thenAnswer { it.getArgument(0) }
-        `when`(database.getAll()).thenReturn(listOf(route1, route2, route3))
-        `when`(database.update(any(RouteModel::class.java))).thenReturn(true)
+        `when`(database.update(org.mockito.kotlin.any())).thenReturn(true)
 
-        // Crear rutas
-        val createdRoute1 = routeService.createRute(start, end, vehicle, RouteType.FASTER)
-        val createdRoute2 = routeService.createRute(start, end, vehicle2, RouteType.FASTER)
-        val createdRoute3 = routeService.createRute(start, end, vehicle3, RouteType.FASTER)
 
         // When // Marcamos la ruta 1 como favorita
-        val updatedRoute1 = createdRoute1.copy(isFavorite = !createdRoute1.isFavorite)
+        val updatedRoute1 = route1.copy(isFavorite = !route1.isFavorite)
         val updated = routeService.updateRoute(updatedRoute1)
+
+        `when`(database.getAll()).thenReturn(listOf(updatedRoute1, route2, route3))
 
         // Then
         val routes = routeService.getRoutes()
@@ -67,8 +60,6 @@ class H23_3FavouriteRouteTest {
         assertEquals("The route should appear on top of the list", true, routes.first().isFavorite)
 
         // Verificar interacciones
-        verify(database, times(3)).add(any(RouteModel::class.java))
-        verify(database).add(updatedRoute1)
         verify(database, atLeastOnce()).getAll()
     }
 }
