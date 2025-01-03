@@ -105,10 +105,6 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
         mutableStateOf(DefaultMapProperties)
     }
 
-    var cost by remember {
-        mutableStateOf(routeViewModel.calculatedPrice)
-    }
-
     val showCard = remember { mutableStateOf(true) }
 
     SideEffect {
@@ -177,7 +173,7 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
                 onCalculateCost = {
                     routeViewModel.calculatePrice(routeViewModel.routeState.value!!)
                 },
-                calculatedCost = cost
+                calculatedCost = routeViewModel.calculatedPrice
             )
         }
         if (!showCard.value) {

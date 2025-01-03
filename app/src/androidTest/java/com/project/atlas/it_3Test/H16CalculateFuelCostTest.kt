@@ -8,10 +8,9 @@ import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.models.VehicleType
-import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.FuelPriceService
-import com.project.atlas.services.RouteDatabaseService
-import com.project.atlas.services.RouteService
+import com.project.atlas.services.routeServicies.RouteDatabaseService
+import com.project.atlas.services.routeServicies.RouteService
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
@@ -21,7 +20,7 @@ import org.junit.Test
 class H16CalculateFuelCostTest {
 
     private var routeService = RouteService(RouteDatabaseService().apply { setTestMode() })
-    private var fuelPriceService = FuelPriceService(FuelPriceRepository())
+    private var fuelPriceService = FuelPriceService
 
     @Before
     fun setup(){

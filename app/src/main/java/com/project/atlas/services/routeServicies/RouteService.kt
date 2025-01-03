@@ -1,11 +1,14 @@
-package com.project.atlas.services
+package com.project.atlas.services.routeServicies
 
 import com.project.atlas.exceptions.InvalidRouteException
 import com.project.atlas.exceptions.RouteAlreadyInDataBaseException
 import com.project.atlas.exceptions.RouteNotFoundException
 import com.project.atlas.exceptions.RouteTypeAlreadyAssignedException
-import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.exceptions.UserNotLoginException
+import com.project.atlas.facades.EnergyCostCalculatorFacade
+import com.project.atlas.interfaces.CalculateRoute
+import com.project.atlas.interfaces.CreateRouteStrategy
+import com.project.atlas.interfaces.EnergyCostCalculatorInterface
 import com.project.atlas.interfaces.RouteDatabase
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.Location
@@ -13,46 +16,29 @@ import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
-import com.project.atlas.repository.FuelPriceRepository
+
 
 
 class RouteService(private val db: RouteDatabase) {
-    var routeApi = ApiClient
-    var consumtionService = FuelPriceService(FuelPriceRepository())
+    var routeApi: CalculateRoute = CalculateRouteAdapter()
+    var costCalculator: EnergyCostCalculatorInterface = EnergyCostCalculatorFacade()
 
     suspend fun createRute(start: Location, end: Location, vehicle: VehicleModel, routeType: RouteType): RouteModel {
         if (start.lon == end.lon && start.lat == end.lat){
             throw InvalidRouteException("The start and end of a route cannot be the same")
         }
-        val coordinates = listOf(listOf(start.lon,start.lat), listOf(end.lon,end.lat))
-        if (routeType.getPreference() == "cheaper"){
-            val shorter = createRute(start,end,vehicle,RouteType.SHORTER)
-            val faster = createRute(start,end,vehicle,RouteType.FASTER)
-            val shortCost = consumtionService.calculateRoutePrice(shorter)
-            val fastCost = consumtionService.calculateRoutePrice(faster)
-            if (shortCost != null && fastCost != null) {
-                if (shortCost < fastCost){
-                    shorter.routeType = RouteType.CHEAPER
-                    return shorter
-                }
-                faster.routeType = RouteType.CHEAPER
-                return faster
-            }
-            throw ServiceNotAvailableException("Route cost can not be calculated")
-        }else {
-            val response =
-                routeApi.fetchRoute(coordinates, routeType.getPreference(), vehicle.type.toRoute())
-            return RouteModel(
-                start = start,
-                end = end,
-                vehicle = vehicle,
-                routeType = routeType,
-                distance = response.getDistance(),
-                duration = response.getDuration(),
-                rute = response.getRute(),
-                bbox = response.bbox
+
+        val createRouteStrategy: CreateRouteStrategy = when (routeType) {
+            RouteType.SHORTER -> ShorterRouteStrategy(routeApi)
+            RouteType.FASTER -> FasterRouteStrategy(routeApi)
+            RouteType.CHEAPER -> CheaperRouteStrategy(
+                ShorterRouteStrategy(routeApi),
+                FasterRouteStrategy(routeApi),
+                costCalculator
             )
         }
+
+        return createRouteStrategy.createRoute(start, end, vehicle, routeType)
     }
 
     suspend fun addRoute(route: RouteModel): Boolean{

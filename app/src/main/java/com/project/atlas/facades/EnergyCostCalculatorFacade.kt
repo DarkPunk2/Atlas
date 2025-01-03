@@ -7,14 +7,15 @@ import Petrol98
 import com.project.atlas.interfaces.EnergyCostCalculatorInterface
 import com.project.atlas.interfaces.Petrol95
 import com.project.atlas.models.RouteModel
-import com.project.atlas.repository.FuelPriceRepository
 import com.project.atlas.services.ElectricityPriceService
 import com.project.atlas.services.FuelPriceService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class EnergyCostCalculatorFacade(
     private val electricityPriceService: ElectricityPriceService = ElectricityPriceService,
-    private val fuelPriceService: FuelPriceService = FuelPriceService(FuelPriceRepository())
+    private val fuelPriceService: FuelPriceService = FuelPriceService
 ) : EnergyCostCalculatorInterface {
 
     override suspend fun calculateCost(route: RouteModel): Double {
@@ -43,12 +44,11 @@ class EnergyCostCalculatorFacade(
     }
 
     private suspend fun calculateFuelCost(route: RouteModel): Double {
-        var price = 0.0
-        runBlocking {
-            price = fuelPriceService.fetchFuelData(route.start.lat, route.start.lon, route.vehicle.energyType!!)!!
+        // Mover la llamada de la API a un hilo de trabajo (Dispatchers.IO)
+        return withContext(Dispatchers.IO) {
+            val price = fuelPriceService.fetchFuelData(route.start.lat, route.start.lon, route.vehicle.energyType!!)
+            route.vehicle.energyType!!.calculateCost(route.distance / 1000, route.vehicle.consumption!!, price ?: 0.0)
         }
-        return route.vehicle.energyType!!.calculateCost(route.distance / 1000, route.vehicle.consumption!!, price)
-        // Delegamos al servicio de precios de combustible
-        //return fuelPriceService.calculateRoutePrice(route)
     }
+
 }

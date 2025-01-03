@@ -1,7 +1,5 @@
 package com.project.atlas.viewModels
 
-import Calories
-import Electricity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,11 +11,9 @@ import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
-import com.project.atlas.repository.FuelPriceRepository
-import com.project.atlas.services.ApiClient
-import com.project.atlas.services.FuelPriceService
-import com.project.atlas.services.RouteDatabaseService
-import com.project.atlas.services.RouteService
+import com.project.atlas.services.OpenRouteServiceAPI
+import com.project.atlas.services.routeServicies.RouteDatabaseService
+import com.project.atlas.services.routeServicies.RouteService
 import com.project.atlas.services.VehicleDatabaseService
 import com.project.atlas.services.VehicleService
 import kotlinx.coroutines.Dispatchers
@@ -32,11 +28,10 @@ class RouteViewModel: ViewModel() {
     val errorState: LiveData<Exception> = _errorState
 
     private var pricesCalculated = false // Flag para evitar cálculos repetidos
-    //private val fuelPriceService = FuelPriceService(FuelPriceRepository())
-    //private val electricityServiceViewModel = ElectricityServiceViewModel()
+
     private val energyCostCalculator: EnergyCostCalculatorInterface = EnergyCostCalculatorFacade()
-    private val _calculatedPrice = MutableLiveData<Double>()
-    val calculatedPrice: LiveData<Double> get() = _calculatedPrice
+    private val _calculatedPrice = MutableLiveData<Double?>()
+    val calculatedPrice: LiveData<Double?> get() = _calculatedPrice
 
     private val _showAddButton = MutableLiveData(false)
     val showAddButton: LiveData<Boolean> = _showAddButton
@@ -200,7 +195,7 @@ class RouteViewModel: ViewModel() {
     fun addStartByCoord(lat: Double, lon:Double){
         viewModelScope.launch {
             try {
-                val toponym = ApiClient.fetchToponymByLatLong(
+                val toponym = OpenRouteServiceAPI.fetchToponymByLatLong(
                     "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                     lat.toString(),
                     lon.toString()
@@ -219,7 +214,7 @@ class RouteViewModel: ViewModel() {
     fun addEndByCoord(lat: Double, lon:Double){
         viewModelScope.launch {
             try {
-                val toponym = ApiClient.fetchToponymByLatLong(
+                val toponym = OpenRouteServiceAPI.fetchToponymByLatLong(
                     "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f",
                     lat.toString(),
                     lon.toString()
@@ -253,6 +248,7 @@ class RouteViewModel: ViewModel() {
 
     fun resetValues(){
         defaultVehicle()
+        _calculatedPrice.value = null
         _vehicle.value = null
         _start.value = null
         _end.value = null
