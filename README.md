@@ -32,14 +32,13 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
  
 ## Funcionalidades Principales
 
-<div style="display: flex; align-items: flex-start; gap: 20px;">
-  <div style="flex: 2;">
-    <h2>Pantalla Principal</h2>
+1. **Pantalla Principal**:
+  <div style="display: flex; align-items: flex-start;">
+  <div style="flex: 1;">
     <ul>
       <li>Selección de ubicaciones en el mapa mediante un toque prolongado.</li>
       <li>Guardado de ubicaciones con un alias o toponimia personalizada.</li>
-      <li>
-        Menú desplegable para:
+      <li>Menú desplegable para:
         <ul>
           <li>Alternar entre tema claro y oscuro.</li>
           <li>Cambiar la contraseña.</li>
@@ -50,10 +49,9 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
     </ul>
   </div>
   <div style="flex: 1; text-align: center;">
-    <img src="resources/homeScreen.png" alt="Atlas homeScreen" style="max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 5px;" />
+    <img src="resources/homeScreen.png" alt="Atlas homeScreen" style="max-width: 100%; border: 1px solid #ccc;">
   </div>
 </div>
-
 
 2. **Gestión de Ubicaciones**:
    - Listado de ubicaciones guardadas.
