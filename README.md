@@ -1,3 +1,6 @@
+
+![Atlas logo](resources/atlas_circleC.png)
+
 # Atlas
 
 Atlas es una aplicación móvil Android diseñada para la gestión de rutas. Permite calcular la distancia y el coste de una ruta entre dos puntos, adaptándose a las necesidades del usuario al calcular los costos en calorías, electricidad o combustibles fósiles.
@@ -26,19 +29,25 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
 ## Diagrama de arquitectura
 
 ![Diagrama de la aplicación](resources/Architecture_diagram.jpg)
-
-
  
 ## Funcionalidades Principales
 
-1. **Pantalla Principal**:
-   - Selección de ubicaciones en el mapa mediante un toque prolongado.
-   - Guardado de ubicaciones con un alias o toponimia personalizada.
-   - Menú desplegable para:
-     - Alternar entre tema claro y oscuro.
-     - Cambiar la contraseña.
-     - Seleccionar el tipo de ruta preferido.
-     - Cerrar sesión o eliminar la cuenta.
+<p>
+  <img src="resources/homeScreen.png" alt="Pantalla Principal" style="width: 200px; float: left; margin-right: 15px;">
+  <strong>Pantalla Principal</strong>:  
+  <ul>
+    <li>Selección de ubicaciones en el mapa mediante un toque prolongado.</li>
+    <li>Guardado de ubicaciones con un alias o toponimia personalizada.</li>
+    <li>Menú desplegable para:
+      <ul>
+        <li>Alternar entre tema claro y oscuro.</li>
+        <li>Cambiar la contraseña.</li>
+        <li>Seleccionar el tipo de ruta preferido.</li>
+        <li>Cerrar sesión o eliminar la cuenta.</li>
+      </ul>
+    </li>
+  </ul>
+</p>
 
 2. **Gestión de Ubicaciones**:
    - Listado de ubicaciones guardadas.
