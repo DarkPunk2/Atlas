@@ -64,7 +64,10 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
    - Marcado de localizaciones, rutas y vehículos como favoritos para priorizarlos en las listas.
    
 **Pantallas de localizaciones y rutas**
-![Atlas logo](resources/locationsScreen.png)
+
+
+<img src="resources/locationsScreen.png" alt="Atlas homeScreen" width="300" align="left">
+
 <img src="resources/routesScreen.png" alt="Atlas homeScreen" width="300" align="right">
 
 
