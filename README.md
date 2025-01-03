@@ -33,7 +33,7 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
 ## Funcionalidades Principales
 
 1. **Pantalla Principal**:
-   - Selección de ubicaciones en el mapa mediante un toque prolongado.
+   - Selección de ubicaciones en el mapa mediante un toque prolongado.					![Atlas homeScreen](resources/homeScreen.png)
    - Guardado de ubicaciones con un alias o toponimia personalizada.
    - Menú desplegable para:
      - Alternar entre tema claro y oscuro.
@@ -41,7 +41,7 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
      - Seleccionar el tipo de ruta preferido.
      - Cerrar sesión o eliminar la cuenta.
 
-![Atlas homeScreen](resources/homeScreen.png)
+
 
 2. **Gestión de Ubicaciones**:
    - Listado de ubicaciones guardadas.
