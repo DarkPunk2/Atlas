@@ -32,22 +32,28 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
  
 ## Funcionalidades Principales
 
-<p>
-  <img src="resources/homeScreen.png" alt="Pantalla Principal" style="width: 200px; float: left; margin-right: 15px;">
-  <strong>Pantalla Principal</strong>:  
-  <ul>
-    <li>Selección de ubicaciones en el mapa mediante un toque prolongado.</li>
-    <li>Guardado de ubicaciones con un alias o toponimia personalizada.</li>
-    <li>Menú desplegable para:
-      <ul>
-        <li>Alternar entre tema claro y oscuro.</li>
-        <li>Cambiar la contraseña.</li>
-        <li>Seleccionar el tipo de ruta preferido.</li>
-        <li>Cerrar sesión o eliminar la cuenta.</li>
-      </ul>
-    </li>
-  </ul>
-</p>
+<div style="display: flex; align-items: flex-start; justify-content: space-between;">
+  <div style="flex: 1; margin-right: 20px;">
+    <strong>Pantalla Principal:</strong>
+    <ul>
+      <li>Selección de ubicaciones en el mapa mediante un toque prolongado.</li>
+      <li>Guardado de ubicaciones con un alias o toponimia personalizada.</li>
+      <li>Menú desplegable para:
+        <ul>
+          <li>Alternar entre tema claro y oscuro.</li>
+          <li>Cambiar la contraseña.</li>
+          <li>Seleccionar el tipo de ruta preferido.</li>
+          <li>Cerrar sesión o eliminar la cuenta.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <div style="flex-shrink: 0;">
+    <img src="resources/homeScreen.png" alt="Pantalla Principal" style="width: 200px;">
+  </div>
+</div>
+
+
 
 2. **Gestión de Ubicaciones**:
    - Listado de ubicaciones guardadas.
