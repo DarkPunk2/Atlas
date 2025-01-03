@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.atlas.facades.EnergyCostCalculatorFacade
 import com.project.atlas.interfaces.EnergyCostCalculatorInterface
+import com.project.atlas.interfaces.EnergyType
 import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
@@ -117,32 +118,49 @@ class RouteViewModel: ViewModel() {
     }
 
     private val calculatedPrices = mutableMapOf<String, Double?>() // Mapa para almacenar precios calculados
+    private val vehiclePropertiesMap = mutableMapOf<String, VehicleProperties>()
+
+    data class VehicleProperties(
+        val energyType: EnergyType?,
+        val consumption: Double?
+    )
 
     fun calculatePricesForRoutesIfNeeded() {
         viewModelScope.launch {
             val updatedRoutes = _ruteList.value?.map { route ->
-                if (calculatedPrices.containsKey(route.id)) {
-                    // Si el precio ya fue calculado, usarlo del mapa
+                val previousProperties = vehiclePropertiesMap[route.id]
+                val currentProperties = VehicleProperties(
+                    energyType = route.vehicle.energyType,
+                    consumption = route.vehicle.consumption
+                )
+
+                // Si las propiedades del vehículo han cambiado, recalcular el precio
+                val isVehicleUpdated = previousProperties != currentProperties
+
+                if (calculatedPrices.containsKey(route.id) && !isVehicleUpdated) {
+                    // Si el precio ya fue calculado y el vehículo no ha cambiado, usar el precio almacenado
                     route.copy(price = calculatedPrices[route.id])
                 } else {
-                    // Si el precio no está calculado, calcularlo y guardarlo en el mapa
+                    // Si el vehículo ha cambiado o el precio no está calculado, recalcularlo
                     try {
                         val price = withContext(Dispatchers.IO) {
                             energyCostCalculator.calculateCost(route)
                         }
-                        calculatedPrices[route.id] = price // Guardar en el mapa
-                        route.copy(price = price)
+                        calculatedPrices[route.id] = price // Guardar el nuevo precio
+                        vehiclePropertiesMap[route.id] = currentProperties // Actualizar las propiedades del vehículo
+                        route.copy(price = price) // Actualizar el precio de la ruta
                     } catch (e: Exception) {
                         calculatedPrices[route.id] = null // Guardar como no disponible
-                        route
+                        route.copy(price = null) // Si no se puede calcular el precio, dejarlo como null
                     }
                 }
             } ?: emptyList()
 
-            _ruteList.postValue(updatedRoutes)
+            _ruteList.postValue(updatedRoutes) // Actualizar la lista de rutas con los precios recalculados
             pricesCalculated = true // Marca los precios como calculados
         }
     }
+
 
     fun calculatePrice(route: RouteModel) {
         viewModelScope.launch {

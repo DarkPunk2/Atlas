@@ -5,6 +5,7 @@ import java.util.UUID
 data class RouteModel(val id: String = UUID.randomUUID().toString(),
                       val start: Location,
                       val end: Location,
+                      val vehicleReference : String = "",
                       val vehicle: VehicleModel,
                       val routeType: RouteType,
                       val distance: Double,
@@ -17,6 +18,7 @@ data class RouteModel(val id: String = UUID.randomUUID().toString(),
     fun changeFavourite() {
         isFavorite = !isFavorite
     }
+
 }
 
 enum class RouteType {

@@ -52,6 +52,7 @@ class RouteService(private val db: RouteDatabase) {
         if (UserModel.getAuthState() == AuthState.Unauthenticated){
             throw UserNotLoginException("User is not login")
         }
+        db.deleteInvalidRoutes()
         val routeList = db.getAll()
         val sortedRouteList = routeList.sortedByDescending { it.isFavorite }
         return sortedRouteList

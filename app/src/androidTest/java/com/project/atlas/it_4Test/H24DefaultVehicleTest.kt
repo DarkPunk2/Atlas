@@ -29,7 +29,7 @@ class H24DefaultVehicleTest {
 
     @Test
     fun acceptanceTest1(){
-        // Given - vehículo en lista y sin vehículo por defecto definido (se pasa Walk por defecto)
+        // Given - vehículo en lista y sin vehículo por defecto definido
         val vehicle = VehicleModel("Mi buga", VehicleType.Car, Petrol95(), 7.9)
         var vehicleList: List<VehicleModel> = emptyList()
         runBlocking {

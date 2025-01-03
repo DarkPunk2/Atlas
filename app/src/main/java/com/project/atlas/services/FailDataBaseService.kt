@@ -33,4 +33,8 @@ class FailDataBaseService: RouteDatabase {
     override suspend fun update(route: RouteModel): Boolean {
         throw ServiceNotAvailableException("Service is not available")
     }
+
+    override suspend fun deleteInvalidRoutes() {
+        throw ServiceNotAvailableException("Service is not available")
+    }
 }

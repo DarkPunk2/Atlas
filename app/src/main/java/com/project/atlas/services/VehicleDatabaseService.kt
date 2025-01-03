@@ -199,11 +199,47 @@ class VehicleDatabaseService : VehicleInterface {
     }
     private suspend fun updateAliasAsWell(user:String, vehicleOldAlias: String, vehicleUpdated: VehicleModel):Boolean{
         var defaultAlias = getDefaultVehicle(user)?.alias
+        updateVehicleReferenceInRoutes(user, vehicleOldAlias, vehicleUpdated)
         if(deleteVehicle(user, vehicleOldAlias) and addVehicle(user, vehicleUpdated)){
             if(defaultAlias == vehicleOldAlias) { setDefaultVehicle(user, vehicleUpdated) }
             return true
         }
         return false
+    }
+
+    private suspend fun updateVehicleReferenceInRoutes(user: String, vehicleOldAlias: String, vehicleUpdated: VehicleModel) {
+        // Aquí creamos las referencias completas para los vehículos
+        val oldVehicleRef = db.collection("users")
+            .document(user)
+            .collection("vehicles")
+            .document(vehicleOldAlias)  // Referencia del vehículo viejo
+
+        val newVehicleRef = db.collection("users")
+            .document(user)
+            .collection("vehicles")
+            .document(vehicleUpdated.alias!!)  // Referencia del vehículo nuevo
+
+        // Buscamos las rutas que tienen el vehículo con el alias viejo
+        val routesQuery = db.collection("users")
+            .document(user)
+            .collection("routes")
+            .whereEqualTo("vehicleRef", oldVehicleRef)
+            .get()
+
+        routesQuery.addOnSuccessListener { routesSnapshot ->
+            for (routeDoc in routesSnapshot) {
+                val routeRef = routeDoc.reference
+
+                // Actualizamos la referencia del vehículo en la ruta con la nueva referencia
+                routeRef.update("vehicleRef", newVehicleRef)
+                    .addOnSuccessListener {
+                        Log.d("VehicleService", "Route reference updated successfully.")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("VehicleService", "Error updating route reference: ${e.message}")
+                    }
+            }
+        }
     }
 
     fun DocumentSnapshot.toVehicle(): VehicleModel {
