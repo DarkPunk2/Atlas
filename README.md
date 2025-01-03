@@ -14,7 +14,21 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
   - [OpenRouteService](https://openrouteservice.org) para localizaciones y rutas.
   - [Apidatos REE](https://apidatos.ree.es/) para precios de electricidad.
   - [Datos.gob.es](https://datos.gob.es) para precios de combustibles fósiles.
+- **Librerías para realización de pruebas**:
+  - JUnit4.
+  - Mockito:
+    - Core: `3.12.4`
+    - Inline: `3.12.4`
+    - Kotlin: `4.0.0`
+- **Otras librerías**:
+  - OpenRouteMap (Para mostrar los mapas y rutas)
+  
+## Diagrama de arquitectura
 
+![Diagrama de la aplicación](resources/Architecture_diagram.jpg)
+
+
+ 
 ## Funcionalidades Principales
 
 1. **Pantalla Principal**:
@@ -28,11 +42,12 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
 
 2. **Gestión de Ubicaciones**:
    - Listado de ubicaciones guardadas.
-   - Creación de nuevas rutas desde ubicaciones registradas.
+   - Crear, modificar y eliminar ubicaciones.
 
 3. **Gestión de Vehículos**:
    - Vehículos predeterminados: a pie y bicicleta.
    - Adición de vehículos personalizados: coches eléctricos o fósiles, motos eléctricas o fósiles, patines eléctricos.
+   - Editar o eliminar los vehiculos personalizados.
 
 4. **Gestión de Rutas**:
    - Consulta de rutas guardadas con detalles de distancia, duración y coste.
@@ -48,13 +63,12 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
 
 1. Clonar el repositorio en tu máquina local:
    ```bash
-   git clone <URL-DEL-REPOSITORIO> 
+   git clone https://github.com/DarkPunk2/Atlas 
    ```
-   
    
 2. Abrir el proyecto en Android Studio LadyBug 2024.2.1.
 
-3. Compilar y ejecutar el proyecto en un emulador o dispositivo físico.
+3. Compilar la actividad principal (main activity) y ejecutar el proyecto en un emulador o dispositivo físico.
 
 ##Equipo de desarrollo
 - **Miembros**:
