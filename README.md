@@ -65,10 +65,10 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
    
 **Pantallas de localizaciones y rutas**
 
-
-<img src="resources/locationsScreen.png" alt="Atlas homeScreen" width="300" align="left">
-
-<img src="resources/routesScreen.png" alt="Atlas homeScreen" width="300" align="right">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <img src="resources/locationsScreen.png" alt="Pantalla de Localizaciones" style="width: 45%; border: 1px solid #ccc;">
+  <img src="resources/routesScreen.png" alt="Pantalla de Rutas" style="width: 45%; border: 1px solid #ccc;">
+</div>
 
 
 ## Instalación y Despliegue
