@@ -2,7 +2,7 @@ package com.project.atlas
 
 import com.project.atlas.interfaces.LocationRepositoryInterface
 import com.project.atlas.models.Location
-import com.project.atlas.services.ApiClient
+import com.project.atlas.services.OpenRouteServiceAPI
 import com.project.atlas.viewModels.LocationsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -17,13 +17,13 @@ import org.mockito.kotlin.any
 class LocationIntegrationTest {
     private lateinit var mockRepository: LocationRepositoryInterface
     private lateinit var locationsViewModel: LocationsViewModel
-    private lateinit var mockApiClient: ApiClient
+    private lateinit var mockApiClient: OpenRouteServiceAPI
 
     val coroutineTestWaitTime: Long = 100
 
     @Before
     fun startup() {
-        mockApiClient = mock(ApiClient::class.java)
+        mockApiClient = mock(OpenRouteServiceAPI::class.java)
         mockRepository = mock(LocationRepositoryInterface::class.java)
 
         locationsViewModel = LocationsViewModel(mockRepository)
