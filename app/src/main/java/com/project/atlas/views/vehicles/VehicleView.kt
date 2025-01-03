@@ -118,7 +118,7 @@ fun listVehicle(
                     contentColor = Color.Black,
                     shape = RoundedCornerShape(16.dp),
                     modifier =  Modifier
-                        .padding(bottom = 76.dp)
+                        .padding(bottom = 6.dp)
                 )
             }
         },

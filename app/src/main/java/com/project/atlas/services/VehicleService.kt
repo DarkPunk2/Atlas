@@ -15,11 +15,11 @@ import com.project.atlas.interfaces.VehicleInterface
 import com.project.atlas.models.VehicleModel
 import com.project.atlas.models.VehicleType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
 
 
 class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInterface {
 
-    private val localDefaultVehicleService = LocalDefaultVehicleService
 
     override suspend fun addVehicle(user: String, vehicle: VehicleModel): Boolean {
         checkBusinessRules(vehicle)
@@ -84,7 +84,11 @@ class VehicleService(private val dbService: VehicleDatabaseService) : VehicleInt
     }
 
     override fun observeVehicles(user: String): Flow<List<VehicleModel>> {
-        return dbService.observeVehicles(user)
+        return dbService.observeVehicles(user).onEach { vehicleList ->
+            if (vehicleList.isEmpty()) {
+                createDefaults(user)
+            }
+        }
     }
 
     @SuppressLint("SuspiciousIndentation")

@@ -10,4 +10,5 @@ interface RouteDatabase {
     suspend fun checkForDuplicates(user: String, id: String): Boolean
     suspend fun addDefaultRouteType(routeType: RouteType): Boolean
     suspend fun getDefaultRouteType(): RouteType
+    suspend fun update(route: RouteModel): Boolean
 }

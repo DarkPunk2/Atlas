@@ -169,7 +169,11 @@ fun RouteViewerPage(navController: NavController, routeViewModel: RouteViewModel
                     routeViewModel.seeRemove(false)
                     routeViewModel.resetValues()
                     navController.navigate("routes")
-                }
+                },
+                onCalculateCost = {
+                    routeViewModel.calculatePrice(routeViewModel.routeState.value!!)
+                },
+                calculatedCost = routeViewModel.calculatedPrice
             )
         }
         if (!showCard.value) {

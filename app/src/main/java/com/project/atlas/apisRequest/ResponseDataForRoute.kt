@@ -11,7 +11,7 @@ data class ResponseDataForRoute(
     fun getDuration(): Double{
         return routes[0].summary.duration
     }
-    fun getRute(): String{
+    fun getRoute(): String{
         return routes[0].geometry
     }
 }

@@ -1,13 +1,12 @@
 package com.project.atlas.viewModels
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.atlas.interfaces.LocationRepositoryInterface
 import com.project.atlas.models.Location
-import com.project.atlas.services.ApiClient
+import com.project.atlas.services.OpenRouteServiceAPI
 import com.project.atlas.repositories.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +17,7 @@ class LocationsViewModel(
     private val locationRepository: LocationRepositoryInterface = LocationRepository()
 ) : ViewModel() {
     private val locationsList = SnapshotStateList<Location>()
-    var locationsApi = ApiClient
+    var locationsApi = OpenRouteServiceAPI
 
     fun addLocation(location: Location) {
         if (abs(location.lat) > 90.0 || abs(location.lon) > 180.0) {

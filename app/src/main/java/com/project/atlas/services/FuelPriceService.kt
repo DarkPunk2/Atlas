@@ -17,9 +17,9 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class FuelPriceService(private val repository: FuelPriceRepository) {
+object FuelPriceService {
     private val geocodeApiKey = "5b3ce3597851110001cf62487f08fce4eb244c3fb214b1e26f965b9f"
-
+    var repository = FuelPriceRepository()
     suspend fun calculateRoutePrice(route: RouteModel): Double? {
         val energyType = route.vehicle.energyType
         val distance = route.distance

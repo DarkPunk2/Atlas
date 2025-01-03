@@ -1,25 +1,25 @@
 package com.project.atlas.services
 
 
-import com.project.auntetification.interfaces.ApiService
+import com.project.auntetification.interfaces.ElectricityApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class ElectricityPriceService {
+object ElectricityPriceService {
     private val BASE_URL = "https://apidatos.ree.es/es/"
 
     private var pricesByHourMap: Map<String, Double> = emptyMap()
 
     private var lastUpdate: LocalDate = LocalDate.of(1999,12,31)
 
-    val apiService: ApiService by lazy {
+    val apiService: ElectricityApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(ApiService::class.java)
+            .create(ElectricityApiService::class.java)
     }
 
     suspend fun fetchPricesByHour() {

@@ -1,13 +1,14 @@
 package com.project.atlas.services.routeServicies
 
-import androidx.compose.ui.Modifier
 import com.project.atlas.exceptions.InvalidRouteException
 import com.project.atlas.exceptions.RouteAlreadyInDataBaseException
 import com.project.atlas.exceptions.RouteNotFoundException
 import com.project.atlas.exceptions.RouteTypeAlreadyAssignedException
-import com.project.atlas.exceptions.ServiceNotAvailableException
 import com.project.atlas.exceptions.UserNotLoginException
+import com.project.atlas.facades.EnergyCostCalculatorFacade
+import com.project.atlas.interfaces.CalculateRoute
 import com.project.atlas.interfaces.CreateRouteStrategy
+import com.project.atlas.interfaces.EnergyCostCalculatorInterface
 import com.project.atlas.interfaces.RouteDatabase
 import com.project.atlas.models.AuthState
 import com.project.atlas.models.Location
@@ -15,16 +16,22 @@ import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
 import com.project.atlas.models.UserModel
 import com.project.atlas.models.VehicleModel
-import com.project.atlas.repository.FuelPriceRepository
-import com.project.atlas.services.ApiClient
-import com.project.atlas.services.FuelPriceService
+
 
 
 class RouteService(private val db: RouteDatabase) {
-    var routeApi = ApiClient
-    var consumtionService = FuelPriceService(FuelPriceRepository())
+    var routeApi: CalculateRoute = CalculateRouteAdapter()
+    var costCalculator: EnergyCostCalculatorInterface = EnergyCostCalculatorFacade()
 
     suspend fun createRute(start: Location, end: Location, vehicle: VehicleModel, routeType: RouteType): RouteModel {
+        if (!isValidCoordinate(start.lon, start.lat)) {
+            throw InvalidRouteException("Invalid coordinates for start location")
+        }
+
+        if (!isValidCoordinate(end.lon, end.lat)) {
+            throw InvalidRouteException("Invalid coordinates for end location")
+        }
+
         if (start.lon == end.lon && start.lat == end.lat){
             throw InvalidRouteException("The start and end of a route cannot be the same")
         }
@@ -35,12 +42,17 @@ class RouteService(private val db: RouteDatabase) {
             RouteType.CHEAPER -> CheaperRouteStrategy(
                 ShorterRouteStrategy(routeApi),
                 FasterRouteStrategy(routeApi),
-                consumtionService
+                costCalculator
             )
         }
 
         return createRouteStrategy.createRoute(start, end, vehicle, routeType)
     }
+
+    private fun isValidCoordinate(lon: Double, lat: Double): Boolean {
+        return lon in -180.0..180.0 && lat in -90.0..90.0
+    }
+
 
     suspend fun addRoute(route: RouteModel): Boolean{
         if (db.checkForDuplicates(UserModel.eMail, route.id)) {
@@ -53,7 +65,9 @@ class RouteService(private val db: RouteDatabase) {
         if (UserModel.getAuthState() == AuthState.Unauthenticated){
             throw UserNotLoginException("User is not login")
         }
-        return db.getAll()
+        val routeList = db.getAll()
+        val sortedRouteList = routeList.sortedByDescending { it.isFavorite }
+        return sortedRouteList
     }
 
     suspend fun removeRoute(routeID: String): Boolean{
@@ -74,5 +88,9 @@ class RouteService(private val db: RouteDatabase) {
 
     suspend fun getDefaultRouteType(): RouteType{
         return db.getDefaultRouteType()
+    }
+
+    suspend fun updateRoute(route: RouteModel): Boolean {
+        return db.update(route)  // Método para actualizar la ruta en la base de datos
     }
 }
