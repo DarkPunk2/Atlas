@@ -32,8 +32,8 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
  
 ## Funcionalidades Principales
 
-<div style="display: flex; align-items: flex-start; justify-content: space-between;">
-  <div style="flex: 1; margin-right: 20px;">
+<div style="display: flex; align-items: center; justify-content: space-between;">
+  <div style="flex: 1;">
     <strong>Pantalla Principal:</strong>
     <ul>
       <li>Selección de ubicaciones en el mapa mediante un toque prolongado.</li>
@@ -48,11 +48,10 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
       </li>
     </ul>
   </div>
-  <div style="flex-shrink: 0;">
-    <img src="resources/homeScreen.png" alt="Pantalla Principal" style="width: 200px;">
+  <div style="flex: 0;">
+    <img src="resources/homeScreen.png" alt="Pantalla Principal" style="width: 200px; margin-left: 20px;">
   </div>
 </div>
-
 
 
 2. **Gestión de Ubicaciones**:
