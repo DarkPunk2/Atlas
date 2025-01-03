@@ -2,6 +2,8 @@ package com.project.atlas.it_3Test
 
 import Calories
 import Electricity
+import com.project.atlas.exceptions.InvalidDistanceException
+import com.project.atlas.exceptions.VehicleNotExistsException
 import com.project.atlas.models.Location
 import com.project.atlas.models.RouteModel
 import com.project.atlas.models.RouteType
@@ -35,5 +37,14 @@ class H17ElectricityPriceTest {
 
         var total_cost = mockElectricityServiceViewModel.calculateCost(route)
         assertTrue(total_cost >= 0)
+    }
+    @Test(expected = InvalidDistanceException::class)
+    fun integrationTest2(){
+        val start = Location(39.992573, -0.064749, "Casa", "Castellon")
+        val end = Location(39.479126, -0.342623, "Trabajo", "Valencia")
+        val route = RouteModel("id",start,end, vehicle, RouteType.FASTER, -72000.0, 1.0, "rute", listOf(0.0))
+        `when`(mockElectricityServiceViewModel.calculateCost(route)).thenAnswer { throw InvalidDistanceException("Distance not valid") }
+
+        var total_cost = mockElectricityServiceViewModel.calculateCost(route)
     }
 }
