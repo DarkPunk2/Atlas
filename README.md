@@ -82,7 +82,7 @@ Este proyecto fue desarrollado como parte de un trabajo universitario, pero tien
 
 3. Compilar la actividad principal (main activity) y ejecutar el proyecto en un emulador o dispositivo físico.
 
-##Equipo de desarrollo
+## Equipo de desarrollo
 - **Miembros**:
 	- Alejandro Beltrán Salas (https://github.com/DarkPunk2)
 	- Gillermo Gragera Cerrillos (https://github.com/G11-GC)
